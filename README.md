@@ -42,7 +42,7 @@ To use the app instead:
 
     ./squashfs-root/AppRun
 
-In the example of OBS Studio, the resulting archive is just over 400MB (note that the /var directory is removed in the script, with it included the AppImage reached 650MB), extracted reaches 1.7GB (but it may be possible to remove something else in guturo, just knowing how to investigate).
+In the example of OBS Studio, the resulting archive is just over 400MB (note that the /var directory is removed in the script, if we include it, the AppImage reached 650MB), extracted reaches 1.7GB (but it may be possible to remove something else in future, just knowing how to investigate).
 
 # Conclusion
 This repository is only a work in progress. If you like the idea, please consider to fork and contribute to improve this solution. Thank you in advance.
