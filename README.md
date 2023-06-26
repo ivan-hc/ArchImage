@@ -1,5 +1,5 @@
 # ArchImage
-Build AppImage packages for all distributions but including Arch Linux packages. Powered by JuNest.
+Build AppImage packages for all distributions by including Arch Linux packages. Powered by JuNest.
 
 #### NOTE: this solution is higly experimental! *Please, read carefully!*
 
