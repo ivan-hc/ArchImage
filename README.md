@@ -1,7 +1,7 @@
 # ArchImage
 Build AppImage packages for all distributions by including Arch Linux packages. Powered by JuNest.
 
-#### NOTE: this solution is higly experimental! *Please, read carefully!*
+#### NOTE: this solution is highly experimental! *Please, read carefully!*
 
 # What is this?
 ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest).
@@ -14,7 +14,7 @@ Only the scripts to create the AppImage on your system, but only for your user.
 # What is not working?
 The portability of the AppImage. For now the only way to made it work for other users is to extract it. Alternativelly you must download the installation script and create it by yourself.
 
-This method is still higly experimental.
+This method is still highly experimental.
 
 # Known issue
 - JuNest runs in isolation, it won't be able to see mounted partitions unless explicitly specified in the script used to create the Appimage.
