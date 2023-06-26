@@ -26,7 +26,7 @@ In this example I'm working for an AppImage of OBS Studio, I suggest to set e te
     mkdir tmp
     cd tmp
     HOME=/path/to/tmp
-    wget https://raw.githubusercontent.com/ivan-hc/ArchImage/master/apps/obs-junest.sh
+    wget https://raw.githubusercontent.com/ivan-hc/ArchImage/main/apps/obs-junest.sh
     chmod a+x ./obs-junest.sh
     ./obs-junest.sh
 
