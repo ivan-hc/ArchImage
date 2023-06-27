@@ -24,7 +24,7 @@ sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 ./.local/share/junest/bin/junest -- sudo locale-gen
 
 # VERSION NAME
-VERSION=$(./.local/share/junest/bin/junest -- obs --version | cut -c 14-)
+VERSION=$(wget -q https://archlinux.org/packages/extra/x86_64/obs-studio/ -O - | grep obs-studio | head -1 | grep -o -P '(?<=obs-studio ).*(?=</)' | tr -d " (x86_64)")
 
 # CREATE THE APPDIR
 wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
