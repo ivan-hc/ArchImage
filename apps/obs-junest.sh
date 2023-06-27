@@ -14,8 +14,9 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S obs-studio python3
 
 # SET THE LOCALE
+sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen
 rm ./.junest/etc/locale.gen
-cp /etc/locale.gen ./.junest/etc/locale.gen
+mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
 echo "LANG=$LANG" >> ./.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
