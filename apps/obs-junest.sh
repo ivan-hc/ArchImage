@@ -4,9 +4,9 @@
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
 ./.local/share/junest/bin/junest setup
 
-# CUSTOM MIRRORLIST
+# CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
 rm -R ./.junest/etc/pacman.d/mirrorlist
-COUNTRY=$(echo $LANG | cut -c -2 | tr a-z A-Z)
+COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
 # INSTALL OBS AND PYTHON
