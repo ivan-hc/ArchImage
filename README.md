@@ -21,11 +21,10 @@ This method is still highly experimental.
 - Due to isolation, it will not be possible to launch a link in the browser or any application installed on the host, these "should" be included in the Appimage itself to work.
 
 # Usage
-In this example I'm working for an AppImage of OBS Studio, I suggest to set e temporary "$HOME" during the installation:
+In this example I'm working for an AppImage of OBS Studio:
 
     mkdir tmp
     cd tmp
-    HOME=/path/to/tmp
     wget https://raw.githubusercontent.com/ivan-hc/ArchImage/main/apps/obs-junest.sh
     chmod a+x ./obs-junest.sh
     ./obs-junest.sh

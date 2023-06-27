@@ -3,6 +3,9 @@
 # FOR EXAMPLE THE PACKAGE "obs-studio" CAN BE STARTED WITH THE BINARY IS "obs"
 APP=SAMPLE
 
+# THIS WILL DO ALL WORK INTO THE CURRENT DIRECTORY
+HOME="$(dirname "$(readlink -f $0)")" 
+
 # DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
 ./.local/share/junest/bin/junest setup
@@ -61,6 +64,10 @@ rm -R -f ./$APP.AppDir/.junest/var
 # REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY)
 #rm -R -f ./$APP.AppDir/.junest/home
 #ln -s /home ./$APP.AppDir/.junest/home
+
+# OPTIONS SPECIFIC FOR "AM" AND APPMAN (see https://github.com/ivan-hc/AM-Application-Manager)
+mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
+mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
