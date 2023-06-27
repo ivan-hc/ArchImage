@@ -26,8 +26,9 @@ sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
 ./.local/share/junest/bin/junest -- sudo locale-gen
 
-# VERSION NAME (CHANGE THIS LINE TO OBTAIN THE VERSION FOR YOUR APP)
-VERSION=$(./.local/share/junest/bin/junest -- $APP --version | cut -c 14-) 
+# VERSION NAME, BY DEFAULT THIS POINTS TO THE NUMBER, CHANGE 'REPO' TO 'core', 'extra'...
+# OR CHANGE THE WHOLE URL TO ANOTHER SOURCE, FOR EXAMPLE IF THE PACKAGE IS ON AUR OR CHAOTIC-AUR
+VERSION=$(wget -q https://archlinux.org/packages/REPO/x86_64/$APP/ -O - | grep $APP | head -1 | grep -o -P '(?<='$APP' ).*(?=</)' | tr -d " (x86_64)")
 
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
 wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
