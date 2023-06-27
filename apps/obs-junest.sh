@@ -4,6 +4,11 @@
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
 ./.local/share/junest/bin/junest setup
 
+# CUSTOM MIRRORLIST
+rm -R ./.junest/etc/pacman.d/mirrorlist
+COUNTRY=$(echo $LANG | cut -c -2 | tr a-z A-Z)
+wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
+
 # INSTALL OBS AND PYTHON
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S obs-studio python3
