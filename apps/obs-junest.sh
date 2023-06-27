@@ -13,6 +13,15 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S obs-studio python3
 
+# SET THE LOCALE
+rm ./.junest/etc/locale.gen
+cp /etc/locale.gen ./.junest/etc/locale.gen
+rm ./.junest/etc/locale.conf
+echo "LANG=$LANG" >> ./.junest/etc/locale.conf
+sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
+./.local/share/junest/bin/junest -- sudo locale-gen
+
 # VERSION NAME
 VERSION=$(./.local/share/junest/bin/junest -- obs --version | cut -c 14-)
 
