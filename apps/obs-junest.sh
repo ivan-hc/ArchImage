@@ -58,7 +58,8 @@ rm -R -f ./$APP.AppDir/.junest/var
 
 # OPTIONS SPECIFIC FOR "AM" AND APPMAN (see https://github.com/ivan-hc/AM-Application-Manager)
 mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
-mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home
+#mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home #this creates the structure of the app in AppMan
+rsync -av -f"+ */" -f"- *" "/home" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
