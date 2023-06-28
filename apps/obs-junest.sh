@@ -45,7 +45,7 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
-echo "$APP $@" | $HERE/.local/share/junest/bin/junest -n
+echo "obs $@" | $HERE/.local/share/junest/bin/junest -n
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
