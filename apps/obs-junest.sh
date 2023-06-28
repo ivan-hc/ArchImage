@@ -62,6 +62,9 @@ mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
 rsync -av -f"+ */" -f"- *" "/home" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /home
 rsync -av -f"+ */" -f"- *" "/run" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /run, needed when running as root
 
+# PERMISSIONS
+chmod -R 777 ./$APP.AppDir
+
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
 mv ./*AppImage ./OBS-Studio_$VERSION-x86_64.AppImage
