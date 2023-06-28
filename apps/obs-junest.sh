@@ -60,10 +60,6 @@ rm -R -f ./$APP.AppDir/.junest/var
 mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
 #mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home #this creates the structure of the app in AppMan
 rsync -av -f"+ */" -f"- *" "/home" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /home
-rsync -av -f"+ */" -f"- *" "/run" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /run, needed when running as root
-
-# PERMISSIONS
-chmod -R 777 ./$APP.AppDir
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
