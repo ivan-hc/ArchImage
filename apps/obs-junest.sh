@@ -52,14 +52,9 @@ chmod a+x ./$APP.AppDir/AppRun
 # REMOVE SOME BLOATWARES
 rm -R -f ./$APP.AppDir/.junest/var
 
-# REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY)
+# REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY, DOES NOT WORK JET)
 #rm -R -f ./$APP.AppDir/.junest/home
 #ln -s /home ./$APP.AppDir/.junest/home
-
-# OPTIONS SPECIFIC FOR "AM" AND APPMAN (see https://github.com/ivan-hc/AM-Application-Manager)
-mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
-#mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home #this creates the structure of the app in AppMan
-rsync -av -f"+ */" -f"- *" "/home" "./$APP.AppDir/.junest" #this creates the full structure of the directories in /home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
