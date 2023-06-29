@@ -31,6 +31,8 @@ In this example I'm working for an AppImage of OBS Studio:
 
 Wait the time that the AppImage is ready before you test it wherever you want but on your system, for your user only.
 
+https://github.com/ivan-hc/ArchImage/assets/88724353/6335f0c4-c274-4e6c-9360-d22a24bb8594
+
 # Main issue
 The only problem I encountered while testing the AppImage under a different account was that it recognized the $HOME as a read-only filesystem. Junest by default must rewrite and update its wrapper scripts, and cannot do so if forced into a read-only file system.
 
