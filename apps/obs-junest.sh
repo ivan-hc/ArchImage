@@ -46,7 +46,7 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
-echo "obs $@" | $HERE/.local/share/junest/bin/junest -n
+echo "obs $@" | $HERE/.local/share/junest/bin/junest proot -n
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -54,8 +54,8 @@ chmod a+x ./$APP.AppDir/AppRun
 rm -R -f ./$APP.AppDir/.junest/var
 
 # REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY, DOES NOT WORK JET)
-#rm -R -f ./$APP.AppDir/.junest/home
-#ln -s /home ./$APP.AppDir/.junest/home
+rm -R -f ./$APP.AppDir/.junest/home
+mkdir -p ./$APP.AppDir/.junest/home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
