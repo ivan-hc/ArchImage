@@ -16,6 +16,7 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 
 # INSTALL OBS AND PYTHON
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S $APP python3
 
 # SET THE LOCALE
