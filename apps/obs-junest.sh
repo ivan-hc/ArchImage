@@ -20,11 +20,12 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S $APP python3
 
 # SET THE LOCALE
-sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen
-rm ./.junest/etc/locale.gen
+#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # ENABLE ALL THE LANGUAGES
+sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY ONE LANGUAGE
+rm -R ./.junest/etc/locale.gen
 mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
-echo "LANG=$LANG" >> ./.junest/etc/locale.conf
+#echo "LANG=$LANG" >> ./.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
 ./.local/share/junest/bin/junest -- sudo locale-gen
@@ -53,9 +54,8 @@ chmod a+x ./$APP.AppDir/AppRun
 # REMOVE SOME BLOATWARES
 rm -R -f ./$APP.AppDir/.junest/var
 
-# REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY, DOES NOT WORK JET)
+# REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
-mkdir -p ./$APP.AppDir/.junest/home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
