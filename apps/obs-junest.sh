@@ -1,6 +1,6 @@
 #!/bin/sh
 
-APP=obs-studio
+APP=obs-
 
 # THIS WILL DO ALL WORK INTO THE CURRENT DIRECTORY
 HOME="$(dirname "$(readlink -f $0)")" 
