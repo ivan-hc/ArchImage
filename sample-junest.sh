@@ -10,17 +10,26 @@ HOME="$(dirname "$(readlink -f $0)")"
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
 ./.local/share/junest/bin/junest setup
 
+# ENABLE MULTILIB (optional)
+#echo "
+#[multilib]
+#Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
 rm -R ./.junest/etc/pacman.d/mirrorlist
 COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
 # INSTALL THE APP WITH ALL THE DEPENDENCES NEEDED, THE WAY YOU DO WITH PACMAN (YOU CAN ALSO REPLACE "$APP", SEE LINE 4)
+# BEING JUNEST STRICTLY MINIMAL, YOU NEED TO ADD ALL YOU NEED, INCLUDING BINUTILS AND GZIP IF YOU NEED TO COMPILE SOMETHING FROM AUR
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S $APP
+./.local/share/junest/bin/junest -- sudo pacman -Syu
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S $APP 
+#./.local/share/junest/bin/junest -- yay --noconfirm -S $APP
 
 # SET THE LOCALE (DON'T TOUCH THIS)
-sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen
+#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
+sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
 rm ./.junest/etc/locale.gen
 mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
@@ -30,8 +39,9 @@ sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 ./.local/share/junest/bin/junest -- sudo locale-gen
 
 # VERSION NAME, BY DEFAULT THIS POINTS TO THE NUMBER, CHANGE 'REPO' TO 'core', 'extra'...
-# OR CHANGE THE WHOLE URL TO ANOTHER SOURCE, FOR EXAMPLE IF THE PACKAGE IS ON AUR OR CHAOTIC-AUR
+# OR COMMENT AND ENABLE THE NEXT LINE THAT POINTS TO A PKGBUILD ON THE AUR, IF YOUR APP IS HOSTED THERE
 VERSION=$(wget -q https://archlinux.org/packages/REPO/x86_64/$APP/ -O - | grep $APP | head -1 | grep -o -P '(?<='$APP' ).*(?=</)' | tr -d " (x86_64)")
+#VERSION=$(wget -q https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$APP -O - | grep pkgver | head -1 | cut -c 8-)
 
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
 wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
@@ -54,21 +64,16 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
-echo "$APP $@" | $HERE/.local/share/junest/bin/junest -n
+echo "$APP $@" | $HERE/.local/share/junest/bin/junest proot -n
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
-# REMOVE SOME BLOATWARES (BY DEFAULT I REMOVE /var, YOU CAN ADD WHATEVER YOU WANT IN THIS LIST, THE MORE IMPORTANT THING IS THAT THE APP WORKS) 
+# REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
 rm -R -f ./$APP.AppDir/.junest/var
 
-# REMOVE THE INBUILT HOME AND SYMLINK THE ONE FROM THE HOST (EXPERIMENTAL, NEEDED FOR PORTABILITY)
-#rm -R -f ./$APP.AppDir/.junest/home
-#ln -s /home ./$APP.AppDir/.junest/home
-
-# OPTIONS SPECIFIC FOR "AM" AND APPMAN (see https://github.com/ivan-hc/AM-Application-Manager)
-mkdir -p ./$APP.AppDir/.junest/opt/$APP/$APP.home
-mkdir -p ./$APP.AppDir/.junest/home/$(echo $USER)/$(cat /home/$(echo $USER)/.config/appman/appman-config)/$APP/$APP.home
+# REMOVE THE INBUILT HOME (optional)
+rm -R -f ./$APP.AppDir/.junest/home
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./$APP-$VERSION-x86_64.AppImage
+mv ./*AppImage ./$(echo "$APP" | tr a-z A-Z)_$VERSION-x86_64.AppImage
