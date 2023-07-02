@@ -53,6 +53,28 @@ chmod a+x ./$APP.AppDir/AppRun
 
 # REMOVE SOME BLOATWARES
 rm -R -f ./$APP.AppDir/.junest/var
+rm -R -f ./$APP.AppDir/.junest/usr/lib/liblsan.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libtsan.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libgfortran.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libgo.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libphobos.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libOSMesa.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libPyImath_Python*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libasan.so*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/d3d
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/crocus_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/d3d12_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/i*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/kms_swrast_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/r*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/nouveau_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/radeonsi_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/virtio_gpu_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/udev
+rm -R -f ./$APP.AppDir/.junest/usr/share/doc
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
