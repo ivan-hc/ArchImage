@@ -64,9 +64,13 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
+mkdir -p $HOME/.cache
 echo "$APP $@" | $HERE/.local/share/junest/bin/junest proot -n
 EOF
 chmod a+x ./$APP.AppDir/AppRun
+
+# REMOVE "READ-ONLY FILE SYSTEM" ERRORS (the AppRun must contain "mkdir -p $HOME/.cache")
+sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
 rm -R -f ./$APP.AppDir/.junest/var
