@@ -54,6 +54,8 @@ chmod a+x ./$APP.AppDir/AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
+sed -i 's/rm/#rm/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
+sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # REMOVE SOME BLOATWARES
 rm -R -f ./$APP.AppDir/.junest/var
