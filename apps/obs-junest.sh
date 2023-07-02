@@ -78,7 +78,11 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so
 rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so
 rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/udev
-rm -R -f ./$APP.AppDir/.junest/usr/share/doc
+mkdir ./save
+mv ./$APP.AppDir/.junest/usr/share/obs ./save/obs
+mv ./$APP.AppDir/.junest/usr/share/glvnd ./save/glvnd
+rm -R -f ./$APP.AppDir/.junest/usr/share/*
+mv ./save/* ./$APP.AppDir/.junest/usr/share/
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
