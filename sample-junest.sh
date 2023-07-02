@@ -71,6 +71,8 @@ chmod a+x ./$APP.AppDir/AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS (the AppRun must contain "mkdir -p $HOME/.cache")
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
+sed -i 's/rm/#rm/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
+sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
 rm -R -f ./$APP.AppDir/.junest/var
