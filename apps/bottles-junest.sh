@@ -63,7 +63,7 @@ export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 export GTK_THEME=Adwaita:dark
 mkdir -p $HOME/.cache
-echo "bottles $@" | $HERE/.local/share/junest/bin/junest proot -n
+echo "bottles $@" | $HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -75,8 +75,12 @@ sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 # REMOVE SOME BLOATWARES
 rm -R -f ./$APP.AppDir/.junest/var
 
-# REMOVE THE INBUILT HOME
+# REMOVE THE INBUILT HOME (optional)
 rm -R -f ./$APP.AppDir/.junest/home
+
+# ENABLE MOUNTPOINTS
+mkdir -p ./$APP.AppDir/.junest/home
+mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir

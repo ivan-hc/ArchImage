@@ -48,7 +48,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-echo "obs $@" | $HERE/.local/share/junest/bin/junest proot -n
+echo "obs $@" | $HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -86,8 +86,12 @@ mv ./$APP.AppDir/.junest/usr/share/glvnd ./save/glvnd
 rm -R -f ./$APP.AppDir/.junest/usr/share/*
 mv ./save/* ./$APP.AppDir/.junest/usr/share/
 
-# REMOVE THE INBUILT HOME
+# REMOVE THE INBUILT HOME (optional)
 rm -R -f ./$APP.AppDir/.junest/home
+
+# ENABLE MOUNTPOINTS
+mkdir -p ./$APP.AppDir/.junest/home
+mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
