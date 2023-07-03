@@ -23,7 +23,7 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 # INSTALL THE APP WITH ALL THE DEPENDENCES NEEDED, THE WAY YOU DO WITH PACMAN (YOU CAN ALSO REPLACE "$APP", SEE LINE 4)
 # BEING JUNEST STRICTLY MINIMAL, YOU NEED TO ADD ALL YOU NEED, INCLUDING BINUTILS AND GZIP IF YOU NEED TO COMPILE SOMETHING FROM AUR
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
-./.local/share/junest/bin/junest -- sudo pacman -Syu
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S $APP 
 #./.local/share/junest/bin/junest -- yay --noconfirm -S $APP
 
