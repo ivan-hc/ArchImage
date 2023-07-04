@@ -24,7 +24,7 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 # BEING JUNEST STRICTLY MINIMAL, YOU NEED TO ADD ALL YOU NEED, INCLUDING BINUTILS AND GZIP IF YOU NEED TO COMPILE SOMETHING FROM AUR
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S mpv ytfzf youtube-dl gzip
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S mpv ytfzf yt-dlp gzip streamlink python-mpv ffmpeg
 #./.local/share/junest/bin/junest -- yay --noconfirm -S $APP
 
 # SET THE LOCALE (DON'T TOUCH THIS)
@@ -129,6 +129,8 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/perl5
 rm -R -f ./$APP.AppDir/.junest/usr/lib/pkcs11
 rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig
 rm -R -f ./$APP.AppDir/.junest/usr/lib/pmix
+rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/site-packages/*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/sasl2
 rm -R -f ./$APP.AppDir/.junest/usr/lib/security
 rm -R -f ./$APP.AppDir/.junest/usr/lib/ssh
@@ -139,7 +141,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/tar
 rm -R -f ./$APP.AppDir/.junest/usr/lib/tmpfiles.d
 rm -R -f ./$APP.AppDir/.junest/usr/lib/udev
 rm -R -f ./$APP.AppDir/.junest/usr/lib/utempter
-rm -R -f ./$APP.AppDir/.junest/usr/lib/vdpau
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/vdpau
 rm -R -f ./$APP.AppDir/.junest/usr/lib/xkbcommon
 rm -R -f ./$APP.AppDir/.junest/usr/lib/xtables
 rm -R -f ./$APP.AppDir/.junest/usr/lib/e2initrd_helper*
@@ -159,10 +161,10 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libaudit.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libauparse.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libBrokenLocale.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libcairo-script-interpreter.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libcap-ng.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libcap-ng.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libcdio++.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libc_malloc_debug.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libcom_err.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libcom_err.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libcryptsetup.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libcrypt.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libcurl.so*
@@ -187,17 +189,17 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libdebuginfod.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdevmapper-event.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdevmapper.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdl.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_amdgpu.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_intel.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_nouveau.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_radeon.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrop_ambient.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_amdgpu.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_intel.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_nouveau.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrm_radeon.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libdrop_ambient.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdvbv5.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdw-0.189.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libdw.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libe2p.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libedit.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libEGL_mesa.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libEGL_mesa.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libelf-0.189.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libelf.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libevent-2.1.so*
@@ -226,7 +228,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libfftw3q_omp.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libfftw3q.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libfftw3q_threads.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libfftw3_threads.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libFLAC++.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libFLAC++.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libform.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libformw.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgdbm_compat.so*
@@ -239,13 +241,13 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libgettextsrc-0.21.1.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgettextsrc.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgfortran.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgif.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libglapi.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLESv2.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libglapi.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLESv2.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libglslang-default-resource-limits.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLX_indirect.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLX_mesa.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLX_indirect.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libGLX_mesa.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgmpxx.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libgnutls-openssl.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libgnutls-openssl.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgnutlsxx.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgo.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libgpgmepp.so*
@@ -358,7 +360,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenEXRCore.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenEXR.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenEXRUtil-3_1.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenEXRUtil.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenGL.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libOpenGL.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libopen-pal.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libopen-rte.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libOSMesa.so*
@@ -383,12 +385,12 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libportaudio.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libprofiler.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libpsl.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libpsx.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libpulse-mainloop-glib.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libpulse-simple.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libPyImath_Python3_11-3_1.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libpulse-mainloop-glib.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libpulse-simple.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libPyImath_Python3_11-3_1.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libquadmath.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libRemarks.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libresolv.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libresolv.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/librt.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/librubberband-jni.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libsasl2.so*
@@ -398,7 +400,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libsecret-1.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libsensors.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libsmartcols.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libsoxr-lsr.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libspeexdsp.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libspeexdsp.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libSPIRV-Tools-diff.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libSPIRV-Tools-link.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libSPIRV-Tools-lint.so*
@@ -416,8 +418,8 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libtcmalloc_debug.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtcmalloc_minimal_debug.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtcmalloc_minimal.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtcmalloc.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libtheora.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libthread_db.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libtheora.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libthread_db.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtic.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtiffxx.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtinfo.so*
@@ -437,7 +439,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libtss2-tcti-mssim.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtss2-tcti-pcap.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtss2-tcti-spi-helper.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libtss2-tcti-swtpm.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libturbojpeg.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libturbojpeg.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libubsan.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libudev.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libudf.so*
@@ -450,32 +452,32 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libusb-1.0.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libutempter.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libutil.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libuuid.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l1.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l2rds.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l2tracer.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libva-glx.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l1.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l2rds.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libv4l2tracer.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libva-glx.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libverto-libevent.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libverto.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libwebpdecoder.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libwebpdemux.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libxatracker.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-composite.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-damage.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-dpms.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-dri2.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-glx.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-present.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-record.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-res.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-screensaver.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-sync.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xf86dri.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xinerama.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xinput.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xkb.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xtest.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xvmc.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xv.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-composite.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-damage.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-dpms.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-dri2.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-glx.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-present.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-record.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-res.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-screensaver.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-sync.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xf86dri.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xinerama.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xinput.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xkb.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xtest.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xvmc.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libxcb-xv.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libXcursor.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libXdamage.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libXft.so*
@@ -488,8 +490,8 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/ompi_monitoring_prof.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/os-release*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/p11-kit-proxy.so*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/preloadable_libintl.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/v4l1compat.so*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/v4l2convert.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/v4l1compat.so*
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/v4l2convert.so*
 
 mkdir -p ./save/share
 mv ./$APP.AppDir/.junest/usr/share/mpv* ./save/share/
