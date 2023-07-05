@@ -31,6 +31,9 @@ https://github.com/ivan-hc/ArchImage/assets/88724353/6335f0c4-c274-4e6c-9360-d22
 - Portable Linux Apps https://portable-linux-apps.github.io
 - "AM" Application Manager https://github.com/DLopezJr/AM-Application-Manager
 
-# ArchImages
+# ArchImages available
+- Abiword https://github.com/ivan-hc/Abiword-appimage
+- Gnumeric https://github.com/ivan-hc/Gnumeric-appimage
+- MPV https://github.com/ivan-hc/MPV-appimage
 - OBS Studio https://github.com/ivan-hc/OBS-Studio-appimage
 
