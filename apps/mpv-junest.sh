@@ -65,7 +65,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/etc" -- $APP "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/etc" 2> /dev/null -- $APP "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -510,4 +510,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./MPV_$VERSION-x86_64.AppImage
+mv ./*AppImage ./MPV-Media-Player_$VERSION-x86_64.AppImage
