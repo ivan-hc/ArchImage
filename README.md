@@ -22,7 +22,7 @@ or
 This tool will create a script to compile an AppImage based on JuNest. To create the script use the option `-b` or `--build`, example:
 
     ./archimage-cli -b handbrake
-Here we are using "handbrake", the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM], being the executable not `/usr/bin/handbrake` but `/usr/bin/ghb`, justr wrote "ghb". If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+Here we are using "handbrake", the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM], being the executable not `/usr/bin/handbrake` but `/usr/bin/ghb`, just write "ghb". If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
 
 After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`).
 
@@ -62,5 +62,4 @@ https://github.com/ivan-hc/ArchImage/assets/88724353/6335f0c4-c274-4e6c-9360-d22
 
 # Related projects
 - Portable Linux Apps https://portable-linux-apps.github.io
-- "AM" Application Manager https://github.com/ivan-hc/AM-Application-Manager
-- 
+- "AM" Application Manager https://github.com/ivan-hc/AM-Application-Manager 
