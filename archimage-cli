@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+VERSION="1.0"
+
+case "$1" in
+
+	'') echo " ArchImage CLI requires an argument, run -h for more info."
+	;;
+	
+	--help|-h) 
+	echo -e "\n ArchImage CLI v$VERSION \n\n A command line interface to build AppImages based on JuNest, the lightweight\n Arch Linux based distro that runs, without root privileges, on top of any\n other Linux distro."
+	echo -e "\n USAGE:\n\n   archimage-cli [OPTION]\n   archimage-cli [OPTION] [PROGRAM]\n"
+	echo -e " OPTIONS:\n\n   -h,--help		Shows this message.\n   -v,--version		Shows the version.\n   -b,--build		Create the script to build the AppImage."
+	echo -e "\n SITES: \n\n   - https://github.com/IVAN-HC	\n\n   - https://github.com/IVAN-HC/ARCHIMAGE	\n\n   - https://github.com/FSQUILLACE/JUNEST\n"
+	;;
+
+	--version|-v) echo "ArchImage CLI v$VERSION"
+	;;
+	
+	--build|-b)
+	while [ -n "$1" ]; do
+	case "$2" in
+		'') echo -e "\n USAGE:	archimage-cli -b [PROGRAM]\n"
+		exit;;
+		*)
+		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-junest.sh -O $2-junest.sh
+		sed -i "s#APP=SAMPLE#APP=$2#g" $2-junest.sh
+		echo -e "\n-----------------------------------------------------------------------\n"
+		read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
+    		case $response in
+			*) 
+			mv ./$2-junest.sh ./$2-junest.sh.old
+			sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
+			echo 'BIN="'$response'"' >> ./$2-junest.sh
+			sed -n '6,100p' ./$2-junest.sh.old >> ./$2-junest.sh
+			rm -f ./$2-junest.sh.old;;
+		esac
+		echo -e "\n-----------------------------------------------------------------------\n"
+		read -r -ep "◆ ADD DEPENDENCES, OR LEAVE BLANK: " RESPONSE
+    		case $RESPONSE in
+			*) 
+			mv ./$2-junest.sh ./$2-junest.sh.old
+			sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
+			echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
+			sed -n '7,100p' ./$2-junest.sh.old >> ./$2-junest.sh
+			rm -f ./$2-junest.sh.old;;
+		esac
+		chmod a+x ./$2-junest.sh
+		echo -e "\n-----------------------------------------------------------------------\n"
+		echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
+		echo -e "\n SUGGESTIONS:\n\n - line 88, add a list of items to be deleted to avoid an excess in the\n size of the final AppImage archive.\n"
+		exit;;
+	esac
+	done
+	;;
+	
+esac
