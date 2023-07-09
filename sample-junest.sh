@@ -33,11 +33,11 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 ./.local/share/junest/bin/junest -- yay -Syy
-./.local/share/junest/bin/junest -- yay --noconfirm -S binutils gcc gnu-free-fonts gzip "$APP" "$DEPENDENCES"
+./.local/share/junest/bin/junest -- yay --noconfirm -S binutils gcc gnu-free-fonts gzip patch "$APP" "$DEPENDENCES"
 #./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S gnu-free-fonts $APP
 
 # REMOVE SOME UNNEEDED PACKAGES
-./.local/share/junest/bin/junest -- yay --noconfirm -R binutils gcc
+./.local/share/junest/bin/junest -- yay --noconfirm -R binutils gcc patch
 ./.local/share/junest/bin/junest -- sudo pacman -Rnsu - $(pacman -Qtdq)
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
 
@@ -60,11 +60,19 @@ cp -r ./.local ./$APP.AppDir/
 cp -r ./.junest ./$APP.AppDir/
 
 # ...ADD THE ICON AND THE DESKTOP FILE AT THE ROOT OF THE APPDIR...
-app=$(echo $APP | cut -c -3)
-cp ./$APP.AppDir/.junest/usr/share/icons/hicolor/scalable/apps/*$app* ./$APP.AppDir/
-cp ./$APP.AppDir/.junest/usr/share/applications/*$app* ./$APP.AppDir/
-cp ./$APP.AppDir/.junest/usr/share/icons/hicolor/scalable/apps/*$BIN* ./$APP.AppDir/
-cp ./$APP.AppDir/.junest/usr/share/applications/*$BIN* ./$APP.AppDir/
+LAUNCHER=$(grep -iRl $APP ~/.junest/usr/share/applications/* | head -1)
+cp -r "$LAUNCHER" ./$APP.AppDir/
+ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
+cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
 
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
