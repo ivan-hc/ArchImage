@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.0"
+VERSION="1.0~1"
 
 case "$1" in
 
@@ -28,6 +28,7 @@ case "$1" in
 		echo -e "\n-----------------------------------------------------------------------\n"
 		read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
     		case $response in
+    			'');;
 			*) 
 			mv ./$2-junest.sh ./$2-junest.sh.old
 			sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
