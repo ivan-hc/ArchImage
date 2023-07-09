@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.0~1"
+VERSION="1.0.1"
 
 case "$1" in
 
@@ -33,7 +33,7 @@ case "$1" in
 			mv ./$2-junest.sh ./$2-junest.sh.old
 			sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
 			echo 'BIN="'$response'"' >> ./$2-junest.sh
-			sed -n '6,100p' ./$2-junest.sh.old >> ./$2-junest.sh
+			sed -n '6,200p' ./$2-junest.sh.old >> ./$2-junest.sh
 			rm -f ./$2-junest.sh.old;;
 		esac
 		echo -e "\n-----------------------------------------------------------------------\n"
@@ -43,7 +43,7 @@ case "$1" in
 			mv ./$2-junest.sh ./$2-junest.sh.old
 			sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
 			echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
-			sed -n '7,100p' ./$2-junest.sh.old >> ./$2-junest.sh
+			sed -n '7,200p' ./$2-junest.sh.old >> ./$2-junest.sh
 			rm -f ./$2-junest.sh.old;;
 		esac
 		chmod a+x ./$2-junest.sh
