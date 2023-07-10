@@ -37,7 +37,6 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 #./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S gnu-free-fonts $APP
 
 # REMOVE SOME UNNEEDED PACKAGES
-./.local/share/junest/bin/junest -- sudo pacman -Rnsu - $(pacman -Qtdq)
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
 
 # SET THE LOCALE (DON'T TOUCH THIS)
