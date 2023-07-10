@@ -33,11 +33,10 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 ./.local/share/junest/bin/junest -- yay -Syy
-./.local/share/junest/bin/junest -- yay --noconfirm -S binutils gcc gnu-free-fonts gzip patch "$APP" "$DEPENDENCES"
+./.local/share/junest/bin/junest -- yay --noconfirm -S binutils gnu-free-fonts "$APP" "$DEPENDENCES"
 #./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S gnu-free-fonts $APP
 
 # REMOVE SOME UNNEEDED PACKAGES
-./.local/share/junest/bin/junest -- yay --noconfirm -R binutils gcc patch
 ./.local/share/junest/bin/junest -- sudo pacman -Rnsu - $(pacman -Qtdq)
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
 
