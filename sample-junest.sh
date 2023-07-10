@@ -58,7 +58,7 @@ cp -r ./.local ./$APP.AppDir/
 cp -r ./.junest ./$APP.AppDir/
 
 # ...ADD THE ICON AND THE DESKTOP FILE AT THE ROOT OF THE APPDIR...
-LAUNCHER=$(grep -iRl $APP ~/.junest/usr/share/applications/* | head -1)
+LAUNCHER=$(grep -iRl $APP ~/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./$APP.AppDir/
 ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
 cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
