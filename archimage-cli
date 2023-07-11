@@ -61,9 +61,9 @@ case "$1" in
 		
 	--sync|-s) 
 		cd $DIR
-		echo " Synchronizing $(./archimage-cli -v)..."; sleep 0.5; echo "";
+		echo " Synchronizing $(./archimage-cli -v)..."; sleep 0.5
   		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
-  		mv ~/.cache/archimage-cli ./archimage-cli; echo " $(./archimage-cli -v) updated! "
+  		mv ~/.cache/archimage-cli ./archimage-cli; echo "  ... $(./archimage-cli -v) updated! "
   		;;
 	
 esac
