@@ -39,6 +39,7 @@ For example, an OBS Studio ArchImage equals 650MB in total, I managed to get it 
 This is a list of the AppImages I've built until I wrote this brief guide:
 - Abiword https://github.com/ivan-hc/Abiword-appimage
 - Gnumeric https://github.com/ivan-hc/Gnumeric-appimage
+- Handbrake https://github.com/ivan-hc/Handbrake-appimage
 - MPV https://github.com/ivan-hc/MPV-appimage
 - OBS Studio https://github.com/ivan-hc/OBS-Studio-appimage
 
