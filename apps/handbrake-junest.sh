@@ -44,7 +44,7 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
 #sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
-#rm ./.junest/etc/locale.gen
+rm ./.junest/etc/locale.gen
 #mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
 #echo "LANG=$LANG" >> ./.junest/etc/locale.conf
@@ -75,7 +75,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt" 2> /dev/null -- BINARY "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/usr/share --bind=/usr/lib/locale --bind=/usr/lib/x86_64-linux-gnu --bind=/etc" 2> /dev/null -- ghb "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 sed -i "s#BINARY#$BIN#g" ./$APP.AppDir/AppRun
@@ -88,82 +88,11 @@ sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 # REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
 rm -R -f ./$APP.AppDir/.junest/var/cache/pacman/pkg/*
 
-rm -R -f ./$APP.AppDir/.junest/usr/share/aclocal
-rm -R -f ./$APP.AppDir/.junest/usr/share/alsa
-rm -R -f ./$APP.AppDir/.junest/usr/share/applications
-rm -R -f ./$APP.AppDir/.junest/usr/share/audit
-rm -R -f ./$APP.AppDir/.junest/usr/share/avahi
-rm -R -f ./$APP.AppDir/.junest/usr/share/awk
-rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
-rm -R -f ./$APP.AppDir/.junest/usr/share/ca-certificates
-rm -R -f ./$APP.AppDir/.junest/usr/share/common-lisp
-rm -R -f ./$APP.AppDir/.junest/usr/share/dbus-1
-rm -R -f ./$APP.AppDir/.junest/usr/share/defaults
-rm -R -f ./$APP.AppDir/.junest/usr/share/doc
-rm -R -f ./$APP.AppDir/.junest/usr/share/drirc.d
-rm -R -f ./$APP.AppDir/.junest/usr/share/emacs
-rm -R -f ./$APP.AppDir/.junest/usr/share/et
-rm -R -f ./$APP.AppDir/.junest/usr/share/factory
-rm -R -f ./$APP.AppDir/.junest/usr/share/file
-rm -R -f ./$APP.AppDir/.junest/usr/share/fish
-rm -R -f ./$APP.AppDir/.junest/usr/share/GConf
-rm -R -f ./$APP.AppDir/.junest/usr/share/gettext
-rm -R -f ./$APP.AppDir/.junest/usr/share/gettext-0.22
-rm -R -f ./$APP.AppDir/.junest/usr/share/gir-1.0
-rm -R -f ./$APP.AppDir/.junest/usr/share/git
-rm -R -f ./$APP.AppDir/.junest/usr/share/git-core
-rm -R -f ./$APP.AppDir/.junest/usr/share/git-gui
-rm -R -f ./$APP.AppDir/.junest/usr/share/gitk
-rm -R -f ./$APP.AppDir/.junest/usr/share/gitweb
-rm -R -f ./$APP.AppDir/.junest/usr/share/glvnd
-rm -R -f ./$APP.AppDir/.junest/usr/share/gnupg
-rm -R -f ./$APP.AppDir/.junest/usr/share/graphite2
-rm -R -f ./$APP.AppDir/.junest/usr/share/gtk-*
-rm -R -f ./$APP.AppDir/.junest/usr/share/hwdata
-rm -R -f ./$APP.AppDir/.junest/usr/share/i18n
-rm -R -f ./$APP.AppDir/.junest/usr/share/iana-etc
-rm -R -f ./$APP.AppDir/.junest/usr/share/icu
-rm -R -f ./$APP.AppDir/.junest/usr/share/info
-rm -R -f ./$APP.AppDir/.junest/usr/share/iptables
-rm -R -f ./$APP.AppDir/.junest/usr/share/iso-codes
-rm -R -f ./$APP.AppDir/.junest/usr/share/java
-rm -R -f ./$APP.AppDir/.junest/usr/share/kbd
-rm -R -f ./$APP.AppDir/.junest/usr/share/keyutils
-rm -R -f ./$APP.AppDir/.junest/usr/share/libalpm
-rm -R -f ./$APP.AppDir/.junest/usr/share/libdrm
-rm -R -f ./$APP.AppDir/.junest/usr/share/libgpg-error
-rm -R -f ./$APP.AppDir/.junest/usr/share/libthai
-rm -R -f ./$APP.AppDir/.junest/usr/share/licenses
-rm -R -f ./$APP.AppDir/.junest/usr/share/locale
-rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg
-rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg-template
-rm -R -f ./$APP.AppDir/.junest/usr/share/man
-rm -R -f ./$APP.AppDir/.junest/usr/share/metainfo
-rm -R -f ./$APP.AppDir/.junest/usr/share/misc
-rm -R -f ./$APP.AppDir/.junest/usr/share/p11-kit
-rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
-rm -R -f ./$APP.AppDir/.junest/usr/share/perl*
-rm -R -f ./$APP.AppDir/.junest/usr/share/pixmaps
-rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig
-rm -R -f ./$APP.AppDir/.junest/usr/share/polkit-1
-rm -R -f ./$APP.AppDir/.junest/usr/share/readline
-rm -R -f ./$APP.AppDir/.junest/usr/share/ss
-rm -R -f ./$APP.AppDir/.junest/usr/share/systemd
-rm -R -f ./$APP.AppDir/.junest/usr/share/tabset
-rm -R -f ./$APP.AppDir/.junest/usr/share/terminfo
-rm -R -f ./$APP.AppDir/.junest/usr/share/themes
-rm -R -f ./$APP.AppDir/.junest/usr/share/thumbnailers
-rm -R -f ./$APP.AppDir/.junest/usr/share/tracker*
-rm -R -f ./$APP.AppDir/.junest/usr/share/vala
-rm -R -f ./$APP.AppDir/.junest/usr/share/wayland
-rm -R -f ./$APP.AppDir/.junest/usr/share/X11
-rm -R -f ./$APP.AppDir/.junest/usr/share/xcb
-rm -R -f ./$APP.AppDir/.junest/usr/share/xml
-rm -R -f ./$APP.AppDir/.junest/usr/share/xtables
-rm -R -f ./$APP.AppDir/.junest/usr/share/zoneinfo
-rm -R -f ./$APP.AppDir/.junest/usr/share/zoneinfo-leaps
-rm -R -f ./$APP.AppDir/.junest/usr/share/zoneinfo-posix
-rm -R -f ./$APP.AppDir/.junest/usr/share/zsh
+mkdir save
+cp -r ./$APP.AppDir/.junest/usr/share/gdb ./save/
+cp -r ./$APP.AppDir/.junest/usr/share/*gst* ./save/
+rm -R -f ./$APP.AppDir/.junest/usr/share/*
+mv ./save/* ./$APP.AppDir/.junest/usr/share/
 
 rm -R -f ./$APP.AppDir/.junest/usr/lib/audit
 rm -R -f ./$APP.AppDir/.junest/usr/lib/avahi
