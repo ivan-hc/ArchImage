@@ -33,16 +33,21 @@ else
 	echo "/usr/bin/pgrep exists"
 fi
 
-# SET THE LOCALE
-#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # ENABLE ALL THE LANGUAGES
-sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY ONE LANGUAGE
-rm -R ./.junest/etc/locale.gen
-mv ./locale.gen ./.junest/etc/locale.gen
+# REMOVE SOME UNNEEDED PACKAGES
+./.local/share/junest/bin/junest -- yay --noconfirm -R binutils
+./.local/share/junest/bin/junest -- sudo pacman -Rnsu - $(pacman -Qtdq)
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
+
+# SET THE LOCALE (DON'T TOUCH THIS)
+#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
+#sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
+rm ./.junest/etc/locale.gen
+#mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
 #echo "LANG=$LANG" >> ./.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc
-./.local/share/junest/bin/junest -- sudo locale-gen
+#./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
+#./.local/share/junest/bin/junest -- sudo locale-gen
 
 # VERSION NAME
 VERSION=$(wget -q https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=bottles -O - | grep pkgver | head -1 | cut -c 8-)
@@ -63,7 +68,7 @@ export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 export GTK_THEME=Adwaita:dark
 mkdir -p $HOME/.cache
-echo "bottles $@" | $HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/etc --bind=/usr/lib/locale --bind=/usr/lib/dri --bind=/usr/lib/x86_64-linux-gnu/dri --bind=/etc --bind=/var --bind=/var/tmp --bind=/usr/include --bind=/usr/share/fonts" -- bottles "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -72,8 +77,10 @@ sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.ol
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
-# REMOVE SOME BLOATWARES
-rm -R -f ./$APP.AppDir/.junest/var
+# REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$APP*" -a -not -name "." -delete
+
+rm -R -f ./$APP.AppDir/.junest/var/cache/pacman/pkg/*
 
 # REMOVE THE INBUILT HOME (optional)
 rm -R -f ./$APP.AppDir/.junest/home
