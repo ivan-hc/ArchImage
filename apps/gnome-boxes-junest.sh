@@ -27,10 +27,14 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S gnome-boxes gzip
 #./.local/share/junest/bin/junest -- yay --noconfirm -S $APP
 
+# REMOVE SOME UNNEEDED PACKAGES
+./.local/share/junest/bin/junest -- sudo pacman -Rnsu - $(pacman -Qtdq)
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
+
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
 #sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
-#rm ./.junest/etc/locale.gen
+rm ./.junest/etc/locale.gen
 #mv ./locale.gen ./.junest/etc/locale.gen
 rm ./.junest/etc/locale.conf
 #echo "LANG=$LANG" >> ./.junest/etc/locale.conf
@@ -65,7 +69,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-echo "$APP $@" | $HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/usr/share/fonts --bind=/usr/lib/locale --bind=/usr/lib/x86_64-linux-gnu/dri --bind=/etc" -- $APP "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
@@ -75,7 +79,9 @@ sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_
 sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
-rm -R -f ./$APP.AppDir/.junest/var
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$APP*" -a -not -name "." -delete
+
+rm -R -f ./$APP.AppDir/.junest/var/cache/pacman/pkg/*
 
 # REMOVE THE INBUILT HOME (optional)
 rm -R -f ./$APP.AppDir/.junest/home
