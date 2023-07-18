@@ -1,7 +1,3 @@
-# ArchImage
-Build AppImage packages for all distributions by including Arch Linux packages. Powered by JuNest.
-
-# What is this?
 ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest).
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
@@ -13,7 +9,12 @@ Download the main script and made it executable:
     chmod a+x ./archimage-cli
 
 # Usage
+In this video I will show all the steps that I will describe in this section:
 
+https://github.com/ivan-hc/ArchImage/assets/88724353/d53f7e11-ceb3-4bc4-bee9-9372fd88cf8d
+
+
+### Step 1: create the script
     ./archimage-cli [OPTION]
 or
 
@@ -26,6 +27,7 @@ Here we are using "handbrake", the script will ask you if you want to specify th
 
 After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`).
 
+### Step 2: run the script
 Finally you've finished and you're ready to run the final script. This will automatically build all the stuff starting from the less options you've decided.
 
 # Suggestion
@@ -52,11 +54,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 Since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources.
-
-# How a newly created script works
-This video is from when this repository was created, since then the Appimage build script has greatly improved.
-
-https://github.com/ivan-hc/ArchImage/assets/88724353/6335f0c4-c274-4e6c-9360-d22a24bb8594
 
 # This project wont be possible without
 - JuNest https://github.com/fsquillace/junest
