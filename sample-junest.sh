@@ -312,7 +312,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/echo
 rm -R -f ./$APP.AppDir/.junest/usr/bin/egrep
 rm -R -f ./$APP.AppDir/.junest/usr/bin/eject
 rm -R -f ./$APP.AppDir/.junest/usr/bin/elfedit
-rm -R -f ./$APP.AppDir/.junest/usr/bin/env
+#rm -R -f ./$APP.AppDir/.junest/usr/bin/env
 rm -R -f ./$APP.AppDir/.junest/usr/bin/env.fakechroot
 rm -R -f ./$APP.AppDir/.junest/usr/bin/envsubst
 rm -R -f ./$APP.AppDir/.junest/usr/bin/escapesrc
