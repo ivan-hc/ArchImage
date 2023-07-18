@@ -68,7 +68,7 @@ export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 export GTK_THEME=Adwaita:dark
 mkdir -p $HOME/.cache
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/opt --bind=/etc --bind=/usr/lib/locale --bind=/usr/lib/dri --bind=/usr/lib/x86_64-linux-gnu/dri --bind=/etc --bind=/var --bind=/var/tmp --bind=/usr/include --bind=/usr/share/fonts" -- bottles "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/etc --bind=/usr/lib/locale --bind=/usr/lib/dri --bind=/usr/lib/x86_64-linux-gnu/dri --bind=/etc --bind=/var --bind=/var/tmp --bind=/usr/include --bind=/usr/share/fonts" -- bottles "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 
