@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.2"
+VERSION="1.2-1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -36,7 +36,7 @@ case "$1" in
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'BIN="'$response'"' >> ./$2-junest.sh
-				sed -n '6,200p' ./$2-junest.sh.old >> ./$2-junest.sh
+				sed -n '6,200000000000p' ./$2-junest.sh.old >> ./$2-junest.sh
 				rm -f ./$2-junest.sh.old;;
 			esac
 			echo -e "\n-----------------------------------------------------------------------\n"
@@ -46,7 +46,7 @@ case "$1" in
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
-				sed -n '7,200p' ./$2-junest.sh.old >> ./$2-junest.sh
+				sed -n '7,200000000000p' ./$2-junest.sh.old >> ./$2-junest.sh
 				rm -f ./$2-junest.sh.old;;
 			esac
 			chmod a+x ./$2-junest.sh
