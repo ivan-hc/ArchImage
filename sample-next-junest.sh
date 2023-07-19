@@ -4,8 +4,7 @@
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES=""
-#BASICSTUFF="binutils gzip"
-#COMPILERS="gcc"
+#BASEDEVEL="base-devel"
 
 # ADD A VERSION, THIS IS NEEDED FOR THE NAME OF THE FINEL APPIMAGE, IF NOT AVAILABLE ON THE REPO, THE VALUE COME FROM AUR, AND VICE VERSA
 for REPO in { "core" "extra" "community" "multilib" }; do
@@ -42,7 +41,7 @@ cp -r ./.junest ./$APP.AppDir/
 
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$BASICSTUFF" "$COMPILERS"
+./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$BASEDEVEL"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 
