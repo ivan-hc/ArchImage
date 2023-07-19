@@ -95,9 +95,6 @@ sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.ol
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
-# REMOVE SOME BLOATWARES
-rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
-
 # TRY TO COPY THE FILES INSTALLED WITH THE APP
 echo $(echo $(./.local/share/junest/bin/junest -- sudo pacman -Si $APP | grep Depends | sed 's/ /\n/g' | grep -v -w "" | grep -w -v Depends | grep -w -v On | sort -u)) > deps
 ./.local/share/junest/bin/junest -- pacman -Ql $APP "$DEPENDENCES" $(cat ./deps) | sed 's/[^ ]* //' >> list
@@ -111,6 +108,10 @@ for arg in $ARGS; do
 		cp --parents ./.junest"$arg" ./$APP.AppDir/
 	done 
 done
+
+# REMOVE SOME BLOATWARES
+rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$APP*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
