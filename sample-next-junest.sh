@@ -103,8 +103,9 @@ echo $(echo $(./.local/share/junest/bin/junest -- sudo pacman -Si $APP | grep De
 ./.local/share/junest/bin/junest -- pacman -Ql $APP "$DEPENDENCES" $(cat ./deps) | sed 's/[^ ]* //' >> list
 
 ./.local/share/junest/bin/junest -- ldd /usr/bin/"$BIN" | grep "=>" | awk '{print $3}' >> list
+./.local/share/junest/bin/junest -- ldd $(cat ./list | grep "bin") | grep "=>" | awk '{print $3}' | grep -w -v " " | uniq | sort -u >> list
 
-ARGS=$(tail -n +2 ./list)
+ARGS=$(tail -n +2 ./list | sort -u | uniq)
 for arg in $ARGS; do
 	for var in $arg; do
 		cp --parents ./.junest"$arg" ./$APP.AppDir/
