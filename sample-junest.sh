@@ -4,6 +4,8 @@
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCES ARE NEEDED
+#BASICSTUFF="binutils gzip"
+#COMPILERS="gcc"
 
 # ADD A VERSION, THIS IS NEEDED FOR THE NAME OF THE FINEL APPIMAGE, IF NOT AVAILABLE ON THE REPO, THE VALUE COME FROM AUR, AND VICE VERSA
 for REPO in { "core" "extra" "community" "multilib" }; do
@@ -33,7 +35,7 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 ./.local/share/junest/bin/junest -- yay -Syy
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts #IF YOU NEED GZIP AND GCC PRE-INSTALLED, ADD THEM HERE MANUALLY
+./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$BASICSTUFF" "$COMPILERS"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 
