@@ -108,9 +108,21 @@ for arg in $ARGS; do
 	done 
 done
 
+# REMOVE PACMAN, YAY AND GIT
+./.local/share/junest/bin/junest -- pacman -Ql pacman yay git | sed 's/[^ ]* //' >> remove
+REMOVE=$(tail -n +2 ./remove | sort -u | uniq)
+for arg in $REMOVE; do
+	for var in $arg; do
+		rm -R -f ./$APP.AppDir"$arg"
+	done 
+done
+
 # REMOVE SOME BLOATWARES
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
+find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+rm -R -f ./$APP.AppDir/.junest/usr/include
+rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
-find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$APP*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
