@@ -84,7 +84,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/share --bind=/usr/lib/locale --bind=/etc/fonts" 2> /dev/null -- BINARY "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc/fonts" 2> /dev/null -- BINARY "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 sed -i "s#BINARY#$BIN#g" ./$APP.AppDir/AppRun
@@ -96,17 +96,22 @@ sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # TRY TO COPY THE FILES INSTALLED WITH THE APP
 echo $(echo $(./.local/share/junest/bin/junest -- sudo pacman -Si $APP | grep Depends | sed 's/ /\n/g' | grep -v -w "" | grep -w -v Depends | grep -w -v On | sort -u)) > deps
-./.local/share/junest/bin/junest -- pacman -Ql $APP "$DEPENDENCES" $(cat ./deps) | sed 's/[^ ]* //' >> list
+./.local/share/junest/bin/junest -- pacman -Ql $APP "$DEPENDENCES" gnu-free-fonts $(cat ./deps) | sed 's/[^ ]* //' >> list
 
-./.local/share/junest/bin/junest -- ldd /usr/bin/"$BIN" | grep "=>" | awk '{print $3}' >> list
-./.local/share/junest/bin/junest -- ldd $(cat ./list | grep "bin") | grep "=>" | awk '{print $3}' | grep -w -v " " | uniq | sort -u >> list
+./.local/share/junest/bin/junest -- ldd /usr/bin/"$BIN" 2>/dev/null | grep "=>" | awk '{print $3}' >> list
+./.local/share/junest/bin/junest -- ldd $(cat ./list  | grep "bin") 2>/dev/null | grep "=>" | awk '{print $3}' | grep -w -v " " | uniq | sort -u >> list
 
+mkdir -p ./$APP.AppDir/.junest
 ARGS=$(tail -n +2 ./list | sort -u | uniq)
 for arg in $ARGS; do
 	for var in $arg; do
 		cp --parents ./.junest"$arg" ./$APP.AppDir/ 2>/dev/null
 	done 
 done
+
+# ADD MIME
+mkdir -p ./$APP.AppDir/.junest/usr/share/mime
+cp -r ./.junest/usr/share/mime/* ./$APP.AppDir/.junest/usr/share/mime/
 
 # REMOVE SOME BLOATWARES
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
