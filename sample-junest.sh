@@ -112,16 +112,10 @@ sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_
 sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
 # REMOVE SOME BLOATWARES
-find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-rm -R -f ./$APP.AppDir/.junest/usr/lib/*.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/*.o
-rm -R -f ./$APP.AppDir/.junest/usr/include
-rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
-rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
-rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
-
-# REMOVED BINARIES
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
+rm -R -f ./$APP.AppDir/.junest/etc/makepkg.conf
+rm -R -f ./$APP.AppDir/.junest/etc/pacman.conf
 rm -R -f ./$APP.AppDir/.junest/usr/bin/[
 rm -R -f ./$APP.AppDir/.junest/usr/bin/4channels
 rm -R -f ./$APP.AppDir/.junest/usr/bin/acceleration_speed
@@ -207,6 +201,9 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/bzgrep
 rm -R -f ./$APP.AppDir/.junest/usr/bin/bzip2
 rm -R -f ./$APP.AppDir/.junest/usr/bin/bzip2recover
 rm -R -f ./$APP.AppDir/.junest/usr/bin/bzmore
+rm -R -f ./$APP.AppDir/.junest/usr/bin/c++
+rm -R -f ./$APP.AppDir/.junest/usr/bin/c89
+rm -R -f ./$APP.AppDir/.junest/usr/bin/c99
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cairo-trace
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cal
 rm -R -f ./$APP.AppDir/.junest/usr/bin/capsh
@@ -214,6 +211,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/captest
 rm -R -f ./$APP.AppDir/.junest/usr/bin/captoinfo
 rm -R -f ./$APP.AppDir/.junest/usr/bin/captree
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cat
+rm -R -f ./$APP.AppDir/.junest/usr/bin/cc
 rm -R -f ./$APP.AppDir/.junest/usr/bin/certtool
 rm -R -f ./$APP.AppDir/.junest/usr/bin/certutil
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cfdisk
@@ -250,6 +248,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/compile_et
 rm -R -f ./$APP.AppDir/.junest/usr/bin/coredumpctl
 rm -R -f ./$APP.AppDir/.junest/usr/bin/core_perl
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cp
+rm -R -f ./$APP.AppDir/.junest/usr/bin/cpp
 rm -R -f ./$APP.AppDir/.junest/usr/bin/c_rehash
 rm -R -f ./$APP.AppDir/.junest/usr/bin/crlutil
 rm -R -f ./$APP.AppDir/.junest/usr/bin/cryptsetup
@@ -398,10 +397,17 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/fsck.ext4
 rm -R -f ./$APP.AppDir/.junest/usr/bin/fsck.minix
 rm -R -f ./$APP.AppDir/.junest/usr/bin/fsfreeze
 rm -R -f ./$APP.AppDir/.junest/usr/bin/fstrim
+rm -R -f ./$APP.AppDir/.junest/usr/bin/g++
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gapplication
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gawk
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gawk-5.2.2
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gawkbug
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcc
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcc-ar
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcc-nm
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcc-ranlib
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcov
+rm -R -f ./$APP.AppDir/.junest/usr/bin/gcov-tool
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gdbm_dump
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gdbm_load
 rm -R -f ./$APP.AppDir/.junest/usr/bin/gdbmtool
@@ -1146,6 +1152,15 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/write
 rm -R -f ./$APP.AppDir/.junest/usr/bin/wrjpgcom
 rm -R -f ./$APP.AppDir/.junest/usr/bin/x265
 rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-c++
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-g++
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-gcc
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-gcc-ar
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-gcc-nm
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-linux-gnu-gcc-ranlib
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-pc-linux-gnu-c++
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-pc-linux-gnu-g++
+rm -R -f ./$APP.AppDir/.junest/usr/bin/x86_64-pc-linux-gnu-gcc*
 rm -R -f ./$APP.AppDir/.junest/usr/bin/xargs
 rm -R -f ./$APP.AppDir/.junest/usr/bin/xgettext
 rm -R -f ./$APP.AppDir/.junest/usr/bin/xml2-config
@@ -1179,6 +1194,47 @@ rm -R -f ./$APP.AppDir/.junest/usr/bin/zstdcat
 rm -R -f ./$APP.AppDir/.junest/usr/bin/zstdgrep
 rm -R -f ./$APP.AppDir/.junest/usr/bin/zstdless
 rm -R -f ./$APP.AppDir/.junest/usr/bin/zstdmt
+rm -R -f ./$APP.AppDir/.junest/usr/include
+rm -R -f ./$APP.AppDir/.junest/usr/include/alpm.h
+rm -R -f ./$APP.AppDir/.junest/usr/include/alpm_list.h
+rm -R -f ./$APP.AppDir/.junest/usr/lib32
+rm -R -f ./$APP.AppDir/.junest/usr/lib/*.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/bfd-plugins/liblto_plugin.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/gcc
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13.0.2
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libasan_preinit.o
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so.0
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so.0.0.0
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libgomp.spec
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libitm.spec
+rm -R -f ./$APP.AppDir/.junest/usr/lib/liblsan_preinit.o
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libsanitizer.spec
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++exp.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++fs.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++_libbacktrace.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libsupc++.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/libtsan_preinit.o
+rm -R -f ./$APP.AppDir/.junest/usr/lib/*.o
+rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/libalpm.pc
+rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
+rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
+rm -R -f ./$APP.AppDir/.junest/usr/share/devtools
+rm -R -f ./$APP.AppDir/.junest/usr/share/gcc-*
+rm -R -f ./$APP.AppDir/.junest/usr/share/gdb
+rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg
+rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg-template
+rm -R -f ./$APP.AppDir/.junest/usr/share/man
+rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
+rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig/libmakepkg.pc
+rm -R -f ./$APP.AppDir/.junest/usr/share/zsh/site-functions/_pacman
+rm -R -f ./$APP.AppDir/.junest/var/*
+rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
