@@ -72,6 +72,26 @@ cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*$ICON* ./$APP.AppDir/ 2>/d
 cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
 
+# TEST IF THE DESKTOP FILE AND THE ICON ARE IN THE ROOT OF THE FUTURE APPIMAGE (./*AppDir/*)
+if test -f ./$APP.AppDir/*.desktop; then
+	echo "The .desktop file is available in $APP.AppDir/"
+else 
+	cat <<-HEREDOC >> "./$APP.AppDir/$APP.desktop"
+	[Desktop Entry]
+	Version=1.0
+	Type=Application
+	Name=SAMPLE
+	Comment=
+	Exec=BINARY
+	Icon=tux
+	Terminal=true
+	StartupNotify=true
+	HEREDOC
+	sed -i "s#BINARY#$BIN#g" ./$APP.AppDir/$APP.desktop
+	sed -i "s#SAMPLE#$(echo $APP | tr a-z A-Z)#g" ./$APP.AppDir/$APP.desktop
+	wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./$APP.AppDir/tux.png
+fi
+
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
 cat >> ./$APP.AppDir/AppRun << 'EOF'
