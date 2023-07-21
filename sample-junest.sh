@@ -1200,7 +1200,18 @@ rm -R -f ./$APP.AppDir/.junest/usr/include/alpm_list.h
 rm -R -f ./$APP.AppDir/.junest/usr/lib32
 rm -R -f ./$APP.AppDir/.junest/usr/lib/*.a
 rm -R -f ./$APP.AppDir/.junest/usr/lib/bfd-plugins/liblto_plugin.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/crocus_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/d3d12_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/i*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/kms_swrast_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/r*
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/nouveau_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/radeonsi_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/virtio_gpu_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so
+rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so
 rm -R -f ./$APP.AppDir/.junest/usr/lib/gcc
+rm -R -f ./$APP.AppDir/.junest/usr/lib/git-*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13
 rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13.0.2
@@ -1221,20 +1232,28 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/libtsan_preinit.o
 rm -R -f ./$APP.AppDir/.junest/usr/lib/*.o
 rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/*
 rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/libalpm.pc
+rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon@.service
+rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon.socket
+rm -R -f ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf
 rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
 rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
 rm -R -f ./$APP.AppDir/.junest/usr/share/devtools
 rm -R -f ./$APP.AppDir/.junest/usr/share/gcc-*
 rm -R -f ./$APP.AppDir/.junest/usr/share/gdb
+rm -R -f ./$APP.AppDir/.junest/usr/share/git
+rm -R -f ./$APP.AppDir/.junest/usr/share/git-*
+rm -R -f ./$APP.AppDir/.junest/usr/share/gitk
+rm -R -f ./$APP.AppDir/.junest/usr/share/gitweb
 rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg
 rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg-template
 rm -R -f ./$APP.AppDir/.junest/usr/share/man
 rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
+rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git
+rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git.pm
 rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig/libmakepkg.pc
 rm -R -f ./$APP.AppDir/.junest/usr/share/zsh/site-functions/_pacman
 rm -R -f ./$APP.AppDir/.junest/var/*
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
-
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
