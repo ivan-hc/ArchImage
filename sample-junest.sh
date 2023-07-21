@@ -34,15 +34,12 @@ wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 
 # INSTALL THE APP, BEING JUNEST STRICTLY MINIMAL, YOU NEED TO ADD ALL YOU NEED, INCLUDING BINUTILS AND GZIP
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
+
+# INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
 ./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$BASICSTUFF" "$COMPILERS"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 ./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
-
-#./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S gnu-free-fonts $APP
-
-# REMOVE SOME UNNEEDED PACKAGES
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Scc
 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
@@ -63,7 +60,7 @@ cp -r ./.local ./$APP.AppDir/
 cp -r ./.junest ./$APP.AppDir/
 
 # ...ADD THE ICON AND THE DESKTOP FILE AT THE ROOT OF THE APPDIR...
-LAUNCHER=$(grep -iRl $APP ~/.junest/usr/share/applications/* | grep ".desktop" | head -1)
+LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./$APP.AppDir/
 ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
 cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./$APP.AppDir/ 2>/dev/null
@@ -86,7 +83,7 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/share --bind=/usr/lib/locale --bind=/etc" 2> /dev/null -- BINARY "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc/fonts" 2> /dev/null -- BINARY "$@"
 EOF
 chmod a+x ./$APP.AppDir/AppRun
 sed -i "s#BINARY#$BIN#g" ./$APP.AppDir/AppRun
@@ -96,9 +93,15 @@ sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.ol
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./$APP.AppDir/.local/share/junest/lib/core/wrappers.sh
 
-# REMOVE SOME BLOATWARES, ADD HERE ALL THE FOLDERS THAT YOU DON'T NEED FOR THE FINAL APPIMAGE
-find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$APP*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
-rm -R -f ./$APP.AppDir/.junest/var/cache/pacman/pkg/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+# REMOVE SOME BLOATWARES
+find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
+find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+rm -R -f ./$APP.AppDir/.junest/usr/lib/*.a
+rm -R -f ./$APP.AppDir/.junest/usr/lib/*.o
+rm -R -f ./$APP.AppDir/.junest/usr/include
+rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
+rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
+rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
 
 # REMOVED BINARIES
 rm -R -f ./$APP.AppDir/.junest/usr/bin/[
