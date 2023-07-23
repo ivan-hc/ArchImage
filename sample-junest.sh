@@ -1253,8 +1253,9 @@ rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git
 rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git.pm
 rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig/libmakepkg.pc
 rm -R -f ./$APP.AppDir/.junest/usr/share/zsh/site-functions/_pacman
-rm -R -f ./$APP.AppDir/.junest/var/*
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+
+# ADDITIONAL REMOVALS
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
