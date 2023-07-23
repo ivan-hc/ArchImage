@@ -45,6 +45,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 - Handbrake https://github.com/ivan-hc/Handbrake-appimage
 - MPV https://github.com/ivan-hc/MPV-appimage
 - OBS Studio https://github.com/ivan-hc/OBS-Studio-appimage
+- VLC https://github.com/ivan-hc/VLC-appimage
 
 ### Advantages
 - compatibility with all versions of Linux starting from kernel 2.6, therefore also older distributions than those normally indicated by the classic AppImage developers;
