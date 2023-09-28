@@ -77,19 +77,9 @@ cp -r ./.junest/usr/share/pixmaps/*$ICON* ./$APP.AppDir/ 2>/dev/null
 if test -f ./$APP.AppDir/*.desktop; then
 	echo "The .desktop file is available in $APP.AppDir/"
 else 
-	cat <<-HEREDOC >> "./$APP.AppDir/$APP.desktop"
-	[Desktop Entry]
-	Version=1.0
-	Type=Application
-	Name=SAMPLE
-	Comment=
-	Exec=BINARY
-	Icon=tux
-	Terminal=true
-	StartupNotify=true
-	HEREDOC
+	echo -e "[Desktop Entry]\nVersion=1.0\nType=Application\nName=NAME\nComment=\nExec=BINARY\nIcon=tux\nCategories=Utility;\nTerminal=true\nStartupNotify=true" >> ./$APP.AppDir/$APP.desktop
 	sed -i "s#BINARY#$BIN#g" ./$APP.AppDir/$APP.desktop
-	sed -i "s#SAMPLE#$(echo $APP | tr a-z A-Z)#g" ./$APP.AppDir/$APP.desktop
+	sed -i "s#Name=NAME#Name=$(echo $APP | tr a-z A-Z)#g" ./$APP.AppDir/$APP.desktop
 	wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./$APP.AppDir/tux.png
 fi
 
