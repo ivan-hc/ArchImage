@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.3-2"
+VERSION="1.3.1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -48,6 +48,12 @@ case "$1" in
 				echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
 				sed -n '7,20000000p' ./$2-junest.sh.old >> ./$2-junest.sh
 				rm -f ./$2-junest.sh.old;;
+			esac
+			echo -e "\n-----------------------------------------------------------------------\n"
+			read -p "◆ DO YOU WANT ENABLE CHAOTIC-AUR (y,N)? " yn
+    			case $yn in
+				[Yy]* ) sed -i 's/###//g' ./$2-junest.sh;;
+				[Nn]*|* ) ;;
 			esac
 			echo -e "\n-----------------------------------------------------------------------\n"
 			read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
