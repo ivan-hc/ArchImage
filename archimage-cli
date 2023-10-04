@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.3-1"
+VERSION="1.3-2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -64,7 +64,7 @@ case "$1" in
 			chmod a+x ./$2-junest.sh
 			echo -e "\n-----------------------------------------------------------------------\n"
 			echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
-			echo -e "\n SUGGESTIONS:\n\n - line 88, add a list of items to be deleted to avoid an excess in the\n size of the final AppImage archive.\n"
+			echo -e "\n SUGGESTIONS:\n\n - from line titled 'REMOVE SOME BLOATWARES', add a list of items to be\n   deleted to avoid an excess in the size of the final AppImage archive.\n"
 			exit
 			;;
 		esac
