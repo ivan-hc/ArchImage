@@ -74,7 +74,7 @@ HOME=./
 ```
 It is now possible to read errors related to the application running in JuNest;
 
-3. Add your changes to jour script and try to rebuild the AppImage.
+3. Add your changes to your script and try to rebuild the AppImage.
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
