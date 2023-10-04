@@ -65,14 +65,15 @@ Since JuNest is a standalone system, it won't be able, for example, to open the 
 
 # Troubleshooting
 If your AppImage package isn't working, here's how to debug it:
-1. Edit the "AppRun" file in the directory with the .AppRun extension and remove `2> /dev/null` from the end of the last line. Save changes to the file;
+1. Edit the "AppRun" file in the directory with the .AppRun extension, then remove the string "`2> /dev/null`" from the end of the last line. Save changes to the file;
 2. Execute the AppRun file, I suggest to set the AppDir as a temporary $HOME directory, like this:
 ```
 cd ./*.AppDir
 HOME=./
 ./AppRun
 ```
-It is now possible to read errors related to application execution in JuNest.
+It is now possible to read errors related to the application running in JuNest.
+3. Add your changes to jour script and try to rebuild the AppImage.
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
