@@ -2,6 +2,16 @@ ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest]
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
+------------------------------------------
+- [Installation](#installation)
+- [Usage](#usage)
+- [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
+- [Troubleshooting](#troubleshooting)
+- [Credits](#credits)
+- [Related projects](#related-projects)
+
+------------------------------------------
+
 # Installation
 Download the main script and made it executable:
 
@@ -30,9 +40,6 @@ After you've/you've not named the executable, the script will ask you to add a l
 ### Step 2: run the script
 Finally you've finished and you're ready to run the final script. This will automatically build all the stuff starting from the less options you've decided.
 
-# Suggestion
-At line 88 of the script it is possible to manually add the list of files and folders to delete, check the contents of "AppDir" (the folder of the AppImage to be created), JuNest is installed in `$PROGRAM.AppDir/.junest` and is equivalent to the root of the Arch Linux guest. 
-
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
@@ -56,7 +63,21 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 ### Disadvantages
 Since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources.
 
-# This project wont be possible without
+# Troubleshooting
+If your AppImage package isn't working, here's how to debug it:
+1. Edit the "AppRun" file in the directory with the .AppRun extension and remove `2> /dev/null` from the end of the last line. Save changes to the file;
+2. Execute the AppRun file, I suggest to set the AppDir as a temporary $HOME directory, like this:
+```
+cd ./*.AppDir
+HOME=./
+./AppRun
+```
+It is now possible to read errors related to application execution in JuNest.
+
+If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
+
+# Credits
+This project wont be possible without:
 - JuNest https://github.com/fsquillace/junest
 - Arch Linux https://archlinux.org
 
