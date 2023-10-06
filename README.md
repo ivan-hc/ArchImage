@@ -82,9 +82,9 @@ cd ./*.AppDir
 HOME=./
 ./AppRun
 ```
-It is now possible to read errors related to the application running in JuNest. If you have not removed the defaults (see "[Files removed by default](#files-removed-by-default)") you can also use JuNest and pacman/yay into it to add packages, this way:
+It is now possible to read errors related to the application running in JuNest. If you have not removed the defaults (see "[Files removed by default](#files-removed-by-default)") you can also use JuNest and pacman/yay into it to add packages (I prefer `yay`), this way:
 ```
-./.local/share/junest/bin/junest -- sudo pacman $YOUR-PACKAGES"
+./.local/share/junest/bin/junest -- yay -S $YOUR-PACKAGES"
 ```
 3. Add your changes to your script and try to rebuild the AppImage.
 4. To re-create the AppImage using the changes you made (and without having to download all the packages all over again) you can re-run the *-junest.sh script again (note that you will need to delete the AppRun and *.desktop files from the AppDir to avoid duplicates and overwrites, if the changes are made in the latter, modify the *-junest.sh script directly):
