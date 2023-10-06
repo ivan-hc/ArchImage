@@ -6,6 +6,7 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 - [Installation](#installation)
 - [Usage](#usage)
 - [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
+- [Files removed by default](#files-removed-by-default)
 - [Troubleshooting](#troubleshooting)
 - [Credits](#credits)
 - [Related projects](#related-projects)
@@ -62,6 +63,15 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 Since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources.
+
+# Files removed by default
+The main template is [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh).
+
+After the line "`# REMOVE SOME BLOATWARES`" I added a list of files that, in my experiments, were found to be useless for the applications I compiled. These defaults may be unsuitable for many other applications. Best practice would be to remove them all from the script at the expense of a larger AppImage package, and then individually investigate what to remove on your own.
+
+This solution is still temporary, I'm still looking for a better solution to keep within the AppImage package only the program, dependencies and basic files that are necessary to run JuNest.
+
+If you have any ideas, feel free to send me a [pull request](https://github.com/ivan-hc/ArchImage/pulls).
 
 # Troubleshooting
 If your AppImage package isn't working, here's how to debug it:
