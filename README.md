@@ -87,9 +87,8 @@ It is now possible to read errors related to the application running in JuNest. 
 ./.local/share/junest/bin/junest -- yay -S $YOUR-PACKAGES"
 ```
 3. Add your changes to your script and try to rebuild the AppImage.
-4. To re-create the AppImage using the changes you made (and without having to download all the packages all over again) you can re-run the *-junest.sh script again (note that you will need to delete the AppRun and *.desktop files from the AppDir to avoid duplicates and overwrites, if the changes are made in the latter, modify the *-junest.sh script directly):
+4. To re-create the AppImage using the changes you made (and without having to download all the packages all over again) you can re-run the *-junest.sh script again. NOTE that AppRun and *.desktop files in the root of the AppDir will be removed to avoid duplicates and overwrites:
 ```
-rm -R ./AppRun ./*.desktop
 cd ..
 ./*-junest.sh
 ```
