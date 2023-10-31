@@ -115,7 +115,7 @@ export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc/fonts" 2> /dev/null -- $EXEC "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc/fonts --bind=/usr/share/fonts --bind=/usr/share/themes" 2> /dev/null -- $EXEC "$@"
 EOF
 chmod a+x ./AppRun
 
@@ -1254,6 +1254,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf
 rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
 rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
 rm -R -f ./$APP.AppDir/.junest/usr/share/devtools
+rm -R -f ./$APP.AppDir/.junest/usr/share/fonts/*
 rm -R -f ./$APP.AppDir/.junest/usr/share/gcc-*
 rm -R -f ./$APP.AppDir/.junest/usr/share/gdb
 rm -R -f ./$APP.AppDir/.junest/usr/share/git
@@ -1267,6 +1268,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
 rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git
 rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git.pm
 rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig/libmakepkg.pc
+rm -R -f ./$APP.AppDir/.junest/usr/share/themes/*
 rm -R -f ./$APP.AppDir/.junest/usr/share/zsh/site-functions/_pacman
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
 
