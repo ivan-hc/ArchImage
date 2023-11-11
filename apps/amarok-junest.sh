@@ -3,8 +3,8 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=amarok
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="phonon-qt5-vlc pulseaudio"
-#BASICSTUFF="binutils gzip"
+DEPENDENCES="phonon-qt5-vlc pulseaudio kcmutils5 kdnssd5 kdoctools5 kirigami2 knewstuff5 ktexteditor5 liblastfm-qt5 libofa mariadb mariadb-clients mariadb-libs phonon-qt5 qt5-webengine threadweaver5 ifuse loudmouth"
+BASICSTUFF="binutils gzip"
 #COMPILERS="gcc"
 
 # ADD A VERSION, THIS IS NEEDED FOR THE NAME OF THE FINEL APPIMAGE, IF NOT AVAILABLE ON THE REPO, THE VALUE COME FROM AUR, AND VICE VERSA
