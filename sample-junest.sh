@@ -138,22 +138,22 @@ rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PA
 
 # FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
-function _savebins(){
-BINSAVED="SAVEBINSPLEASE"
-mkdir save
-cp -r ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
-cp -r ./$APP.AppDir/.junest/usr/bin/bash ./save/
-cp -r ./$APP.AppDir/.junest/usr/bin/env ./save/
-cp -r ./$APP.AppDir/.junest/usr/bin/proot* ./save/
-cp -r ./$APP.AppDir/.junest/usr/bin/sh ./save/
-for arg in $BINSAVED; do
-	for var in $arg; do
- 		cp -r ./$APP.AppDir/.junest/usr/bin/"$arg"
+_savebins(){
+	BINSAVED="SAVEBINSPLEASE"
+	mkdir save
+	cp -r ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
+	cp -r ./$APP.AppDir/.junest/usr/bin/bash ./save/
+	cp -r ./$APP.AppDir/.junest/usr/bin/env ./save/
+	cp -r ./$APP.AppDir/.junest/usr/bin/proot* ./save/
+	cp -r ./$APP.AppDir/.junest/usr/bin/sh ./save/
+	for arg in $BINSAVED; do
+		for var in $arg; do
+ 			cp -r ./$APP.AppDir/.junest/usr/bin/"$arg" ./save/
+		done
 	done
-done
-rm -R -f ./$APP.AppDir/.junest/usr/bin/*
-mv ./save/* ./$APP.AppDir/.junest/usr/bin/
-rmdir save
+	rm -R -f ./$APP.AppDir/.junest/usr/bin/*
+	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
+	rmdir save
 }
 #_savebins
 
