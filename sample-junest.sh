@@ -129,7 +129,7 @@ cd ..
 
 # CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
 mkdir -p ./junest-backups/usr/bin
-mkdir -p ./junest-backups/usr/lib
+mkdir -p ./junest-backups/usr/lib/dri
 mkdir -p ./junest-backups/usr/share
 
 # REMOVE SOME BLOATWARES
