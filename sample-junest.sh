@@ -189,7 +189,7 @@ mv ./$APP.AppDir/.junest/usr/lib/libgomp.spec ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/libitm.spec ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/liblsan_preinit.o ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/libsanitizer.spec ./junest-backups/usr/lib/
-mv ./$APP.AppDir/.junest/usr/lib/libstdc++* ./junest-backups/usr/lib/
+#mv ./$APP.AppDir/.junest/usr/lib/libstdc++* ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/libtsan_preinit.o ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/*.o ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/pkgconfig ./junest-backups/usr/lib/
