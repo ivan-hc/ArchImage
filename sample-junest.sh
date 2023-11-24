@@ -197,7 +197,7 @@ rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon@.service
 rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon.socket
 rm -R -f ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf
 
-# REMOVE SOME DIRECTORS FROM /usr/share THAT MAY NOT BE USED
+# REMOVE SOME DIRECTORIES FROM /usr/share THAT MAY NOT BE USED
 rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
 rm -R -f ./$APP.AppDir/.junest/usr/share/devtools
 rm -R -f ./$APP.AppDir/.junest/usr/share/fonts/*
