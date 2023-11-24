@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.4"
+VERSION="1.5"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -72,7 +72,7 @@ case "$1" in
     			case $yn in
 				[Yy]* ) sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
 					echo -e "\n-----------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
+					read -r -ep "◆ LIST BINARS TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
 					case "$savebins" in
 					'');;
 					*) 
@@ -82,6 +82,19 @@ case "$1" in
 			esac
 			chmod a+x ./$2-junest.sh
 			echo -e "\n-----------------------------------------------------------------------\n"
+			read -p "◆ DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
+    			case $yn in
+				[Yy]* ) sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
+					echo -e "\n-----------------------------------------------------------------------\n"
+					read -r -ep "◆ LIST FOLDERS TO SAVE $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " saveshare
+					case "$saveshare" in
+					'');;
+					*) 
+					sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./$2-junest.sh;;
+					esac;;
+				[Nn]*|* ) ;;
+			esac
+			chmod a+x ./$2-junest.sh
 			echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
 			echo -e "\n SUGGESTIONS:\n\n - from line titled 'REMOVE SOME BLOATWARES', add a list of items to be\n   deleted to avoid an excess in the size of the final AppImage archive.\n"
 			exit
@@ -92,9 +105,9 @@ case "$1" in
 		
 	--sync|-s) 
 		cd $DIR
-		echo " Synchronizing $(./archimage-cli -v)..."; sleep 0.5
+		echo -ne " Synchronizing $(./archimage-cli -v)...\r"; sleep 0.5
   		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
-  		mv ~/.cache/archimage-cli ./archimage-cli; echo "  ... $(./archimage-cli -v) updated! "
+  		mv ~/.cache/archimage-cli ./archimage-cli; echo "  ArchImage version $VERSION is updated! "
   		;;
   		
   		*)
