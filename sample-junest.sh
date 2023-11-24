@@ -127,11 +127,6 @@ sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
 # EXIT THE APPDIR
 cd ..
 
-# CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
-mkdir -p ./junest-backups/usr/bin
-mkdir -p ./junest-backups/usr/lib/dri
-mkdir -p ./junest-backups/usr/share
-
 # REMOVE SOME BLOATWARES
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -141,19 +136,28 @@ rm -R -f ./$APP.AppDir/.junest/usr/include #FILES RELATED TO THE COMPILER
 rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
 
-# FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
+# IN THE NEXT 4 STEPS WE WILL TRY TO LIGHTEN THE FINAL APPIMAGE PACKAGE
+# WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
+# THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
+
+# STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
+mkdir -p ./junest-backups/usr/bin
+mkdir -p ./junest-backups/usr/lib/dri
+mkdir -p ./junest-backups/usr/share
+
+# STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
 _savebins(){
 	BINSAVED="SAVEBINSPLEASE"
 	mkdir save
-	cp -r ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
-	cp -r ./$APP.AppDir/.junest/usr/bin/bash ./save/
-	cp -r ./$APP.AppDir/.junest/usr/bin/env ./save/
-	cp -r ./$APP.AppDir/.junest/usr/bin/proot* ./save/
-	cp -r ./$APP.AppDir/.junest/usr/bin/sh ./save/
+	mv ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
+	mv ./$APP.AppDir/.junest/usr/bin/bash ./save/
+	mv ./$APP.AppDir/.junest/usr/bin/env ./save/
+	mv ./$APP.AppDir/.junest/usr/bin/proot* ./save/
+	mv ./$APP.AppDir/.junest/usr/bin/sh ./save/
 	for arg in $BINSAVED; do
 		for var in $arg; do
- 			cp -r ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
+ 			mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
 		done
 	done
 	mv ./$APP.AppDir/.junest/usr/bin/* ./junest-backups/usr/bin/
@@ -162,64 +166,59 @@ _savebins(){
 }
 #_savebins
 
-# REMOVE LIBRARIES
-rm -R -f ./$APP.AppDir/.junest/usr/lib32
-rm -R -f ./$APP.AppDir/.junest/usr/lib/*.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/bfd-plugins/liblto_plugin.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/crocus_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/d3d12_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/i*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/kms_swrast_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/r*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/nouveau_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/radeonsi_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/virtio_gpu_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/gcc
-rm -R -f ./$APP.AppDir/.junest/usr/lib/git-*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libalpm.so.13.0.2
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libasan_preinit.o
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so.0
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libcc1.so.0.0.0
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libgomp.spec
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libitm.spec
-rm -R -f ./$APP.AppDir/.junest/usr/lib/liblsan_preinit.o
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libsanitizer.spec
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++exp.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++fs.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libstdc++_libbacktrace.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libsupc++.a
-rm -R -f ./$APP.AppDir/.junest/usr/lib/libtsan_preinit.o
-rm -R -f ./$APP.AppDir/.junest/usr/lib/*.o
-rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/*
-rm -R -f ./$APP.AppDir/.junest/usr/lib/pkgconfig/libalpm.pc
-rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon@.service
-rm -R -f ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon.socket
-rm -R -f ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf
+# STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP FOLDER (FOR TESTING PURPOSES)
+mv ./$APP.AppDir/.junest/usr/lib32 ./junest-backups/usr/
+mv ./$APP.AppDir/.junest/usr/lib/*.a ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/bfd-plugins/liblto_plugin.so ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/dri/crocus_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/d3d12_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/i* ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/kms_swrast_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/r* ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/nouveau_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/radeonsi_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/virtio_gpu_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so ./junest-backups/usr/lib/dri/
+mv ./$APP.AppDir/.junest/usr/lib/gcc ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/git-* ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libalpm.so* ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libasan_preinit.o ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libcc* ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libgomp.spec ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libitm.spec ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/liblsan_preinit.o ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libsanitizer.spec ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libstdc++* ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/libtsan_preinit.o ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/*.o ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/pkgconfig ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon@.service ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon.socket ./junest-backups/usr/lib/
+mv ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf ./junest-backups/usr/lib/
 
-# REMOVE SOME DIRECTORIES FROM /usr/share THAT MAY NOT BE USED
-rm -R -f ./$APP.AppDir/.junest/usr/share/bash-completion
-rm -R -f ./$APP.AppDir/.junest/usr/share/devtools
-rm -R -f ./$APP.AppDir/.junest/usr/share/fonts/*
-rm -R -f ./$APP.AppDir/.junest/usr/share/gcc-*
-rm -R -f ./$APP.AppDir/.junest/usr/share/gdb
-rm -R -f ./$APP.AppDir/.junest/usr/share/git
-rm -R -f ./$APP.AppDir/.junest/usr/share/git-*
-rm -R -f ./$APP.AppDir/.junest/usr/share/gitk
-rm -R -f ./$APP.AppDir/.junest/usr/share/gitweb
-rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg
-rm -R -f ./$APP.AppDir/.junest/usr/share/makepkg-template
-rm -R -f ./$APP.AppDir/.junest/usr/share/pacman
-rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git
-rm -R -f ./$APP.AppDir/.junest/usr/share/perl5/vendor_perl/Git.pm
-rm -R -f ./$APP.AppDir/.junest/usr/share/pkgconfig/libmakepkg.pc
-rm -R -f ./$APP.AppDir/.junest/usr/share/themes/*
-rm -R -f ./$APP.AppDir/.junest/usr/share/zsh/site-functions/_pacman
+# STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share (TO DO SO, UNCOMMENT THE "#_saveshare" LINE)
+_saveshare(){
+	SHARESAVED="SAVESHAREPLEASE"
+	mkdir save
+	mv ./$APP.AppDir/.junest/usr/share/*$APP* ./save/
+ 	mv ./$APP.AppDir/.junest/usr/share/*$BIN* ./save/
+	mv ./$APP.AppDir/.junest/usr/share/fontconfig ./save/
+	mv ./$APP.AppDir/.junest/usr/share/glib-* ./save/
+	mv ./$APP.AppDir/.junest/usr/share/locale ./save/
+	mv ./$APP.AppDir/.junest/usr/share/mime ./save/
+	mv ./$APP.AppDir/.junest/usr/share/wayland ./save/
+	mv ./$APP.AppDir/.junest/usr/share/X11 ./save/
+	for arg in $SHARESAVED; do
+		for var in $arg; do
+ 			mv ./$APP.AppDir/.junest/usr/share/*"$arg"* ./save/
+		done
+	done
+	mv ./$APP.AppDir/.junest/usr/share/* ./junest-backups/usr/share/
+	mv ./save/* ./$APP.AppDir/.junest/usr/share/
+	rmdir save
+}
+#_saveshare
 
 # ADDITIONAL REMOVALS
 
