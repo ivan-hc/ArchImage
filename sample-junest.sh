@@ -197,7 +197,8 @@ mv ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon@.service ./junest-bac
 mv ./$APP.AppDir/.junest/usr/lib/systemd/system/git-daemon.socket ./junest-backups/usr/lib/
 mv ./$APP.AppDir/.junest/usr/lib/sysusers.d/git.conf ./junest-backups/usr/lib/
 
-# STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share (TO DO SO, UNCOMMENT THE "#_saveshare" LINE)
+# STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
+# IF YOU NEED TO SAVE MORE FOLDERS, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
 _saveshare(){
 	SHARESAVED="SAVESHAREPLEASE"
 	mkdir save
