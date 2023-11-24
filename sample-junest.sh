@@ -148,7 +148,7 @@ _savebins(){
 	cp -r ./$APP.AppDir/.junest/usr/bin/sh ./save/
 	for arg in $BINSAVED; do
 		for var in $arg; do
- 			cp -r ./$APP.AppDir/.junest/usr/bin/"$arg" ./save/
+ 			cp -r ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
 		done
 	done
 	rm -R -f ./$APP.AppDir/.junest/usr/bin/*
