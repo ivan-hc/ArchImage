@@ -127,6 +127,11 @@ sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
 # EXIT THE APPDIR
 cd ..
 
+# CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
+mkdir -p ./junest-backups/usr/bin
+mkdir -p ./junest-backups/usr/lib
+mkdir -p ./junest-backups/usr/share
+
 # REMOVE SOME BLOATWARES
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -151,7 +156,7 @@ _savebins(){
  			cp -r ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
 		done
 	done
-	rm -R -f ./$APP.AppDir/.junest/usr/bin/*
+	mv ./$APP.AppDir/.junest/usr/bin/* ./junest-backups/usr/bin/
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
