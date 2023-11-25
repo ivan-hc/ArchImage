@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.5"
+VERSION="2.0"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -26,9 +26,9 @@ case "$1" in
 			'') echo -e "\n USAGE:	archimage-cli -b [PROGRAM]\n"
 			exit;;
 			*)
-			wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-junest.sh -O $2-junest.sh
+			wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-next-junest.sh -O $2-junest.sh
 			sed -i "s#APP=SAMPLE#APP=$2#g" $2-junest.sh
-			echo -e "\n-----------------------------------------------------------------------\n"
+			echo -e "\n---------------------------------------------------------------------------\n"
 			read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
     			case $response in
     				'');;
@@ -39,7 +39,7 @@ case "$1" in
 				sed -n '6,20000000p' ./$2-junest.sh.old >> ./$2-junest.sh
 				rm -f ./$2-junest.sh.old;;
 			esac
-			echo -e "\n-----------------------------------------------------------------------\n"
+			echo -e "\n---------------------------------------------------------------------------\n"
 			read -r -ep "◆ ADD DEPENDENCES, OR LEAVE BLANK: " RESPONSE
     			case $RESPONSE in
 				*) 
@@ -49,29 +49,30 @@ case "$1" in
 				sed -n '7,20000000p' ./$2-junest.sh.old >> ./$2-junest.sh
 				rm -f ./$2-junest.sh.old;;
 			esac
-			echo -e "\n-----------------------------------------------------------------------\n"
+			echo -e "\n---------------------------------------------------------------------------\n"
 			read -p "◆ DO YOU WANT ENABLE CHAOTIC-AUR (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/###//g' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
 			esac
-			echo -e "\n-----------------------------------------------------------------------\n"
+			echo -e "\n---------------------------------------------------------------------------\n"
 			read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
 			esac
-			echo -e "\n-----------------------------------------------------------------------\n"
+			echo -e "\n---------------------------------------------------------------------------\n"
 			read -p "◆ DO YOU WANT TO INCLUDE THE GCC COMPILER (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
 			esac
-			echo -e "\n-----------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO REMOVE FILES IN /usr/bin AND SPECIFY WHAT TO SAVE (y,N)? " yn
+			echo -e "\n---------------------------------------------------------------------------\n"
+			echo -e '◆ All of the following steps are intended for advanced users and aim to\n  lighten the final AppImage archive. Always press ENTER if you are unsure.'
+			read -p "  DO YOU WANT TO REMOVE FILES IN /usr/bin AND SPECIFY WHAT TO SAVE (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
-					echo -e "\n-----------------------------------------------------------------------\n"
+					echo -e "\n---------------------------------------------------------------------------\n"
 					read -r -ep "◆ LIST BINARS TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
 					case "$savebins" in
 					'');;
@@ -81,11 +82,12 @@ case "$1" in
 				[Nn]*|* ) ;;
 			esac
 			chmod a+x ./$2-junest.sh
-			echo -e "\n-----------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
+			echo -e "\n---------------------------------------------------------------------------\n"
+			echo -e '◆ Attempt to lighten the final AppImage by removing unnecessary folders.'
+			read -p "  DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
-					echo -e "\n-----------------------------------------------------------------------\n"
+					echo -e "\n---------------------------------------------------------------------------\n"
 					read -r -ep "◆ LIST FOLDERS TO SAVE $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " saveshare
 					case "$saveshare" in
 					'');;
@@ -94,6 +96,17 @@ case "$1" in
 					esac;;
 				[Nn]*|* ) ;;
 			esac
+			echo -e "\n---------------------------------------------------------------------------\n"
+			echo -e '◆ The next step will take account of the folders in /usr/share that you have\n  saved previously to automatically check libraries in /usr/lib that contain\n  the keyword. If a file is missing the app may not work. Note that this step\n  will use "readelf" and "find" to locate files directly dependent on the\n  main executables saved in /usr/bin, the related libraries and the libraries\n  related to these. The process could be much longer than normal.'
+			read -p "  DO YOU WANT TO LET THE SCRIPT DECIDE WHICH LIBRARIES TO SAVE (y,N)? " yn
+    			case $yn in
+				[Yy]* ) sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
+					sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh
+					sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh;;
+				[Nn]*|* ) ;;
+			esac
+			chmod a+x ./$2-junest.sh
+			echo -e "\n---------------------------------------------------------------------------\n"
 			chmod a+x ./$2-junest.sh
 			echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
 			echo -e "\n SUGGESTIONS:\n\n - from line titled 'REMOVE SOME BLOATWARES', add a list of items to be\n   deleted to avoid an excess in the size of the final AppImage archive.\n"
