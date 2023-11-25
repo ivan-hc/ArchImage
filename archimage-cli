@@ -73,7 +73,7 @@ case "$1" in
     			case $yn in
 				[Yy]* ) sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST BINARS TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
+					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
 					case "$savebins" in
 					'');;
 					*) 
