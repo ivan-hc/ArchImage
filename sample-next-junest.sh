@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES=""
+DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCES ARE NEEDED
 #BASICSTUFF="binutils gzip"
 #COMPILERS="gcc"
 
@@ -164,110 +164,73 @@ _savebins(){
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
-_savebins
+#_savebins
 
 # STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP FOLDER (FOR TESTING PURPOSES)
-mv ./$APP.AppDir/.junest/usr/lib/*.a ./junest-backups/usr/lib/
-mv ./$APP.AppDir/.junest/usr/lib/*.o ./junest-backups/usr/lib/
-mv ./$APP.AppDir/.junest/usr/lib/cmake* ./junest-backups/usr/lib/
-mv ./$APP.AppDir/.junest/usr/lib/dri/crocus_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/d3d12_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/i* ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/kms_swrast_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/r* ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/nouveau_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/radeonsi_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/virtio_gpu_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/vmwgfx_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/dri/zink_dri.so ./junest-backups/usr/lib/dri/
-mv ./$APP.AppDir/.junest/usr/lib/gcc* ./junest-backups/usr/lib/
-mv ./$APP.AppDir/.junest/usr/lib/git-* ./junest-backups/usr/lib/
+mkdir save
 
 _binlibs(){
-	ldd ./$APP.AppDir/.junest/usr/bin/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	sed -i 's/	/lib/g' ./list
-	mkdir save
+	readelf -d ./$APP.AppDir/.junest/usr/bin/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	mv ./$APP.AppDir/.junest/usr/lib/ld-linux-x86-64.so* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/*$APP* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/*$BIN* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/libdw* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/libelf* ./save/
+	SHARESAVED="SAVESHAREPLEASE"
+	for arg in $SHARESAVED; do
+		for var in $arg; do
+ 			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
+		done
+	done
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
 			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
+			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
+			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
 	done
+	
 	rm list
 }
 
 _liblibs(){
-	ldd ./save/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
+	readelf -d ./save/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./save/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./save/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
 			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
+			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
+			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
 	done
 	rm list
 }
 
-_libsublibs(){
-	ldd ./save/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	ldd ./save/*/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	ldd ./save/*/*/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	ldd ./save/*/*/*/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	ldd ./save/*/*/*/*/* | grep lib | sort | sed 's/\(^.*so\).*$/\1/' | sed 's:.* ::' | uniq | sed 's#/lib/x86_64-linux-gnu##g' >> ./list
-	ARGS=$(tail -n +2 ./list | sort -u | uniq)
-	for arg in $ARGS; do
-		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-		done 
-	done
-	rm list
-}
-
-_libdirs(){
-	LIBDIRS=$(ls ./save/ | sort | grep .so | cut -c 4- | cut -c -3 | uniq)
-	for arg in $LIBDIRS; do
-		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/*$arg* ./save/
-		done 
-	done
-}
-
-_binlibs
-
-_liblibs | echo "Check 1"
-_liblibs | echo "Check 2"
-_liblibs | echo "Check 3"
-_liblibs | echo "Check 4"
-_liblibs | echo "Check 5"
-
-_libsublibs | echo "Check 1"
-_libsublibs | echo "Check 2"
-_libsublibs | echo "Check 3"
-_libsublibs | echo "Check 4"
-_libsublibs | echo "Check 5"
-
-_libdirs
-
-_binlibs
-
-_liblibs | echo "Check 1"
-_liblibs | echo "Check 2"
-_liblibs | echo "Check 3"
-_liblibs | echo "Check 4"
-_liblibs | echo "Check 5"
-
-_libsublibs | echo "Check 1"
-_libsublibs | echo "Check 2"
-_libsublibs | echo "Check 3"
-_libsublibs | echo "Check 4"
-_libsublibs | echo "Check 5"
-
+_mvlibs(){
 mv ./$APP.AppDir/.junest/usr/lib/* ./junest-backups/usr/lib/
 mv ./save/* ./$APP.AppDir/.junest/usr/lib/
+}
+
+#_binlibs
+
+#_liblibs
+#_liblibs
+#_liblibs
+#_liblibs
+#_liblibs
+
+#_mvlibs
+
 rmdir save
 
 # STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
@@ -292,7 +255,7 @@ _saveshare(){
 	mv ./save/* ./$APP.AppDir/.junest/usr/share/
 	rmdir save
 }
-_saveshare
+#_saveshare
 
 # ADDITIONAL REMOVALS
 
