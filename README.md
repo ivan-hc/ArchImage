@@ -5,6 +5,7 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 ------------------------------------------
 - [Installation](#installation)
 - [Usage](#usage)
+- [Version 2.x](#version-2.x)
 - [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Files removed by default](#files-removed-by-default)
 - [Troubleshooting](#troubleshooting)
@@ -20,7 +21,7 @@ Download the main script and made it executable:
     chmod a+x ./archimage-cli
 
 # Usage
-In this video I will show all the steps that I will describe in this section:
+In this video I will show all the steps that I will describe in this section (Archimage 1.x):
 
 https://github.com/ivan-hc/ArchImage/assets/88724353/d53f7e11-ceb3-4bc4-bee9-9372fd88cf8d
 
@@ -40,6 +41,15 @@ After you've/you've not named the executable, the script will ask you to add a l
 
 ### Step 2: run the script
 Finally you've finished and you're ready to run the final script. This will automatically build all the stuff starting from the less options you've decided.
+
+# Version 2.x
+From version 2.x, new actions are available (for advanced users) that will allow you to further automate the process, so as to remove files, directories and libraries that are not needed, making the final AppImage smaller and smaller.
+
+During the construction of the AppImage, files considered "excess" will still be saved in a backup directory for post-build testing in case the AppImage does not work correctly. You will still need to note the additional steps in the script.
+
+However, it will be possible to skip the advanced options when creating the script, in order to package all the files installed in JuNest in the final package (at the expense of a larger AppImage package).
+
+Archimage 2.x uses the template [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh).
 
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
@@ -65,18 +75,16 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 Since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources.
 
 # Files removed by default
-The main template is [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh).
-
-After the line "`# REMOVE SOME BLOATWARES`" I added a list of files that, in my experiments, were found to be useless for the applications I compiled. These defaults may be unsuitable for many other applications. Best practice would be to remove them all from the script at the expense of a larger AppImage package, and then individually investigate what to remove on your own.
-
-This solution is still temporary, I'm still looking for a better solution to keep within the AppImage package only the program, dependencies and basic files that are necessary to run JuNest.
-
-If you have any ideas, feel free to send me a [pull request](https://github.com/ivan-hc/ArchImage/pulls).
+After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
 
 # Troubleshooting
 If your AppImage package isn't working, here's how to debug it:
 1. Edit the "AppRun" file in the directory with the .AppRun extension, then remove the string "`2> /dev/null`" from the end of the last line. Save changes to the file;
-2. Execute the AppRun file, I suggest to set the AppDir as a temporary $HOME directory, like this:
+2. Execute the AppRun file:
+```
+./AppRun
+```
+In case you wont to parse dotfiles in your $HOME directory, use the AppDir itself as a custom $HOME, like this:
 ```
 cd ./*.AppDir
 HOME=./
@@ -87,11 +95,6 @@ It is now possible to read errors related to the application running in JuNest. 
 ./.local/share/junest/bin/junest -- yay -S $YOUR-PACKAGES"
 ```
 3. Add your changes to your script and try to rebuild the AppImage.
-4. To re-create the AppImage using the changes you made (and without having to download all the packages all over again) you can re-run the *-junest.sh script again. NOTE that AppRun and *.desktop files in the root of the AppDir will be removed to avoid duplicates and overwrites:
-```
-cd ..
-./*-junest.sh
-```
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
