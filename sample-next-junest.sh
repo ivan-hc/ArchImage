@@ -189,6 +189,7 @@ _binlibs(){
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
 			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
 			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
@@ -197,11 +198,26 @@ _binlibs(){
 	rm list
 }
 
+_include_swrast_dri(){
+	mkdir ./save/dri
+	mv ./$APP.AppDir/.junest/usr/lib/dri/swrast_dri.so ./save/dri/
+}
+
+_libkeywords(){
+	LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/folder names to save in /usr/lib.
+	for arg in $LIBSAVED; do
+		for var in $arg; do
+ 			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
+		done
+	done
+}
+
 _liblibs(){
 	readelf -d ./save/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./save/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
@@ -209,6 +225,7 @@ _liblibs(){
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
+			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
 			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
 			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
@@ -223,8 +240,10 @@ mv ./save/* ./$APP.AppDir/.junest/usr/lib/
 
 #_binlibs
 
-#_liblibs
-#_liblibs
+#_include_swrast_dri
+
+#_libkeywords
+
 #_liblibs
 #_liblibs
 #_liblibs
