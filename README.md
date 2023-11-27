@@ -51,6 +51,8 @@ However, it will be possible to skip the advanced options when creating the scri
 
 Archimage 2.x uses the template [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh).
 
+NOTE: if you have allowed the script to remove unneeded libraries, you will see a long output that may be longer than 5-10 minutes, this is because the script will re-run the check and the copy of all files saved in the /usr/lib directory of the AppDir to be sure that (almost) all needed libraries are in place, so don't be afraid for the long output. Let the script work until it have finished.
+
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
