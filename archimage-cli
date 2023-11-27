@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.0"
+VERSION="2.1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -73,7 +73,7 @@ case "$1" in
     			case $yn in
 				[Yy]* ) sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " savebins
+					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
 					case "$savebins" in
 					'');;
 					*) 
@@ -88,7 +88,7 @@ case "$1" in
     			case $yn in
 				[Yy]* ) sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST FOLDERS TO SAVE $(echo -e '\nDO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED TO ALLOW GENERIC SELECTIONS\n:') " saveshare
+					read -r -ep "◆ LIST FOLDERS TO SAVE OR LEAVE BLANK$(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
 					case "$saveshare" in
 					'');;
 					*) 
@@ -102,7 +102,27 @@ case "$1" in
     			case $yn in
 				[Yy]* ) sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
 					sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh
-					sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh;;
+					sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
+					echo -e "\n---------------------------------------------------------------------------\n"
+					read -p "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
+    					case $yn in
+						[Yy]* ) sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./$2-junest.sh;;
+						[Nn]*|* ) ;;
+					esac
+					echo -e "\n---------------------------------------------------------------------------\n"
+					read -p "◆ DO YOU WANT TO INCLUDE EXTRA ITEMS OF YOUR CHOICE IN /usr/lib (y,N)? " yn
+    					case $yn in
+						[Yy]* ) 
+							echo -e "\n---------------------------------------------------------------------------\n"
+							read -r -ep "◆ LIST KEYWORDS TO SEARCH AND SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
+							case "$savelibs" in
+							'');;
+							*) 
+							sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./$2-junest.sh
+							sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh;;
+						esac;;
+						[Nn]*|* ) ;;
+					esac;;
 				[Nn]*|* ) ;;
 			esac
 			chmod a+x ./$2-junest.sh
