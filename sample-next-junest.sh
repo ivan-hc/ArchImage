@@ -247,6 +247,8 @@ mv ./save/* ./$APP.AppDir/.junest/usr/lib/
 #_liblibs
 #_liblibs
 #_liblibs
+#_liblibs
+#_liblibs
 
 #_mvlibs
 
