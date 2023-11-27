@@ -191,10 +191,9 @@ _binlibs(){
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
 			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
-			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
 	done
-	
+	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 	rm list
 }
 
@@ -227,9 +226,9 @@ _liblibs(){
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
 			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
 			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
-			rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 		done 
 	done
+ 	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 	rm list
 }
 
