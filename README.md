@@ -92,10 +92,8 @@ cd ./*.AppDir
 HOME=./
 ./AppRun
 ```
-It is now possible to read errors related to the application running in JuNest. If you have not removed the defaults (see "[Files removed by default](#files-removed-by-default)") you can also use JuNest and pacman/yay into it to add packages (I prefer `yay`), this way:
-```
-./.local/share/junest/bin/junest -- yay -S $YOUR-PACKAGES"
-```
+It is now possible to read errors related to the application.
+
 For more detailed output, I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
 For example, to know what are the missing libraries:
