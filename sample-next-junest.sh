@@ -127,6 +127,15 @@ sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
 # EXIT THE APPDIR
 cd ..
 
+# EXTRACT PACKAGE CONTENT
+mkdir base
+tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$APP*.zst -C ./base/
+for arg in $DEPENDENCES; do
+	for var in $arg; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./base/
+	done
+done
+
 # REMOVE SOME BLOATWARES
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -162,6 +171,7 @@ _savebins(){
 	done
 	mv ./$APP.AppDir/.junest/usr/bin/* ./junest-backups/usr/bin/
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
+ 	mv ./base/bin/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
 #_savebins
@@ -217,6 +227,11 @@ _liblibs(){
 	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+ 	readelf -d ./base/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./base/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./base/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./base/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./base/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
@@ -233,8 +248,9 @@ _liblibs(){
 }
 
 _mvlibs(){
-mv ./$APP.AppDir/.junest/usr/lib/* ./junest-backups/usr/lib/
-mv ./save/* ./$APP.AppDir/.junest/usr/lib/
+	mv ./$APP.AppDir/.junest/usr/lib/* ./junest-backups/usr/lib/
+	mv ./save/* ./$APP.AppDir/.junest/usr/lib/
+ 	mv ./base/lib/* ./$APP.AppDir/.junest/usr/lib/
 }
 
 #_binlibs
@@ -273,6 +289,7 @@ _saveshare(){
 	done
 	mv ./$APP.AppDir/.junest/usr/share/* ./junest-backups/usr/share/
 	mv ./save/* ./$APP.AppDir/.junest/usr/share/
+ 	mv ./base/share/* ./$APP.AppDir/.junest/usr/share/
 	rmdir save
 }
 #_saveshare
