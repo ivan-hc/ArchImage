@@ -198,11 +198,7 @@ _binlibs(){
 	for arg in $ARGS; do
 		for var in $arg; do
 			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
-			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
+			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
 		done 
 	done
 	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
@@ -243,13 +239,10 @@ _liblibs(){
 	for arg in $ARGS; do
 		for var in $arg; do
 			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/$arg* ./save/
-			cp --parent ./$APP.AppDir/.junest/usr/lib/*/*/*/*/$arg* ./save/
-			mv $(find ./save/ | sort | grep "usr/lib" | head -1)/* ./save/
+			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
 		done 
 	done
+	rsync -av ./save/$APP.AppDir/.junest/usr/lib/* ./save/
  	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 	rm list
 }
@@ -312,4 +305,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.1-2-x86_64.AppImage
