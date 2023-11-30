@@ -81,7 +81,7 @@ After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you
 
 # Troubleshooting
 If your AppImage package isn't working, here's how to debug it:
-1. Edit the "AppRun" file in the directory with the .AppRun extension, then remove the string "`2> /dev/null`" from the end of the last line. Save changes to the file. This step is really important to read all the outputs from the terminal;
+1. Edit the "AppRun" file in the directory with the .AppRun extension, then remove the string "`2> /dev/null`" from the end of the last line. Save changes to the file. This step is really important to read all the outputs from the terminal. If you are using an AppImage already built thiw way, extract it with the option `--appimage-extract`;
 2. Execute the AppRun file:
 ```
 ./AppRun
