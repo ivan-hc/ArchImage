@@ -94,6 +94,10 @@ HOME=./
 ```
 It is now possible to read errors related to the application.
 
+**Watch this video if these steps are still not much clear for you** (how to extract an ArchImage and how to see errors in the terminal):
+
+https://github.com/ivan-hc/MPV-appimage/assets/88724353/9ba88e03-5873-4605-8705-f8e1cc9cf713
+
 For more detailed output, I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
 For example, to know what are the missing libraries:
