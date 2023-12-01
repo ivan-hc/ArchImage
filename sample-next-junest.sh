@@ -47,6 +47,10 @@ COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 rm -R ./.junest/etc/pacman.d/mirrorlist
 wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
+# BYPASS SIGNATURE CHECK LEVEL
+sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
+sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
+
 # UPDATE ARCH LINUX IN JUNEST
 ./.local/share/junest/bin/junest -- sudo pacman -Syy
 ./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
