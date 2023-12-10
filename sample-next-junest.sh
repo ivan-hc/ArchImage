@@ -57,6 +57,7 @@ sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
 
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
+#./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
 ./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES $APP")
 
 # SET THE LOCALE (DON'T TOUCH THIS)
@@ -90,22 +91,28 @@ cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 # TEST IF THE DESKTOP FILE AND THE ICON ARE IN THE ROOT OF THE FUTURE APPIMAGE (./*AppDir/*)
 if test -f ./*.desktop; then
 	echo "The .desktop file is available in $APP.AppDir/"
-else 
-	cat <<-HEREDOC >> "./$APP.desktop"
-	[Desktop Entry]
-	Version=1.0
-	Type=Application
-	Name=NAME
-	Comment=
-	Exec=BINARY
-	Icon=tux
-	Categories=Utility;
-	Terminal=true
-	StartupNotify=true
-	HEREDOC
-	sed -i "s#BINARY#$BIN#g" ./$APP.desktop
-	sed -i "s#Name=NAME#Name=$(echo $APP | tr a-z A-Z)#g" ./$APP.desktop
-	wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./tux.png
+else
+	if test -f ./.junest/usr/bin/$BIN; then
+ 		echo "No .desktop file available for $APP, creating a new one..."
+ 		cat <<-HEREDOC >> "./$APP.desktop"
+		[Desktop Entry]
+		Version=1.0
+		Type=Application
+		Name=NAME
+		Comment=
+		Exec=BINARY
+		Icon=tux
+		Categories=Utility;
+		Terminal=true
+		StartupNotify=true
+		HEREDOC
+		sed -i "s#BINARY#$BIN#g" ./$APP.desktop
+		sed -i "s#Name=NAME#Name=$(echo $APP | tr a-z A-Z)#g" ./$APP.desktop
+		wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./tux.png
+	else
+ 		echo "No binary in path... aborting all the processes."
+		exit
+	fi
 fi
 
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
