@@ -8,7 +8,7 @@ case "$1" in
 
 	'') echo -e "\n ArchImage CLI requires an argument, run -h for more info.\n"
 		;;
-	
+
 	--help|-h) 
 		echo -e "\n ArchImage CLI v$VERSION \n\n A command line interface to build AppImages based on JuNest, the lightweight\n Arch Linux based distro that runs, without root privileges, on top of any\n other Linux distro."
 		echo -e "\n USAGE:\n\n   archimage-cli [OPTION]\n   archimage-cli [OPTION] [PROGRAM]\n"
@@ -16,9 +16,6 @@ case "$1" in
 		echo -e "\n SITES: \n\n   - https://github.com/IVAN-HC	\n\n   - https://github.com/IVAN-HC/ARCHIMAGE	\n\n   - https://github.com/FSQUILLACE/JUNEST\n"
 		;;
 
-	--version|-v) echo "ArchImage CLI v$VERSION"
-		;;
-	
 	--build|-b)
 		while [ -n "$1" ]; do
 		cd $(xdg-user-dir DESKTOP)
@@ -32,7 +29,7 @@ case "$1" in
 			read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
     			case $response in
     				'');;
-				*) 
+				*)
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'BIN="'$response'"' >> ./$2-junest.sh
@@ -42,7 +39,7 @@ case "$1" in
 			echo -e "\n---------------------------------------------------------------------------\n"
 			read -r -ep "◆ ADD DEPENDENCES, OR LEAVE BLANK: " RESPONSE
     			case $RESPONSE in
-				*) 
+				*)
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
@@ -76,7 +73,7 @@ case "$1" in
 					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
 					case "$savebins" in
 					'');;
-					*) 
+					*)
 					sed -i "s/SAVEBINSPLEASE/$savebins/g" ./$2-junest.sh;;
 					esac;;
 				[Nn]*|* ) ;;
@@ -91,7 +88,7 @@ case "$1" in
 					read -r -ep "◆ LIST FOLDERS TO SAVE OR LEAVE BLANK$(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
 					case "$saveshare" in
 					'');;
-					*) 
+					*)
 					sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./$2-junest.sh;;
 					esac;;
 				[Nn]*|* ) ;;
@@ -112,13 +109,13 @@ case "$1" in
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -p "◆ DO YOU WANT TO INCLUDE EXTRA ITEMS OF YOUR CHOICE IN /usr/lib (y,N)? " yn
     					case $yn in
-						[Yy]* ) 
+						[Yy]* )
 							echo -e "\n---------------------------------------------------------------------------\n"
 							sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh
 							read -r -ep "◆ LIST KEYWORDS TO SEARCH AND SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
 							case "$savelibs" in
 							'');;
-							*) 
+							*)
 								sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./$2-junest.sh
 								echo -e "\n---------------------------------------------------------------------------\n"
 								read -r -ep "◆ DO YOU WISH TO ADD KEIWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
@@ -154,16 +151,19 @@ case "$1" in
 		esac
 		done
 		;;
-		
+
 	--sync|-s) 
 		cd $DIR
 		echo -ne " ◆ Synchronizing $(./archimage-cli -v)...\r"; sleep 0.5
   		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
   		mv ~/.cache/archimage-cli ./archimage-cli; echo " ◆ ArchImage is now updated to the version $(./archimage-cli -v) "
   		;;
-  		
+
+	--version|-v) echo "$VERSION"
+		;;
+
   		*)
   		echo -e "\n Unknown option '$1', run -h for more info.\n"
   		;;
-	
+
 esac
