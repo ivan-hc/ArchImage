@@ -142,10 +142,11 @@ cd ..
 mkdir base
 tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$APP*.zst -C ./base/
 
+DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 mkdir deps
-for arg in $DEPENDENCES; do
-	for var in $arg; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
+for arg in $DEPS; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
 	done
 done
 
