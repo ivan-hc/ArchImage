@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.2"
+VERSION="2.2-1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -125,14 +125,14 @@ case "$1" in
 								case $yn in
 								[Yy]* ) sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh
 									echo -e "\n---------------------------------------------------------------------------\n"
-									read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
+									read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TRYING TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
 									case $yn in
 										[Yy]* ) sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh
 											sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh
 											sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
 											sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh
 											sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
-											sed -i 's/LIBSAVED="/LIBSAVED="certificates /g'  ./$2-junest.sh
+											#sed -i 's/LIBSAVED="/LIBSAVED=" /g'  ./$2-junest.sh
 											sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
 											sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh;;
 										[Nn]*|* ) ;;
