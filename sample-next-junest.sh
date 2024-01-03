@@ -335,9 +335,9 @@ _saveshare(){
 #_saveshare 2> /dev/null
 
 # RSYNC DEPENDENCES
-rsync -av ./deps/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
+#rsync -av ./deps/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
 rsync -av ./deps/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
-rsync -av ./deps/usr/share/* ./$APP.AppDir/.junest/usr/share/
+#rsync -av ./deps/usr/share/* ./$APP.AppDir/.junest/usr/share/
 
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
