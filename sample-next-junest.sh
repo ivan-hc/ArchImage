@@ -147,7 +147,35 @@ mkdir deps
 for arg in $DEPS; do
 	for var in "$arg"; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
+done
+
+DEPS2=$(cat ./depdeps)
+mkdir deps
+for arg in $DEPS2; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
+ 	done
+done
+
+DEPS3=$(cat ./depdeps2)
+mkdir deps
+for arg in $DEPS3; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
+ 	done
+done
+
+DEPS4=$(cat ./depdeps3)
+mkdir deps
+for arg in $DEPS4; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
+ 	done
 done
 
 # REMOVE SOME BLOATWARES
@@ -306,9 +334,14 @@ _saveshare(){
 }
 #_saveshare 2> /dev/null
 
+# RSYNC DEPENDENCES
+rsync -av ./deps/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
+rsync -av ./deps/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
+rsync -av ./deps/usr/share/* ./$APP.AppDir/.junest/usr/share/
+
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
-#rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
+rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
@@ -319,4 +352,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.1-4-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.2-x86_64.AppImage
