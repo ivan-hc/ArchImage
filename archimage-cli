@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.1"
+VERSION="2.1-1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -50,7 +50,7 @@ case "$1" in
 				rm -f ./$2-junest.sh.old;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT ENABLE CHAOTIC-AUR (y,N)? " yn
+			read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/###//g' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
@@ -62,7 +62,7 @@ case "$1" in
 				[Nn]*|* ) ;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO INCLUDE THE GCC COMPILER (y,N)? " yn
+			read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE TO COMPILE FROM AUR (y,N)? " yn
     			case $yn in
 				[Yy]* ) sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
