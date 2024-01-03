@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.2-1"
+VERSION="2.2-2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -157,9 +157,9 @@ case "$1" in
 		
 	--sync|-s) 
 		cd $DIR
-		echo -ne " Synchronizing $(./archimage-cli -v)...\r"; sleep 0.5
+		echo -ne " ◆ Synchronizing $(./archimage-cli -v)...\r"; sleep 0.5
   		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
-  		mv ~/.cache/archimage-cli ./archimage-cli; echo "  ArchImage version $VERSION is updated! "
+  		mv ~/.cache/archimage-cli ./archimage-cli; echo " ◆ ArchImage is now updated to the version $(./archimage-cli -v) "
   		;;
   		
   		*)
