@@ -152,7 +152,6 @@ for arg in $DEPS; do
 done
 
 DEPS2=$(cat ./depdeps)
-mkdir deps
 for arg in $DEPS2; do
 	for var in "$arg"; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
@@ -161,7 +160,6 @@ for arg in $DEPS2; do
 done
 
 DEPS3=$(cat ./depdeps2)
-mkdir deps
 for arg in $DEPS3; do
 	for var in "$arg"; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
@@ -170,7 +168,6 @@ for arg in $DEPS3; do
 done
 
 DEPS4=$(cat ./depdeps3)
-mkdir deps
 for arg in $DEPS4; do
 	for var in "$arg"; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
