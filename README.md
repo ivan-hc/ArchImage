@@ -5,8 +5,8 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 ------------------------------------------
 - [Installation](#installation)
 - [Usage](#usage)
-- [Version 2.x](#version-2.x)
-- [Version 3.x](#version-3.x)
+- [Version 2.x](#version-2x)
+- [Version 3.x](#version-3x)
 - [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Files removed by default](#files-removed-by-default)
 - [Troubleshooting](#troubleshooting)
