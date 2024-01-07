@@ -6,6 +6,7 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 - [Installation](#installation)
 - [Usage](#usage)
 - [Version 2.x](#version-2.x)
+- [Version 3.x](#version-3.x)
 - [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Files removed by default](#files-removed-by-default)
 - [Troubleshooting](#troubleshooting)
@@ -19,6 +20,8 @@ Download the main script and made it executable:
 
     wget https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli
     chmod a+x ./archimage-cli
+
+-----------------------------------------------------------
 
 # Usage
 In this video I will show all the steps that I will describe in this section (Archimage 1.x):
@@ -42,6 +45,8 @@ After you've/you've not named the executable, the script will ask you to add a l
 ### Step 2: run the script
 Finally you've finished and you're ready to run the final script. This will automatically build all the stuff starting from the less options you've decided.
 
+-----------------------------------------------------------
+
 # Version 2.x
 From version 2.x, new actions are available (for advanced users) that will allow you to further automate the process, so as to remove files, directories and libraries that are not needed, making the final AppImage smaller and smaller.
 
@@ -52,6 +57,13 @@ However, it will be possible to skip the advanced options when creating the scri
 Archimage 2.x uses the template [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh).
 
 NOTE: if you have allowed the script to remove unneeded libraries, you will see a long output that may be longer than 5-10 minutes, this is because the script will re-run the check and the copy of all files saved in the /usr/lib directory of the AppDir to be sure that (almost) all needed libraries are in place, so don't be afraid for the long output. Let the script work until it have finished.
+
+-----------------------------------------------------------
+
+# Version 3.x
+Since version 3, ArchImage uses JuNest's "normal" mode instead of PROOT to work with "namespaces" thanks to "Bubblewrap". This ensures it works without too many limitations, as long as some directories are mounted (add the `-b "--bind /path/to/directory /your/directory"` option after `junest -n` in AppRun) . This should ensure the app can interact with the rest of the other apps installed on the system.
+
+-----------------------------------------------------------
 
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
@@ -74,11 +86,12 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 - all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
 
 ### Disadvantages
-- since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources;
-- being the final AppImage running using its internal PROOT binary, apps requiring internet and/or hardware accelleration may not use these features (I'm still working to improve this).
+- since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources... unless you use at least version 3 and link the appropriate directories.
 
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
+
+-----------------------------------------------------------
 
 # Troubleshooting
 If your AppImage package isn't working, here's how to debug it:
@@ -111,10 +124,14 @@ and then add the missing libraries from the directory "junest-backups" and try a
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
+-----------------------------------------------------------
+
 # Credits
 This project wont be possible without:
 - JuNest https://github.com/fsquillace/junest
 - Arch Linux https://archlinux.org
+
+-----------------------------------------------------------
 
 # Related projects
 - Portable Linux Apps https://portable-linux-apps.github.io
