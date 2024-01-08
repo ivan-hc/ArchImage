@@ -68,7 +68,7 @@ Since version 3, ArchImage uses JuNest's "normal" mode instead of PROOT to work 
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
-For example, an OBS Studio ArchImage equals 650MB in total, I managed to get it to 260MB by removing what wasn't necessary. This is the only disadvantage, having to look for the files to delete requires a long search... but at least you already have a working program using minimal effort!
+For example, an OBS Studio ArchImage equals 650MB in total, I managed to get it to 260MB by removing what wasn't necessary, while now (since Archimage2.x was released) is about 180MB.
 
 This is a list of the AppImages I've built until I wrote this brief guide:
 - Abiword https://github.com/ivan-hc/Abiword-appimage
