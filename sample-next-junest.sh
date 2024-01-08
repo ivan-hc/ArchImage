@@ -344,7 +344,7 @@ _saveshare(){
 
 # RSYNC DEPENDENCES
 #rsync -av ./deps/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
-rsync -av ./deps/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
+#rsync -av ./deps/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
 #rsync -av ./deps/usr/share/* ./$APP.AppDir/.junest/usr/share/
 
 # ADDITIONAL REMOVALS
