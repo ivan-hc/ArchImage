@@ -27,7 +27,9 @@ HOME="$(dirname "$(readlink -f $0)")"
 
 # DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
-./.local/share/junest/bin/junest setup
+wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
+rm -f junest-x86_64.tar.gz
 
 # ENABLE MULTILIB (optional)
 echo "
