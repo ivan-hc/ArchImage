@@ -147,22 +147,22 @@ cd ..
 
 # EXTRACT PACKAGE CONTENT
 mkdir base
-tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$APP*.zst -C ./base/
+tar fx $(find ./$APP.AppDir -name $APP-[0-9]*zst | head -1) -C ./base/
 
 mkdir deps
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
 	for var in $arg; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
-		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
@@ -170,7 +170,7 @@ done
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
  	done
 done
@@ -178,7 +178,7 @@ done
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
  	done
 done
@@ -186,7 +186,7 @@ done
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
  	done
 done
