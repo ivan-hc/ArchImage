@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.99-RC2"
+VERSION="3.0"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -138,6 +138,12 @@ case "$1" in
 								esac;;
 							[Nn]*|* ) ;;
 							esac;;
+						[Nn]*|* ) ;;
+					esac
+					echo -e "\n---------------------------------------------------------------------------\n"
+					read -p "◆ DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
+    					case $yn in
+						[Yy]* ) sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
 						[Nn]*|* ) ;;
 					esac;;
 				[Nn]*|* ) ;;
