@@ -141,7 +141,7 @@ cd ..
 # EXTRACT PACKAGE CONTENT
 mkdir base
 tar fx $(find ./$APP.AppDir -name $APP-[0-9]*zst | head -1) -C ./base/
-VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10-)
+VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
 mkdir deps
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
