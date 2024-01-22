@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="2.99-RC1"
+VERSION="2.99-RC2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -59,9 +59,10 @@ case "$1" in
 				[Nn]*|* ) ;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE TO COMPILE FROM AUR (y,N)? " yn
+			read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
     			case $yn in
-				[Yy]* ) sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh;;
+				[Yy]* ) sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh
+					sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh;;
 				[Nn]*|* ) ;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
