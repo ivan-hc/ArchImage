@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-VERSION="3.0"
+VERSION="3.1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 case "$1" in
 
-	'') echo -e "\n ArchImage CLI requires an argument, run -h for more info.\n"
-		;;
+	'') 
+		echo -e "\n ArchImage CLI requires an argument, run -h for more info.\n";;
 
 	--help|-h) 
 		echo -e "\n ArchImage CLI v$VERSION \n\n A command line interface to build AppImages based on JuNest, the lightweight\n Arch Linux based distro that runs, without root privileges, on top of any\n other Linux distro."
@@ -20,16 +20,18 @@ case "$1" in
 		while [ -n "$1" ]; do
 		cd $(xdg-user-dir DESKTOP)
 		case "$2" in
-			'') echo -e "\n USAGE:	archimage-cli -b [PROGRAM]\n"
+		'') 
+			echo -e "\n USAGE:	archimage-cli -b [PROGRAM]\n"
 			exit;;
-			*)
+		*)
 			wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-next-junest.sh -O $2-junest.sh
 			sed -i "s#APP=SAMPLE#APP=$2#g" $2-junest.sh
 			echo -e "\n---------------------------------------------------------------------------\n"
 			read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
     			case $response in
-    				'');;
-				*)
+    			'')
+    				;;
+			*)
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'BIN="'$response'"' >> ./$2-junest.sh
@@ -37,9 +39,9 @@ case "$1" in
 				rm -f ./$2-junest.sh.old;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -r -ep "◆ ADD DEPENDENCES, OR LEAVE BLANK: " RESPONSE
-    			case $RESPONSE in
-				*)
+			read -r -ep "◆ ADD (OPTIONAL) DEPENDENCES OR LEAVE BLANK: " RESPONSE
+  	  		case $RESPONSE in
+			*)
 				mv ./$2-junest.sh ./$2-junest.sh.old
 				sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
 				echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
@@ -47,106 +49,164 @@ case "$1" in
 				rm -f ./$2-junest.sh.old;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
+			echo -e '◆ Choose to finish using a standard configuration with the bare minimum or'
+			echo -e '  continue by customizing the script as much as possible (default).\n'
+			echo -e '  The standard configuration includes "binutils", "gzip" and "basedevel"'
+			echo -e '  (all of them are only required to compile from and will not be included'
+			echo -e '  in the AppImage package), the AUR is enabled, installs "ca-certificates",'
+			echo -e '  includes keywords for the internet connections and audio to enable them'
+			echo -e '  and all dependencies are bundled in the AppImage package.'
+			echo -e '  The file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed.\n'
+			echo -e '  Choose "N" or leave blank instead to continue customization (RECOMMENDED).\n'
+			read -p "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			case $yn in
-				[Yy]* ) sed -i 's/###//g' ./$2-junest.sh;;
-				[Nn]*|* ) ;;
-			esac
-			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
-    			case $yn in
-				[Yy]* ) sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh;;
-				[Nn]*|* ) ;;
-			esac
-			echo -e "\n---------------------------------------------------------------------------\n"
-			read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
-    			case $yn in
-				[Yy]* ) sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh
+			[Yy]* )
+				sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh # INSTALL BINUTILS AND GZIP
+				sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh # INSTALL BASE-DEVEL
+				sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh # ENABLE AUR GPG VALIDATION
+				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
+				sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
+				sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
+				sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
+				sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
+				sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh # INSTALL CA-CERTIFICATES
+				sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/bin
+				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
+				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
+				sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/share
+				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
+				sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh # ADD ALL DEPENDENCES IN THE APPIMAGE PACKAGE
+				;;					
+			[Nn]*|* ) 
+				echo -e "\n---------------------------------------------------------------------------\n"
+				read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
+    				case $yn in
+				[Yy]* ) 
+					sed -i 's/###//g' ./$2-junest.sh;;
+				[Nn]*|* ) 
+					;;
+				esac
+				echo -e "\n---------------------------------------------------------------------------\n"
+				read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
+    				case $yn in
+				[Yy]* ) 
+					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh;;
+				[Nn]*|* ) 
+					;;
+				esac
+				echo -e "\n---------------------------------------------------------------------------\n"
+				read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
+    				case $yn in
+				[Yy]* ) 
+					sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh
 					sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh;;
-				[Nn]*|* ) ;;
-			esac
-			echo -e "\n---------------------------------------------------------------------------\n"
-			echo -e '◆ All of the following steps are intended for advanced users and aim to\n  lighten the final AppImage archive. Always press ENTER if you are unsure.'
-			read -p "  DO YOU WANT TO REMOVE FILES IN /usr/bin AND SPECIFY WHAT TO SAVE (y,N)? " yn
-    			case $yn in
-				[Yy]* ) sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
+				[Nn]*|* ) 
+					;;
+				esac
+				echo -e "\n---------------------------------------------------------------------------\n"
+				echo -e '◆ All of the following steps are intended for advanced users and aim to'
+				echo -e '  lighten the final AppImage archive. Always press ENTER if you are unsure.\n'
+				read -p "  DO YOU WANT TO REMOVE FILES IN /usr/bin AND SPECIFY WHAT TO SAVE (y,N)? " yn
+    				case $yn in
+				[Yy]* ) 
+					sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
 					case "$savebins" in
-					'');;
+					'')
+						;;
 					*)
-					sed -i "s/SAVEBINSPLEASE/$savebins/g" ./$2-junest.sh;;
-					esac;;
-				[Nn]*|* ) ;;
-			esac
-			chmod a+x ./$2-junest.sh
-			echo -e "\n---------------------------------------------------------------------------\n"
-			echo -e '◆ Attempt to lighten the final AppImage by removing unnecessary folders.'
-			read -p "  DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
-    			case $yn in
+						sed -i "s/SAVEBINSPLEASE/$savebins/g" ./$2-junest.sh;;
+						esac;;
+				[Nn]*|* ) 
+					;;
+				esac
+				echo -e "\n---------------------------------------------------------------------------\n"
+				echo -e '◆ Attempt to lighten the final AppImage by removing unnecessary folders.'
+				read -p "  DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
+    				case $yn in
 				[Yy]* ) sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -r -ep "◆ LIST FOLDERS TO SAVE OR LEAVE BLANK$(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
 					case "$saveshare" in
 					'');;
 					*)
-					sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./$2-junest.sh;;
-					esac;;
-				[Nn]*|* ) ;;
-			esac
-			echo -e "\n---------------------------------------------------------------------------\n"
-			echo -e '◆ The next step will take account of the folders in /usr/share that you have\n  saved previously to automatically check libraries in /usr/lib that contain\n  the keyword. If a file is missing the app may not work. Note that this step\n  will use "readelf" and "find" to locate files directly dependent on the\n  main executables saved in /usr/bin, the related libraries and the libraries\n  related to these. The process could be much longer than normal.'
-			read -p "  DO YOU WANT TO LET THE SCRIPT DECIDE WHICH LIBRARIES TO SAVE (y,N)? " yn
-    			case $yn in
-				[Yy]* ) sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
+						sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./$2-junest.sh;;
+						esac;;
+					[Nn]*|* ) 
+						;;
+					esac
+				echo -e "\n---------------------------------------------------------------------------\n"
+				echo -e '◆ The next step will take account of the folders in /usr/share that you have'
+				echo -e '  saved previously to automatically check libraries in /usr/lib that contain'
+				echo -e '  the keyword. If a file is missing the app may not work. Note that this step'
+				echo -e '  will use "readelf" and "find" to locate files directly dependent on the'
+				echo -e '  main executables saved in /usr/bin, the related libraries and the libraries'
+				echo -e '  related to these. The process could be much longer than normal.\n'
+				read -p "  DO YOU WANT TO LET THE SCRIPT DECIDE WHICH LIBRARIES TO SAVE (y,N)? " yn
+    				case $yn in
+				[Yy]* ) 
+					sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
 					sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh
 					sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -p "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
     					case $yn in
-						[Yy]* ) sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./$2-junest.sh;;
-						[Nn]*|* ) ;;
+					[Yy]* ) 
+						sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./$2-junest.sh;;
+					[Nn]*|* ) 
+						;;
 					esac
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -p "◆ DO YOU WANT TO INCLUDE EXTRA ITEMS OF YOUR CHOICE IN /usr/lib (y,N)? " yn
     					case $yn in
-						[Yy]* )
-							echo -e "\n---------------------------------------------------------------------------\n"
-							sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh
-							read -r -ep "◆ LIST KEYWORDS TO SEARCH AND SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
-							case "$savelibs" in
-							'');;
-							*)
-								sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./$2-junest.sh;;
-							esac
-							echo -e "\n---------------------------------------------------------------------------\n"
-							read -r -ep "◆ DO YOU WISH TO ADD KEIWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
-							case $yn in
-							[Yy]* ) sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh
-								echo -e "\n---------------------------------------------------------------------------\n"
-								read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TRYING TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
-								case $yn in
-									[Yy]* ) sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh
-										sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh
-										sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
-										sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh
-										sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
-										sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh
-										sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
-										sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh;;
-									[Nn]*|* ) ;;
-								esac;;
-							[Nn]*|* ) ;;
-							esac;;
-						[Nn]*|* ) ;;
+					[Yy]* )
+						echo -e "\n---------------------------------------------------------------------------\n"
+						sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh
+						read -r -ep "◆ LIST KEYWORDS TO SEARCH AND SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
+						case "$savelibs" in
+						'')	
+							;;
+						*)
+							sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./$2-junest.sh;;
+						esac
+						echo -e "\n---------------------------------------------------------------------------\n"
+						read -r -ep "◆ DO YOU WISH TO ADD KEIWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
+						case $yn in
+						[Yy]* ) 
+							sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh;;
+						[Nn]*|* ) 
+							;;
+						esac
+						echo -e "\n---------------------------------------------------------------------------\n"
+						read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TRYING TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
+						case $yn in
+						[Yy]* ) 
+							sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh
+							sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh
+							sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
+							sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh
+							sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
+							sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh
+							sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
+							sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh;;
+						[Nn]*|* ) 
+							;;
+						esac;;
+					[Nn]*|* ) 
+						;;
 					esac
 					echo -e "\n---------------------------------------------------------------------------\n"
 					read -p "◆ DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
     					case $yn in
-						[Yy]* ) sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
-						[Nn]*|* ) ;;
+					[Yy]* ) 
+						sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
+					[Nn]*|* ) 
+						;;
 					esac;;
-				[Nn]*|* ) ;;
+				[Nn]*|* ) 
+					;;
+				esac
 			esac
 			chmod a+x ./$2-junest.sh
 			echo -e "\n---------------------------------------------------------------------------\n"
