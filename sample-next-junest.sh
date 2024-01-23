@@ -185,7 +185,7 @@ for arg in $DEPS4; do
 done
 
 # REMOVE SOME BLOATWARES
-rm -R .f ./$APP.AppDir/.cache/yay/*
+#rm -R .f ./$APP.AppDir/.cache/yay/*
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 rm -R -f ./$APP.AppDir/.junest/etc/makepkg.conf
