@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.1"
+VERSION="3.1-1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -51,19 +51,18 @@ case "$1" in
 			echo -e "\n---------------------------------------------------------------------------\n"
 			echo -e '◆ Choose to finish using a standard configuration with the bare minimum or'
 			echo -e '  continue by customizing the script as much as possible (default).\n'
-			echo -e '  The standard configuration includes "binutils", "gzip" and "basedevel"'
-			echo -e '  (all of them are only required to compile from and will not be included'
-			echo -e '  in the AppImage package), the AUR is enabled, installs "ca-certificates",'
-			echo -e '  includes keywords for the internet connections and audio to enable them'
-			echo -e '  and all dependencies are bundled in the AppImage package.'
+			echo -e '  The standard configuration includes a package availability check in the'
+			echo -e '  Arch User Repository (if so, enable AUR and installs "binutils", "gzip"'
+			echo -e '  and "basedevel", all of them are only required to compile from and will'
+			echo -e '  not be included in the AppImage package), the AUR is enabled, installs'
+			echo -e '  "ca-certificates", includes keywords for the internet connections and '
+			echo -e '  audio trying to enable them and all dependencies are bundled into the'
+			echo -e '  final AppImage (it might be overkill, but it should work in most cases).'
 			echo -e '  The file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed.\n'
 			echo -e '  Choose "N" or leave blank instead to continue customization (RECOMMENDED).\n'
 			read -p "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			case $yn in
 			[Yy]* )
-				sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh # INSTALL BINUTILS AND GZIP
-				sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh # INSTALL BASE-DEVEL
-				sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh # ENABLE AUR GPG VALIDATION
 				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
 				sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
 				sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
@@ -76,7 +75,12 @@ case "$1" in
 				sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/share
 				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
 				sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh # ADD ALL DEPENDENCES IN THE APPIMAGE PACKAGE
-				;;					
+				if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/$2 2> /dev/null; then
+					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh # INSTALL BINUTILS AND GZIP
+					sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh # INSTALL BASE-DEVEL
+					sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh # ENABLE AUR GPG VALIDATION
+				fi
+				;;
 			[Nn]*|* ) 
 				echo -e "\n---------------------------------------------------------------------------\n"
 				read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
