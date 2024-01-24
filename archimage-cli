@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.1-1"
+VERSION="3.1-2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -70,6 +70,7 @@ case "$1" in
 				sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
 				sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh # INSTALL CA-CERTIFICATES
 				sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/bin
+				sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/bin
 				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
 				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
 				sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/share
