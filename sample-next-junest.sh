@@ -128,7 +128,7 @@ if test -f /etc/resolv.conf; then
 	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
 fi
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV" 2> /dev/null -- $EXEC "$@"
+$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV" -- $EXEC "$@"
 EOF
 chmod a+x ./AppRun
 
