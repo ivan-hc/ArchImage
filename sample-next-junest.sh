@@ -221,6 +221,7 @@ _savebins(){
 	mv ./$APP.AppDir/.junest/usr/bin/env ./save/
 	mv ./$APP.AppDir/.junest/usr/bin/sh ./save/
  	mv ./$APP.AppDir/.junest/usr/bin/tr ./save/
+   	mv ./$APP.AppDir/.junest/usr/bin/tty ./save/
 	for arg in $BINSAVED; do
 		for var in $arg; do
  			mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
