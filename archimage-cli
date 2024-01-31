@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.1-2"
+VERSION="3.2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -49,6 +49,15 @@ case "$1" in
 				rm -f ./$2-junest.sh.old;;
 			esac
 			echo -e "\n---------------------------------------------------------------------------\n"
+			echo "◆ Automatic library checking should be more than enough. However..."
+			read -p "  DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
+    			case $yn in
+			[Yy]* ) 
+				sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
+			[Nn]*|* ) 
+				;;
+			esac
+			echo -e "\n---------------------------------------------------------------------------\n"
 			echo -e '◆ Choose to finish using a standard configuration with the bare minimum or'
 			echo -e '  continue by customizing the script as much as possible (default).\n'
 			echo -e '  The standard configuration includes a package availability check in the'
@@ -56,8 +65,7 @@ case "$1" in
 			echo -e '  and "basedevel", all of them are only required to compile from and will'
 			echo -e '  not be included in the AppImage package), the AUR is enabled, installs'
 			echo -e '  "ca-certificates", includes keywords for the internet connections and '
-			echo -e '  audio trying to enable them and all dependencies are bundled into the'
-			echo -e '  final AppImage (it might be overkill, but it should work in most cases).'
+			echo -e '  audio trying to enable them.'
 			echo -e '  The file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed.\n'
 			echo -e '  Choose "N" or leave blank instead to continue customization (RECOMMENDED).\n'
 			read -p "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
@@ -75,7 +83,6 @@ case "$1" in
 				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
 				sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/share
 				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
-				sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh # ADD ALL DEPENDENCES IN THE APPIMAGE PACKAGE
 				if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/$2 2> /dev/null; then
 					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh # INSTALL BINUTILS AND GZIP
 					sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh # INSTALL BASE-DEVEL
@@ -198,14 +205,6 @@ case "$1" in
 						[Nn]*|* ) 
 							;;
 						esac;;
-					[Nn]*|* ) 
-						;;
-					esac
-					echo -e "\n---------------------------------------------------------------------------\n"
-					read -p "◆ DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
-    					case $yn in
-					[Yy]* ) 
-						sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
 					[Nn]*|* ) 
 						;;
 					esac;;
