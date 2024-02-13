@@ -123,7 +123,6 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$PATH:$HERE/.local/share/junest/bin
-mkdir -p $HOME/.cache
 if test -f /etc/resolv.conf; then
 	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
 fi
