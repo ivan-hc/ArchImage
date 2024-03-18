@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.2"
+VERSION="3.3"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -94,7 +94,7 @@ case "$1" in
 				read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
     				case $yn in
 				[Yy]* ) 
-					sed -i 's/###//g' ./$2-junest.sh;;
+					sed -i 's/###_enable_chaoticaur/_enable_chaoticaur/g' ./$2-junest.sh;;
 				[Nn]*|* ) 
 					;;
 				esac
