@@ -28,7 +28,6 @@ In this video I will show all the steps that I will describe in this section (Ar
 
 https://github.com/ivan-hc/ArchImage/assets/88724353/d53f7e11-ceb3-4bc4-bee9-9372fd88cf8d
 
-
 ### Step 1: create the script
     ./archimage-cli [OPTION]
 or
@@ -62,6 +61,10 @@ NOTE: if you have allowed the script to remove unneeded libraries, you will see 
 
 # Version 3.x
 Since version 3, ArchImage uses JuNest's "normal" mode instead of PROOT to work with "namespaces" thanks to "Bubblewrap". This ensures it works without too many limitations, as long as some directories are mounted (add the `-b "--bind /path/to/directory /your/directory"` option after `junest -n` in AppRun) . This should ensure the app can interact with the rest of the other apps installed on the system.
+
+Also, version 3.3 allows you to repeat your tests without having to download everything again.
+
+https://github.com/ivan-hc/ArchImage/assets/88724353/06c91ddf-b9c8-41aa-a68c-325250925fd7
 
 -----------------------------------------------------------
 
