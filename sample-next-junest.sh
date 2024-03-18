@@ -28,7 +28,7 @@ if ! test -d "$HOME/.local/share/junest"; then
 	rm -f junest-x86_64.tar.gz
 
 	# ENABLE MULTILIB (optional)
-	echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	echo "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
 	# ENABLE CHAOTIC-AUR
 	_enable_chaoticaur(){
@@ -36,7 +36,7 @@ if ! test -d "$HOME/.local/share/junest"; then
 		./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
 		./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
 		./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-		echo "[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+		echo "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 	}
 	###_enable_chaoticaur
 
