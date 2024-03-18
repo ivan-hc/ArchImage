@@ -8,58 +8,74 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 #COMPILERS="base-devel"
 
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
-wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
-chmod a+x appimagetool
-mkdir $APP.AppDir
+if ! test -f ./appimagetool; then
+	wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+	chmod a+x appimagetool
+fi
+mkdir -p $APP.AppDir
 
 # ENTER THE APPDIR
 cd $APP.AppDir
 
 # SET APPDIR AS A TEMPORARY $HOME DIRECTORY, THIS WILL DO ALL WORK INTO THE APPDIR
-HOME="$(dirname "$(readlink -f $0)")" 
+HOME="$(dirname "$(readlink -f $0)")"
 
 # DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
-git clone https://github.com/fsquillace/junest.git "$HOME/.local/share/junest"
-wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
-./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
-rm -f junest-x86_64.tar.gz
+if ! test -d "$HOME/.local/share/junest"; then
+	git clone https://github.com/fsquillace/junest.git "$HOME/.local/share/junest"
+	wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
+	rm -f junest-x86_64.tar.gz
 
-# ENABLE MULTILIB (optional)
-echo "
-[multilib]
-Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	# ENABLE MULTILIB (optional)
+	echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
-# ENABLE CHAOTIC-AUR
-###./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-###./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
-###./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
-###./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-###echo "
-###[chaotic-aur]
-###Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+	# ENABLE CHAOTIC-AUR
+	_enable_chaoticaur(){
+		./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+		./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
+		./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
+		./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+		echo "[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+	}
+	###_enable_chaoticaur
 
-# CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-_custom_mirrorlist(){
-	#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
-	rm -R ./.junest/etc/pacman.d/mirrorlist
-	wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
-	#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
-}
-_custom_mirrorlist
+	# CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
+	_custom_mirrorlist(){
+		#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+		rm -R ./.junest/etc/pacman.d/mirrorlist
+		wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
+		#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
+	}
+	_custom_mirrorlist
 
-# BYPASS SIGNATURE CHECK LEVEL
-sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
-sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
+	# BYPASS SIGNATURE CHECK LEVEL
+	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
+	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
 
-# UPDATE ARCH LINUX IN JUNEST
-./.local/share/junest/bin/junest -- sudo pacman -Syy
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
+	# UPDATE ARCH LINUX IN JUNEST
+	./.local/share/junest/bin/junest -- sudo pacman -Syy
+	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
+else
+	cd ..
+	rsync -av ./junest-backups/* ./$APP.AppDir/.junest/
+	rsync -av ./stock-local/* ./$APP.AppDir/.local/
+	cd ./$APP.AppDir
+fi
 
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
 #./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
 ./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS")
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$DEPENDENCES $APP")
+./.local/share/junest/bin/junest -- yay --noconfirm -S $(echo "$DEPENDENCES $APP")
+
+# DO A BACKUP OF THE CURRENT STATE OF JUNEST
+cd ..
+mkdir -p ./junest-backups
+mkdir -p ./stock-junest
+rsync -av --ignore-existing ./$APP.AppDir/.junest/* ./junest-backups/
+rsync -av --ignore-existing ./$APP.AppDir/.local/* ./stock-local/
+cd ./$APP.AppDir
 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
@@ -204,18 +220,10 @@ rm -R -f ./$APP.AppDir/.junest/usr/include #FILES RELATED TO THE COMPILER
 rm -R -f ./$APP.AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
 rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
 
-# IN THE NEXT 4 STEPS WE WILL TRY TO LIGHTEN THE FINAL APPIMAGE PACKAGE
-# WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
-# THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
-
+# SAVE FILES USING KEYWORDS
 BINSAVED="SAVEBINSPLEASE" # Enter here keywords to find and save in /usr/bin
 SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
 LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/folder names to save in /usr/lib
-
-# STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
-mkdir -p ./junest-backups/usr/bin
-mkdir -p ./junest-backups/usr/lib/dri
-mkdir -p ./junest-backups/usr/share
 
 # STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
@@ -233,7 +241,7 @@ _savebins(){
  			mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
 		done
 	done
-	mv ./$APP.AppDir/.junest/usr/bin/* ./junest-backups/usr/bin/
+	rm -R -f ./$APP.AppDir/.junest/usr/bin/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
@@ -307,7 +315,7 @@ _liblibs(){
 }
 
 _mvlibs(){
-	mv ./$APP.AppDir/.junest/usr/lib/* ./junest-backups/usr/lib/
+	rm -R -f ./$APP.AppDir/.junest/usr/lib/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/lib/
 }
 
@@ -344,7 +352,7 @@ _saveshare(){
  			mv ./$APP.AppDir/.junest/usr/share/*"$arg"* ./save/
 		done
 	done
-	mv ./$APP.AppDir/.junest/usr/share/* ./junest-backups/usr/share/
+	rm -R -f ./$APP.AppDir/.junest/usr/share/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/share/
  	rmdir save
 }
@@ -359,7 +367,7 @@ rm -R -f ./deps/.*
 #rsync -av ./deps/* ./$APP.AppDir/.junest/
 
 # ADDITIONAL REMOVALS
-#mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
+#rm -R -f ./$APP.AppDir/.junest/usr/lib/libLLVM-* #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
 rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
 
 # REMOVE THE INBUILT HOME
@@ -374,5 +382,8 @@ mkdir -p ./$APP.AppDir/.junest/usr/share/themes
 mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
+if test -f ./*.AppImage; then
+	rm -R -f ./*archimage*.AppImage
+fi
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.2-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.3-x86_64.AppImage
