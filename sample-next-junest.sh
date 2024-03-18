@@ -59,6 +59,7 @@ if ! test -d "$HOME/.local/share/junest"; then
 else
 	cd ..
 	rsync -av ./junest-backups/* ./$APP.AppDir/.junest/
+	rsync -av ./stock-cache/* ./$APP.AppDir/.cache/
 	rsync -av ./stock-local/* ./$APP.AppDir/.local/
 	cd ./$APP.AppDir
 fi
@@ -72,8 +73,10 @@ fi
 # DO A BACKUP OF THE CURRENT STATE OF JUNEST
 cd ..
 mkdir -p ./junest-backups
-mkdir -p ./stock-junest
+mkdir -p ./stock-cache
+mkdir -p ./stock-local
 rsync -av --ignore-existing ./$APP.AppDir/.junest/* ./junest-backups/
+rsync -av --ignore-existing ./$APP.AppDir/.cache/* ./stock-cache/
 rsync -av --ignore-existing ./$APP.AppDir/.local/* ./stock-local/
 cd ./$APP.AppDir
 
@@ -165,10 +168,14 @@ sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappe
 cd ..
 
 # EXTRACT PACKAGE CONTENT
-mkdir base
+mkdir -p base
+rm -R -f ./base/*
+
 tar fx $(find ./$APP.AppDir -name $APP-[0-9]*zst | head -1) -C ./base/
 VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
-mkdir deps
+
+mkdir -p deps
+rm -R -f ./deps/*
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
