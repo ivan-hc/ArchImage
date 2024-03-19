@@ -189,46 +189,36 @@ rm -R -f ./deps/*
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
-	for var in $arg; do
- 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
- 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
-	done
+	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
-	for var in $arg; do
- 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
- 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
-	done
+	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 done
 
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
-	for var in $arg; do
- 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
- 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
- 	done
+	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
 done
 
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
-	for var in $arg; do
- 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
- 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
- 	done
+	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
 done
 
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
-	for var in $arg; do
- 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
- 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
- 	done
+	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
 done
 
 # REMOVE SOME BLOATWARES
-echo Y | rm -R .f ./$APP.AppDir/.cache/yay/*
+echo Y | rm -R -f ./$APP.AppDir/.cache/yay/*
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 rm -R -f ./$APP.AppDir/.junest/etc/makepkg.conf
@@ -254,9 +244,7 @@ function _savebins(){
  	mv ./$APP.AppDir/.junest/usr/bin/tr ./save/
    	mv ./$APP.AppDir/.junest/usr/bin/tty ./save/
 	for arg in $BINSAVED; do
-		for var in $arg; do
- 			mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
-		done
+		mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
 	done
 	rm -R -f ./$APP.AppDir/.junest/usr/bin/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
@@ -275,16 +263,12 @@ function _binlibs(){
 	mv ./$APP.AppDir/.junest/usr/lib/libdw* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/libelf* ./save/
 	for arg in $SHARESAVED; do
-		for var in $arg; do
- 			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
-		done
+		mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
 	done
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
-		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
-		done 
+		mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
+		find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
 	done
 	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
 	rm list
@@ -297,9 +281,7 @@ function _include_swrast_dri(){
 
 function _libkeywords(){
 	for arg in $LIBSAVED; do
-		for var in $arg; do
- 			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
-		done
+		mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
 	done
 }
 
@@ -321,10 +303,8 @@ function _liblibs(){
 	readelf -d ./deps/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
-		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
-		done 
+		mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
+		find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
 	done
 	rsync -av ./save/$APP.AppDir/.junest/usr/lib/* ./save/
  	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
@@ -365,9 +345,7 @@ function _saveshare(){
 	mv ./$APP.AppDir/.junest/usr/share/wayland ./save/
 	mv ./$APP.AppDir/.junest/usr/share/X11 ./save/
 	for arg in $SHARESAVED; do
-		for var in $arg; do
- 			mv ./$APP.AppDir/.junest/usr/share/*"$arg"* ./save/
-		done
+		mv ./$APP.AppDir/.junest/usr/share/*"$arg"* ./save/
 	done
 	rm -R -f ./$APP.AppDir/.junest/usr/share/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/share/
