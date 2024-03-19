@@ -30,6 +30,11 @@ if ! test -d "$HOME/.local/share/junest"; then
 	# ENABLE MULTILIB (optional)
 	echo "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
+	# ENABLE LIBSELINUX FROM THIRD PARTY REPOSITORY
+	if [[ $DEPENDENCES = *"libselinux"* ]]; then
+		echo "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
+	fi
+
 	# ENABLE CHAOTIC-AUR
 	_enable_chaoticaur(){
 		./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
@@ -152,6 +157,11 @@ if test -f /etc/resolv.conf; then
 	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
 fi
 BINDS=" $MNT_MEDIA $ETC_RESOLV "
+
+if test -f $JUNEST_HOME/usr/lib/libselinux.so; then
+	export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
+fi
+
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 $HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
 EOF
