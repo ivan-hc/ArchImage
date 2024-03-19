@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=SAMPLE
@@ -28,25 +28,25 @@ if ! test -d "$HOME/.local/share/junest"; then
 	rm -f junest-x86_64.tar.gz
 
 	# ENABLE MULTILIB (optional)
-	echo "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
 	# ENABLE LIBSELINUX FROM THIRD PARTY REPOSITORY
 	if [[ $DEPENDENCES = *"libselinux"* ]]; then
-		echo "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
+		echo -e "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
 	fi
 
 	# ENABLE CHAOTIC-AUR
-	_enable_chaoticaur(){
+	function _enable_chaoticaur(){
 		./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
 		./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
 		./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
 		./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-		echo "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+		echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 	}
 	###_enable_chaoticaur
 
 	# CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-	_custom_mirrorlist(){
+	function _custom_mirrorlist(){
 		#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 		rm -R ./.junest/etc/pacman.d/mirrorlist
 		wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
@@ -197,7 +197,7 @@ done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
@@ -205,7 +205,7 @@ done
 
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
  	done
@@ -213,7 +213,7 @@ done
 
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
  	done
@@ -221,7 +221,7 @@ done
 
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
  	done
@@ -244,7 +244,7 @@ LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/folder names to save in 
 
 # STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
-_savebins(){
+function _savebins(){
 	mkdir save
 	mv ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
 	mv ./$APP.AppDir/.junest/usr/bin/bash ./save/
@@ -267,7 +267,7 @@ _savebins(){
 # STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP FOLDER (FOR TESTING PURPOSES)
 mkdir save
 
-_binlibs(){
+function _binlibs(){
 	readelf -d ./$APP.AppDir/.junest/usr/bin/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	mv ./$APP.AppDir/.junest/usr/lib/ld-linux-x86-64.so* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/*$APP* ./save/
@@ -290,12 +290,12 @@ _binlibs(){
 	rm list
 }
 
-_include_swrast_dri(){
+function _include_swrast_dri(){
 	mkdir ./save/dri
 	mv ./$APP.AppDir/.junest/usr/lib/dri/swrast_dri.so ./save/dri/
 }
 
-_libkeywords(){
+function _libkeywords(){
 	for arg in $LIBSAVED; do
 		for var in $arg; do
  			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
@@ -303,7 +303,7 @@ _libkeywords(){
 	done
 }
 
-_liblibs(){
+function _liblibs(){
 	readelf -d ./save/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -331,7 +331,7 @@ _liblibs(){
 	rm list
 }
 
-_mvlibs(){
+function _mvlibs(){
 	rm -R -f ./$APP.AppDir/.junest/usr/lib/*
 	mv ./save/* ./$APP.AppDir/.junest/usr/lib/
 }
@@ -354,7 +354,7 @@ rmdir save
 
 # STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
 # IF YOU NEED TO SAVE MORE FOLDERS, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
-_saveshare(){
+function _saveshare(){
 	mkdir save
 	mv ./$APP.AppDir/.junest/usr/share/*$APP* ./save/
  	mv ./$APP.AppDir/.junest/usr/share/*$BIN* ./save/
