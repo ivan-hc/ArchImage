@@ -9,13 +9,13 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
 if ! test -f ./appimagetool; then
-	wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
+	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1)" -O appimagetool
 	chmod a+x appimagetool
 fi
 mkdir -p $APP.AppDir
 
 # ENTER THE APPDIR
-cd $APP.AppDir
+cd $APP.AppDir || return
 
 # SET APPDIR AS A TEMPORARY $HOME DIRECTORY, THIS WILL DO ALL WORK INTO THE APPDIR
 HOME="$(dirname "$(readlink -f $0)")"
@@ -66,14 +66,14 @@ else
 	rsync -av ./junest-backups/* ./$APP.AppDir/.junest/
 	rsync -av ./stock-cache/* ./$APP.AppDir/.cache/
 	rsync -av ./stock-local/* ./$APP.AppDir/.local/
-	cd ./$APP.AppDir
+	cd ./$APP.AppDir || return
 fi
 
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
 #./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS")
-./.local/share/junest/bin/junest -- yay --noconfirm -S $(echo "$DEPENDENCES $APP")
+./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$(echo "$BASICSTUFF $COMPILERS")"
+./.local/share/junest/bin/junest -- yay --noconfirm -S "$(echo "$DEPENDENCES $APP")"
 
 # DO A BACKUP OF THE CURRENT STATE OF JUNEST
 cd ..
@@ -83,7 +83,7 @@ mkdir -p ./stock-local
 rsync -av --ignore-existing ./$APP.AppDir/.junest/* ./junest-backups/
 rsync -av --ignore-existing ./$APP.AppDir/.cache/* ./stock-cache/
 rsync -av --ignore-existing ./$APP.AppDir/.local/* ./stock-local/
-cd ./$APP.AppDir
+cd ./$APP.AppDir || return
 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
@@ -101,18 +101,18 @@ rm -R -f ./*.desktop
 LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./
 ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
-cp -r ./.junest/usr/share/icons/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/pixmaps/*"$ICON"* ./ 2>/dev/null
 
 # TEST IF THE DESKTOP FILE AND THE ICON ARE IN THE ROOT OF THE FUTURE APPIMAGE (./*AppDir/*)
 if test -f ./*.desktop; then
@@ -181,7 +181,7 @@ cd ..
 mkdir -p base
 rm -R -f ./base/*
 
-tar fx $(find ./$APP.AppDir -name $APP-[0-9]*zst | head -1) -C ./base/
+tar fx "$(find ./$APP.AppDir -name "$APP-[0-9]*zst" | head -1)" -C ./base/
 VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
 
 mkdir -p deps
@@ -189,31 +189,31 @@ rm -R -f ./deps/*
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
-	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+	tar fx "$(find ./$APP.AppDir -name "$arg-[0-9]*zst")" -C ./deps/
  	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
-	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+	tar fx "$(find ./$APP.AppDir -name "$arg-[0-9]*zst")" -C ./deps/
  	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 done
 
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
-	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+	tar fx "$(find ./$APP.AppDir -name "$arg-[0-9]*zst")" -C ./deps/
  	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
 done
 
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
-	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+	tar fx "$(find ./$APP.AppDir -name "$arg-[0-9]*zst")" -C ./deps/
  	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
 done
 
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
-	tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+	tar fx "$(find ./$APP.AppDir -name "$arg-[0-9]*zst")" -C ./deps/
  	cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
 done
 
@@ -268,9 +268,9 @@ function _binlibs(){
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-		find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
+		find ./$APP.AppDir/.junest/usr/lib/ -name "$arg" -exec cp -r --parents -t save/ {} +
 	done
-	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
+	rm -R -f "$(find ./save/ | sort | grep ".AppDir" | head -1)"
 	rm list
 }
 
@@ -303,11 +303,11 @@ function _liblibs(){
 	readelf -d ./deps/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
-		mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-		find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
+		mv ./$APP.AppDir/.junest/usr/lib/"$arg"* ./save/
+		find ./$APP.AppDir/.junest/usr/lib/ -name "$arg" -exec cp -r --parents -t save/ {} +
 	done
 	rsync -av ./save/$APP.AppDir/.junest/usr/lib/* ./save/
- 	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
+ 	rm -R -f "$(find ./save/ | sort | grep ".AppDir" | head -1)"
 	rm list
 }
 
