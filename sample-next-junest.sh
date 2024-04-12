@@ -72,8 +72,8 @@ fi
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
 #./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts "$(echo "$BASICSTUFF $COMPILERS")"
-./.local/share/junest/bin/junest -- yay --noconfirm -S "$(echo "$DEPENDENCES $APP")"
+./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS")
+./.local/share/junest/bin/junest -- yay --noconfirm -S $(echo "$DEPENDENCES $APP")
 
 # DO A BACKUP OF THE CURRENT STATE OF JUNEST
 cd ..
