@@ -9,7 +9,7 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
 if ! test -f ./appimagetool; then
-	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1)" -O appimagetool
+	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
 	chmod a+x appimagetool
 fi
 mkdir -p $APP.AppDir
