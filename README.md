@@ -140,4 +140,4 @@ This project wont be possible without:
 
 # Related projects
 - Portable Linux Apps https://portable-linux-apps.github.io
-- "AM" Application Manager https://github.com/ivan-hc/AM-Application-Manager 
+- "AM" Application Manager https://github.com/ivan-hc/AM
