@@ -89,7 +89,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 - all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
 
 ### Disadvantages
-- since JuNest is a standalone system, it won't be able, for example, to open the host's browser, it relies almost completely on its own built-in resources... unless you use at least version 3 and link the appropriate directories.
+- hardware acceleration is absent (for now), see https://github.com/ivan-hc/ArchImage/issues/20
 
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
