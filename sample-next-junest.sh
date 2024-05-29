@@ -150,13 +150,25 @@ HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$PATH:$HERE/.local/share/junest/bin
-if test -d /media; then
-	MNT_MEDIA=' --bind /media /media '
-fi
+
 if test -f /etc/resolv.conf; then
-	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
-fi
-BINDS=" $MNT_MEDIA $ETC_RESOLV "
+ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
+if test -d /media; then
+MNT_MEDIA_DIR=' --bind /media /media '; fi
+if test -d /mnt; then
+MNT_DIR=' --bind /mnt /mnt '; fi
+if test -d /opt; then
+OPT_DIR=' --bind /opt /opt '; fi
+if test -d /run/user; then
+RUN_USER_DIR=' --bind /run/user /run/user '; fi
+if test -d /usr/lib/locale; then
+USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
+if test -d /usr/share/fonts; then
+USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
+if test -d /usr/share/themes; then
+USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
+
+BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $RUN_USER_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
 
 if test -f $JUNEST_HOME/usr/lib/libselinux.so; then
 	export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
@@ -171,7 +183,7 @@ chmod a+x ./AppRun
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's#--bind "$HOME" "$HOME"#--bind /opt /opt --bind /usr/lib/locale /usr/lib/locale --bind /usr/share/fonts /usr/share/fonts --bind /usr/share/themes /usr/share/themes --bind /mnt /mnt --bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home#g' .local/share/junest/lib/core/namespace.sh
 sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 
 # EXIT THE APPDIR
