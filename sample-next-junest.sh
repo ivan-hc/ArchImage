@@ -160,15 +160,13 @@ MNT_DIR=' --bind /mnt /mnt '; fi
 if test -d /opt; then
 OPT_DIR=' --bind /opt /opt '; fi
 if test -d /run/user; then
-RUN_USER_DIR=' --bind /run/user /run/user '; fi
-if test -d /usr/lib/locale; then
 USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
 if test -d /usr/share/fonts; then
 USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
 if test -d /usr/share/themes; then
 USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
 
-BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $RUN_USER_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
+BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
 
 if test -f $JUNEST_HOME/usr/lib/libselinux.so; then
 	export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
@@ -183,7 +181,7 @@ chmod a+x ./AppRun
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home#g' .local/share/junest/lib/core/namespace.sh
+sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
 sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 
 # EXIT THE APPDIR
@@ -393,4 +391,4 @@ if test -f ./*.AppImage; then
 	rm -R -f ./*archimage*.AppImage
 fi
 ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.1-x86_64.AppImage
