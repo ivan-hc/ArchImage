@@ -400,12 +400,14 @@ function _saveshare(){
 #_saveshare 2> /dev/null
 
 # RSYNC THE CONTENT OF THE APP'S PACKAGE
+echo -e "\n-----------------------------------------------------------"
 rm -R -f ./base/.*
-rsync -av ./base/* ./"$APP".AppDir/.junest/
+rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync the content of the \"$APP\" package"
 
 # RSYNC DEPENDENCES
 rm -R -f ./deps/.*
-#rsync -av ./deps/* ./"$APP".AppDir/.junest/
+#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync all dependeces, please wait..."
+echo -e "-----------------------------------------------------------\n"
 
 # ADDITIONAL REMOVALS
 #rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
