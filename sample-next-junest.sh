@@ -71,8 +71,8 @@ else
 	echo " RESTORATION OF BACKUPS IN PROGRESS"
 	echo "-------------------------------------"
 	rsync -av ./junest-backups/* ./"$APP".AppDir/.junest/ | echo -e "\n◆ Restore the content of the Arch Linux container, please wait"
-	rsync -av ./stock-cache/* ./"$APP".AppDir/.cache/ | echo "◆ Restore the content of the Arch Linux container, please wait"
-	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo -e "◆ Restore the content of the Arch Linux container, please wait\n"
+	rsync -av ./stock-cache/* ./"$APP".AppDir/.cache/ | echo "◆ Restore the content of JuNest's ~/.cache directory"
+	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo -e "◆ Restore the content of JuNest's ~/.local directory\n"
 	echo -e "-----------------------------------------------------------\n"
 	cd ./"$APP".AppDir || return
 fi
