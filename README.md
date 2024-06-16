@@ -2,6 +2,8 @@ ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest]
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
+Being this a container into an AppImage, it has its own "bubblewrap" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
+
 ------------------------------------------
 - [Installation](#installation)
 - [Usage](#usage)
@@ -17,54 +19,60 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 
 # Installation
 Download the main script and made it executable:
-
-    wget https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli
-    chmod a+x ./archimage-cli
+```
+wget https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli
+chmod a+x ./archimage-cli
+```
 
 -----------------------------------------------------------
 
-# Usage
-In this video I will show all the steps that I will describe in this section (Archimage 1.x):
+# USAGE:
+```
+archimage-cli [OPTION]
+archimage-cli [OPTION] [PROGRAM]
+```
+### OPTIONS:
+```
+-h,--help		Shows this message.
+-v,--version	Shows the version.
+-b,--build		Create the script to build the AppImage.
+-s,--sync		Update archimage-cli to the latest version.
+```
 
-https://github.com/ivan-hc/ArchImage/assets/88724353/d53f7e11-ceb3-4bc4-bee9-9372fd88cf8d
+In this video I will show all the steps that I will describe in this section (Archimage 3.4.2):
+
+https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
 
 ### Step 1: create the script
-    ./archimage-cli [OPTION]
-or
-
-    ./archimage-cli [OPTION] [PROGRAM]
-
 This tool will create a script to compile an AppImage based on JuNest. To create the script use the option `-b` or `--build`, example:
+```
+./archimage-cli -b firefox
+```
+Here we are using "firefox", the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM].
 
-    ./archimage-cli -b handbrake
-Here we are using "handbrake", the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM], being the executable not `/usr/bin/handbrake` but `/usr/bin/ghb`, just write "ghb". If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank.
 
-After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`).
+Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it).
+
+If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+
+After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependenci is needed.
+
+The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
+
+This phase, shown in the video, has a last message asking you to use a standard configuration with the following defaults if you press "Y":
+- a package availability check in the Arch User Repository (if so, enable AUR and installs "binutils", "gzip" and "basedevel", all of them are only required to compile from and will not be included in the AppImage package)
+- the AUR is enabled
+- installs "ca-certificates"
+- includes keywords for the internet connections and audio trying to enable them
+- the file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed
+
+If you press "N" (or leave blank) instead, you have a lot of configurations you can do by your own.
 
 ### Step 2: run the script
-Finally you've finished and you're ready to run the final script. This will automatically build all the stuff starting from the less options you've decided.
+Finally you've finished and you're ready to run the final script.
 
------------------------------------------------------------
-
-# Version 2.x
-From version 2.x, new actions are available (for advanced users) that will allow you to further automate the process, so as to remove files, directories and libraries that are not needed, making the final AppImage smaller and smaller.
-
-During the construction of the AppImage, files considered "excess" will still be saved in a backup directory for post-build testing in case the AppImage does not work correctly. You will still need to note the additional steps in the script.
-
-However, it will be possible to skip the advanced options when creating the script, in order to package all the files installed in JuNest in the final package (at the expense of a larger AppImage package).
-
-Archimage 2.x uses the template [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh).
-
-NOTE: if you have allowed the script to remove unneeded libraries, you will see a long output that may be longer than 5-10 minutes, this is because the script will re-run the check and the copy of all files saved in the /usr/lib directory of the AppDir to be sure that (almost) all needed libraries are in place, so don't be afraid for the long output. Let the script work until it have finished.
-
------------------------------------------------------------
-
-# Version 3.x
-Since version 3, ArchImage uses JuNest's "normal" mode instead of PROOT to work with "namespaces" thanks to "Bubblewrap". This ensures it works without too many limitations, as long as some directories are mounted (add the `-b "--bind /path/to/directory /your/directory"` option after `junest -n` in AppRun) . This should ensure the app can interact with the rest of the other apps installed on the system.
-
-https://github.com/ivan-hc/ArchImage/assets/88724353/06c91ddf-b9c8-41aa-a68c-325250925fd7
-
-Also, version 3.3 allows you to repeat your tests without having to download everything again.
+This will automatically build all the stuff starting from the options you've decided.
 
 -----------------------------------------------------------
 
