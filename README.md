@@ -89,7 +89,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 - hardware acceleration is absent (for now), see https://github.com/ivan-hc/ArchImage/issues/20
-- being JuNest an Arch Linux container using "bubblewrap" and "namespaces", it requires that on your system exist at least a direcotry named "/run/user" to be portable and widelly distributable.
 
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
