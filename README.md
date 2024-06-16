@@ -48,25 +48,16 @@ This tool will create a script to compile an AppImage based on JuNest. To create
 ```
 ./archimage-cli -b firefox
 ```
-Here we are using "firefox", the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM].
-
-Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank.
-
-Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it).
-
-If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
-
-After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependenci is needed.
-
-The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
-
-This phase, shown in the video, has a last message asking you to use a standard configuration with the following defaults if you press "Y":
+Here we are using "firefox":
+1. the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank. Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it). If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+2. After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependenci is needed.
+3. The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
+4. This phase, shown in the video, has a last message asking you to use a standard configuration with the following defaults if you press "Y":
 - a package availability check in the Arch User Repository (if so, enable AUR and installs "binutils", "gzip" and "basedevel", all of them are only required to compile from and will not be included in the AppImage package)
 - the AUR is enabled
 - installs "ca-certificates"
 - includes keywords for the internet connections and audio trying to enable them
 - the file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed
-
 If you press "N" (or leave blank) instead, you have a lot of configurations you can do by your own.
 
 ### Step 2: run the script
@@ -98,6 +89,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 - hardware acceleration is absent (for now), see https://github.com/ivan-hc/ArchImage/issues/20
+- being JuNest an Arch Linux container using "bubblewrap" and "namespaces", it requires that on your system exist at least a direcotry named "/run/user" to be portable and widelly distributable.
 
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
@@ -105,10 +97,7 @@ After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you
 -----------------------------------------------------------
 
 # Troubleshooting
-**NOTE, starting from version 3.2, templates no longer hide application logs, this means you can already use `LD_DEBUG` without having to extract the AppImage.**
-
-**In case your Archimage is 3.1 or lower, perform the following steps to debug it:**
-1. Edit the "AppRun" file in the directory with the .AppRun extension, then remove the string "`2> /dev/null`" from the end of the last line. Save changes to the file. This step is really important to read all the outputs from the terminal. If you are using an AppImage already built thiw way, extract it with the option `--appimage-extract`;
+1. If the AppImage is already bundled, extract the AppImage using `./*.AppImage --appimage-extract`
 2. Execute the AppRun file:
 ```
 ./AppRun
@@ -116,14 +105,10 @@ After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you
 In case you wont to parse dotfiles in your $HOME directory, use the AppDir itself as a custom $HOME, like this:
 ```
 cd ./*.AppDir
-HOME=./
+HOME="$(dirname "$(readlink -f $0)")"
 ./AppRun
 ```
 It is now possible to read errors related to the application.
-
-**Watch this video if these steps are still not much clear for you** (how to extract an ArchImage and how to see errors in the terminal):
-
-https://github.com/ivan-hc/MPV-appimage/assets/88724353/9ba88e03-5873-4605-8705-f8e1cc9cf713
 
 For more detailed output, I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
@@ -147,5 +132,5 @@ This project wont be possible without:
 -----------------------------------------------------------
 
 # Related projects
-- Portable Linux Apps https://portable-linux-apps.github.io
-- "AM" Application Manager https://github.com/ivan-hc/AM
+- "AM", the package manager for AppImage an portable apps for GNU/Linux https://github.com/ivan-hc/AM
+- "AppImagen", build AppImage packages using .deb packages from Debian and Ubuntu https://github.com/ivan-hc/AppImaGen
