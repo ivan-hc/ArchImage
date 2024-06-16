@@ -72,7 +72,8 @@ else
 	echo "-------------------------------------"
 	rsync -av ./junest-backups/* ./"$APP".AppDir/.junest/ | echo -e "\n◆ Restore the content of the Arch Linux container, please wait"
 	rsync -av ./stock-cache/* ./"$APP".AppDir/.cache/ | echo "◆ Restore the content of the Arch Linux container, please wait"
-	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo "◆ Restore the content of the Arch Linux container, please wait"
+	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo -e "◆ Restore the content of the Arch Linux container, please wait\n"
+	echo -e "-----------------------------------------------------------\n"
 	cd ./"$APP".AppDir || return
 fi
 
@@ -104,7 +105,8 @@ mkdir -p ./stock-cache
 mkdir -p ./stock-local
 rsync -av --ignore-existing ./"$APP".AppDir/.junest/* ./junest-backups/ | echo -e "\n◆ Backup the content of the Arch Linux container, please wait"
 rsync -av --ignore-existing ./"$APP".AppDir/.cache/* ./stock-cache/ | echo "◆ Backup the content of JuNest's ~/.cache directory"
-rsync -av --ignore-existing ./"$APP".AppDir/.local/* ./stock-local/ | echo "◆ Backup the content of JuNest's ~/.local directory"
+rsync -av --ignore-existing ./"$APP".AppDir/.local/* ./stock-local/ | echo -e "◆ Backup the content of JuNest's ~/.local directory\n"
+echo -e "-----------------------------------------------------------\n"
 cd ./"$APP".AppDir || return
 
 # SET THE LOCALE (DON'T TOUCH THIS)
@@ -138,9 +140,9 @@ cp -r ./.junest/usr/share/pixmaps/*"$ICON"* ./ 2>/dev/null
 
 # TEST IF THE DESKTOP FILE AND THE ICON ARE IN THE ROOT OF THE FUTURE APPIMAGE (./*AppDir/*)
 if test -f ./*.desktop; then
-	echo "The .desktop file is available in $APP.AppDir/"
+	echo -e "◆ The .desktop file is available in $APP.AppDir/\n"
 elif test -f ./.junest/usr/bin/"$BIN"; then
- 	echo "No .desktop file available for $APP, creating a new one..."
+ 	echo -e "◆ No .desktop file available for $APP, creating a new one...\n"
  	cat <<-HEREDOC >> ./"$APP".desktop
 	[Desktop Entry]
 	Version=1.0
