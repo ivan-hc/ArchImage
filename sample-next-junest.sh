@@ -97,7 +97,7 @@ fi
 
 # DO A BACKUP OF THE CURRENT STATE OF JUNEST
 cd ..
-echo "-----------------------------------------------------------"
+echo -e "\n-----------------------------------------------------------"
 echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
 echo "-----------------------------------------------------------"
 mkdir -p ./junest-backups
