@@ -272,6 +272,8 @@ for arg in $DEPS4; do
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
 done
 
+rm -f ./packages
+
 # REMOVE SOME BLOATWARES
 echo Y | rm -R -f ./"$APP".AppDir/.cache/yay/*
 find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
