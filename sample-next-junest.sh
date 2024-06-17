@@ -221,7 +221,17 @@ VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
 mkdir -p deps
 rm -R -f ./deps/*
 
+function _download_missing_packages() {
+	localpackage=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
+	if ! test -f "$localpackage"; then
+		cd ./"$APP".AppDir
+		./.local/share/junest/bin/junest -- yay --noconfirm -Sw "$arg"
+		cd ..
+	fi
+}
+
 function _extract_package() {
+	_download_missing_packages &> /dev/null
 	pkgname=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
 	if test -f "$pkgname"; then
 		echo "◆ Extracting $(echo "$pkgname" | sed 's:.*/::')"
