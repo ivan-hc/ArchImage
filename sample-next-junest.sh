@@ -234,8 +234,11 @@ function _extract_package() {
 	_download_missing_packages &> /dev/null
 	pkgname=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
 	if test -f "$pkgname"; then
-		echo "◆ Extracting $(echo "$pkgname" | sed 's:.*/::')"
-		tar fx "$pkgname" -C ./deps/
+		if ! grep -q "$(echo "$pkgname" | sed 's:.*/::')" ./packages 2>/dev/null;then
+			echo "◆ Extracting $(echo "$pkgname" | sed 's:.*/::')"
+			tar fx "$pkgname" -C ./deps/
+			echo "$(echo "$pkgname" | sed 's:.*/::')" >> ./packages
+		fi
 	fi
 }
 
