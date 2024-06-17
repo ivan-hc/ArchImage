@@ -171,26 +171,17 @@ export UNION_PRELOAD=$HERE
 export JUNEST_HOME=$HERE/.junest
 export PATH=$PATH:$HERE/.local/share/junest/bin
 
-if test -f /etc/resolv.conf; then
-ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
-if test -d /media; then
-MNT_MEDIA_DIR=' --bind /media /media '; fi
-if test -d /mnt; then
-MNT_DIR=' --bind /mnt /mnt '; fi
-if test -d /opt; then
-OPT_DIR=' --bind /opt /opt '; fi
-if test -d /run/user; then
-USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
-if test -d /usr/share/fonts; then
-USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
-if test -d /usr/share/themes; then
-USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
+if test -f /etc/resolv.conf; then ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
+if test -d /media; then MNT_MEDIA_DIR=' --bind /media /media '; fi
+if test -d /mnt; then MNT_DIR=' --bind /mnt /mnt '; fi
+if test -d /opt; then OPT_DIR=' --bind /opt /opt '; fi
+if test -d /run/user; then USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
+if test -d /usr/share/fonts; then USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
+if test -d /usr/share/themes; then USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
 
 BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
 
-if test -f $JUNEST_HOME/usr/lib/libselinux.so; then
-	export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
-fi
+if test -f $JUNEST_HOME/usr/lib/libselinux.so; then export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"; fi
 
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 $HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
