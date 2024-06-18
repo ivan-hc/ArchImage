@@ -261,3 +261,10 @@ This project wont be possible without:
 # Related projects
 - "AM", the package manager for AppImage an portable apps for GNU/Linux https://github.com/ivan-hc/AM
 - "AppImagen", build AppImage packages using .deb packages from Debian and Ubuntu https://github.com/ivan-hc/AppImaGen
+
+------------------------------------------------------------------------
+
+| [**ko-fi.com**](https://ko-fi.com/IvanAlexHC) | [**PayPal.me**](https://paypal.me/IvanAlexHC) | ["Index"](#index) |
+| - | - | - |
+
+------------------------------------------------------------------------
