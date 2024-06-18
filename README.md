@@ -4,7 +4,10 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 
 Being this a container into an AppImage, it has its own "bubblewrap" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
 
-------------------------------------------
+------------------------------------------------------------------------
+### Index
+------------------------------------------------------------------------
+
 [Installation](#installation)
 
 [Usage](#usage)
@@ -49,7 +52,12 @@ archimage-cli [OPTION] [PROGRAM]
 -s,--sync		Update archimage-cli to the latest version.
 ```
 
-------------------------------------------
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 ### What to do
 To prevent problems of any kind, dedicate a single directory to the created script, proceed as follows:
 1. create the script;
@@ -75,7 +83,12 @@ Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example]
 
 ##### Referenced issues https://github.com/ivan-hc/ArchImage/issues/19 and https://github.com/ivan-hc/ArchImage/issues/23
 
-------------------------------------------
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 ### Step by step guide
 Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
@@ -128,7 +141,12 @@ The Archimage is first built, and then reassembled with only the essential files
 
 ### Repeat the build
 
------------------------------------------------------------
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
@@ -155,7 +173,12 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
 
------------------------------------------------------------
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 # Troubleshooting
 1. If the AppImage is already bundled, extract the AppImage using `./*.AppImage --appimage-extract`
 2. Execute the AppRun file:
@@ -182,7 +205,12 @@ and then add the missing libraries from the directory "junest-backups" and try a
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
------------------------------------------------------------
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 # Credits
 This project wont be possible without:
 - JuNest https://github.com/fsquillace/junest
