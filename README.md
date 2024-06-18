@@ -5,15 +5,19 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 Being this a container into an AppImage, it has its own "bubblewrap" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
 
 ------------------------------------------
-- [Installation](#installation)
-- [Usage](#usage)
-- [Version 2.x](#version-2x)
-- [Version 3.x](#version-3x)
-- [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
-- [Files removed by default](#files-removed-by-default)
-- [Troubleshooting](#troubleshooting)
-- [Credits](#credits)
-- [Related projects](#related-projects)
+[Installation](#installation)
+[Usage](#usage)
+- [Options](#options)
+- [Example (with video)](#example)
+- [What to do](#what-to-do)
+- [What NOT to do](#what-not-to-do)
+[Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
+- [Advantages](#advantages)
+- [Disadvantages](#disadvantages)
+[Files removed by default](#files-removed-by-default)
+[Troubleshooting](#troubleshooting)
+[Credits](#credits)
+[Related projects](#related-projects)
 
 ------------------------------------------
 
@@ -39,9 +43,29 @@ archimage-cli [OPTION] [PROGRAM]
 -s,--sync		Update archimage-cli to the latest version.
 ```
 
+### EXAMPLE
 In this video I will show all the steps that I will describe in this section (Archimage 3.4.2):
 
 https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
+
+### What to do
+To prevent problems of any kind, dedicate a single directory to the created script, proceed as follows:
+1. create the script;
+2. create an empty directory (the name must not contain spaces);
+3. move the script you created to the directory in step 2;
+4. open a terminal in the directory created in step 2;
+5. run the script inside the directory, like this: `./sample-junest.sh`
+
+In short, all the steps performed in the video above.
+
+### What NOT to do
+Here's what absolutely NOT to do when running a script you created:
+- DO NOT DRAG THE CREATED SCRIPT INTO THE TERMINAL!
+- DO NOT RUN THE CREATED SCRIPT IN YOUR $HOME DIRECTORY!
+- DO NOT RUN THE CREATED SCRIPT IN ANY DIRECTORY CONTAINING OTHER THAN THE DEDICATED ONE!
+
+Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#example)" above.
+
 
 ### Step 1: create the script
 This tool will create a script to compile an AppImage based on JuNest. To create the script use the option `-b` or `--build`, example:
