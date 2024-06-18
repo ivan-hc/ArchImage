@@ -17,8 +17,11 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [Disadvantages](#disadvantages)
 
 [Files removed by default](#files-removed-by-default)
+
 [Troubleshooting](#troubleshooting)
+
 [Credits](#credits)
+
 [Related projects](#related-projects)
 
 ------------------------------------------
