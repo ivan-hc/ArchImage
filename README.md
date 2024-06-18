@@ -6,6 +6,7 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 
 ------------------------------------------
 [Installation](#installation)
+
 [Usage](#usage)
 - [Options](#options)
 - [Example (with video)](#example)
