@@ -70,7 +70,7 @@ https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374
 Here's what absolutely NOT to do when running a script you created:
 - DO NOT DRAG THE CREATED SCRIPT INTO THE TERMINAL! The script only works if run in place, [see point 5 above](#what-to-do).
 - DO NOT RUN THE CREATED SCRIPT IN YOUR $HOME DIRECTORY! The script will use the directory where it is run as $HOME. [You must follow points 2, 3 and 4 above](#what-to-do).
-- DO NOT RUN THE CREATED SCRIPT IN ANY OTHER DIRECTORY OUT OF THE DEDICATED ONE! Again, [just follow points 2, 3 and 4 above](#what-to-do).
+- DO NOT RUN THE CREATED SCRIPT IN ANY OTHER DIRECTORIES! Create an empty one and dedicate that to it. Again, [just follow points 2, 3 and 4 above](#what-to-do).
 
 Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#example)" above.
 
