@@ -246,6 +246,13 @@ and then add the missing libraries from the directory "junest-backups" and try a
 
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
+See also
+
+- [Archimage structure](#archimage-structure)
+- [Test the AppImage](#test-the-appimage)
+- [Dotfiles tip](#dotfiles-tip)
+- [Repeat the build](#repeat-the-build)
+
 ------------------------------------------------------------------------
 
 | [Back to "Index"](#index) |
