@@ -124,15 +124,22 @@ An Archimage is a Type3 AppImage, i.e. one that does not require libfuse2 to fun
 
 Unlike many other AppImages, its structure, [other than the requirements above](#requirements-of-an-appimage), resembles a $HOME directory:
 ```
-App.AppDir
+App.AppDir/
   |
-  |-App.desktop
-  |-app.png
-  |-.cache/
-  |-.local/share/junest/
-  |-.junest/
+  |_/App.desktop
+  |
+  |_/app.png
+  |
+  |_/.cache/
+  |
+  |_/.local/share/junest/
+  |
+  |_/.junest/
 ```
-Hidden directories are those used in a normal Junest installation. The directory of the same name, in the root, contains the Arch Linux system. .local/share/junest contains the JuNest files to start Arch Linux in a container. In .cache in ash are packages created with YAY.
+Hidden directories are those used in a normal Junest installation:
+- ".junest" contains the Arch Linux system;
+- ".local/share/junest" contains the JuNest files to start Arch Linux in a container;
+- ".cache" is usually empty and used by YAY during the temporary JuNest session.
 
 The Archimage is first built, and then reassembled with only the essential files indicated in the script you created.
 
