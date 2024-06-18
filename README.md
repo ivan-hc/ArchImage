@@ -11,9 +11,11 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [Example (with video)](#example)
 - [What to do](#what-to-do)
 - [What NOT to do](#what-not-to-do)
+
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
 - [Disadvantages](#disadvantages)
+
 [Files removed by default](#files-removed-by-default)
 [Troubleshooting](#troubleshooting)
 [Credits](#credits)
