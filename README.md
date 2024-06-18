@@ -11,6 +11,7 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [Options](#options)
 - [What to do](#what-to-do)
 - [What NOT to do](#what-not-to-do)
+- [Step by step guide](#step-by-step-guide)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
