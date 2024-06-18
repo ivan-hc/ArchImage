@@ -12,14 +12,16 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [What to do](#what-to-do)
 - [What NOT to do](#what-not-to-do)
 - [Step by step guide](#step-by-step-guide)
+- [Requirements of an AppImage](#requirements-of-an-appimage)
+- [Archimage structure](#archimage-structure)
+- [Test the AppImage](#test-the-appimage)
+  - [Repeat the build](#)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
 - [Disadvantages](#disadvantages)
 
 [Files removed by default](#files-removed-by-default)
-
-[Troubleshooting](#troubleshooting)
 
 [Credits](#credits)
 
@@ -96,6 +98,35 @@ Before proceeding, make sure you have understood "[What to do](#what-to-do)" and
 - the file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed
 If you press "N" (or leave blank) instead, you have a lot of configurations you can do by your own.
 6. Run the script.
+
+-----------------------------------------------------------
+
+## Requirements of an AppImage
+To be valid, an AppImage must contain, in the root of the .AppDir directory:
+1. a valid .desktop file (the application one is selected by default, otherwise a custom one is created);
+2. an icon, whose name (without extension) must correspond to the "Icon=" entry of the .desktop file at point 1;
+3. the binary file must be contained in the $PATH (/usr/bin) of the AppImage, and must correspond to the "Exec=" entry of the .desktop file at point 1.
+
+If this requirement is not met, no AppImage will be created.
+
+-----------------------------------------------------------
+
+## Archimage structure
+An Archimage is a Type3 AppImage, i.e. one that does not require libfuse2 to function.
+
+Unlike many other AppImages, its structure, [other than the requirements above](#requirements-of-an-appimage), resembles a $HOME directory:
+```
+App.AppDir
+  |
+  |-App.desktop
+  |-app.png
+  |-.cache/
+  |-.local/share/junest/
+  |-.junest/
+```
+Hidden directories are those used in a normal Junest installation. The directory of the same name, in the root, contains the Arch Linux system. .local/share/junest contains the JuNest files to start Arch Linux in a container. In .cache in ash are packages created with YAY.
+
+The Archimage is first built, and then reassembled with only the essential files indicated in the script you created.
 
 -----------------------------------------------------------
 
