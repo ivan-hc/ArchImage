@@ -54,7 +54,7 @@ archimage-cli [OPTION] [PROGRAM]
 ### What to do
 To prevent problems of any kind, dedicate a single directory to the created script, proceed as follows:
 1. create the script;
-2. create an empty directory (the name must not contain spaces);
+2. create an empty directory, the name must not contain spaces, for example "tmp" or "test";
 3. move the script you created to the directory in step 2;
 4. open a terminal in the directory created in step 2;
 5. run the script inside the directory, like this: `./sample-junest.sh`
