@@ -27,6 +27,8 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 
 [Files removed by default](#files-removed-by-default)
 
+[Troubleshooting](#troubleshooting)
+
 [Credits](#credits)
 
 [Related projects](#related-projects)
@@ -234,17 +236,11 @@ HOME="$(dirname "$(readlink -f $0)")"
 ```
 It is now possible to read errors related to the application.
 
-For more detailed output, I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
-
-For example, to know what are the missing libraries:
+For more verbose output, use `LD_DEBUG`, like this (for example, to know what are the missing libraries):
 ```
 LD_DEBUG=libs ./AppRun
 ```
-and then add the missing libraries from the directory "junest-backups" and try again until your app runs as expected. 
-
-3. Add your changes to your script and try to rebuild the AppImage.
-
-If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
+I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
 See also
 
@@ -252,6 +248,9 @@ See also
 - [Test the AppImage](#test-the-appimage)
 - [Dotfiles tip](#dotfiles-tip)
 - [Repeat the build](#repeat-the-build)
+
+If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
+
 
 ------------------------------------------------------------------------
 
