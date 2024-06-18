@@ -9,7 +9,6 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 
 [Usage](#usage)
 - [Options](#options)
-- [Example (with video)](#example)
 - [What to do](#what-to-do)
 - [What NOT to do](#what-not-to-do)
 
@@ -49,10 +48,7 @@ archimage-cli [OPTION] [PROGRAM]
 -s,--sync		Update archimage-cli to the latest version.
 ```
 
-### EXAMPLE
-In this video I will show all the steps that I will describe in this section (Archimage 3.4.2):
-
-https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
+------------------------------------------
 
 ### What to do
 To prevent problems of any kind, dedicate a single directory to the created script, proceed as follows:
@@ -62,7 +58,12 @@ To prevent problems of any kind, dedicate a single directory to the created scri
 4. open a terminal in the directory created in step 2;
 5. run the script inside the directory, like this: `./sample-junest.sh`
 
-In short, all the steps performed in the video above.
+#### EXAMPLE
+In this video I will show all the steps that I will describe in this section (Archimage 3.4.2):
+
+https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
+
+------------------------------------------
 
 ### What NOT to do
 Here's what absolutely NOT to do when running a script you created:
@@ -72,28 +73,25 @@ Here's what absolutely NOT to do when running a script you created:
 
 Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#example)" above.
 
+------------------------------------------
+### Step by step guide
+Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
-### Step 1: create the script
-This tool will create a script to compile an AppImage based on JuNest. To create the script use the option `-b` or `--build`, example:
+1. Create the script, use the option `-b` or `--build`, example with "firefox" (see the above "[video](#example)"):
 ```
 ./archimage-cli -b firefox
 ```
-Here we are using "firefox":
-1. the script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank. Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it). If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
-2. After you've/you've not named the executable, the script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependenci is needed.
-3. The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
-4. This phase, shown in the video, has a last message asking you to use a standard configuration with the following defaults if you press "Y":
+2. The script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank. Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it). If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+3. The script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependency is needed.
+4. The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
+5. This phase, shown in the [video](#example), has a last message asking you to use a standard configuration with the following defaults if you press "Y":
 - a package availability check in the Arch User Repository (if so, enable AUR and installs "binutils", "gzip" and "basedevel", all of them are only required to compile from and will not be included in the AppImage package)
 - the AUR is enabled
 - installs "ca-certificates"
 - includes keywords for the internet connections and audio trying to enable them
 - the file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed
 If you press "N" (or leave blank) instead, you have a lot of configurations you can do by your own.
-
-### Step 2: run the script
-Finally you've finished and you're ready to run the final script.
-
-This will automatically build all the stuff starting from the options you've decided.
+6. Run the script.
 
 -----------------------------------------------------------
 
