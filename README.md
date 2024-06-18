@@ -15,7 +15,7 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [Requirements of an AppImage](#requirements-of-an-appimage)
 - [Archimage structure](#archimage-structure)
 - [Test the AppImage](#test-the-appimage)
-  - [Repeat the build](#)
+  - [Repeat the build](#repeat-the-build)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
@@ -28,7 +28,6 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 [Related projects](#related-projects)
 
 ------------------------------------------
-
 # Installation
 Download the main script and made it executable:
 ```
@@ -37,7 +36,6 @@ chmod a+x ./archimage-cli
 ```
 
 -----------------------------------------------------------
-
 # USAGE:
 ```
 archimage-cli [OPTION]
@@ -52,7 +50,6 @@ archimage-cli [OPTION] [PROGRAM]
 ```
 
 ------------------------------------------
-
 ### What to do
 To prevent problems of any kind, dedicate a single directory to the created script, proceed as follows:
 1. create the script;
@@ -67,7 +64,6 @@ In this video I will show all the steps that I will describe in this section (Ar
 https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
 
 ------------------------------------------
-
 ### What NOT to do
 Here's what absolutely NOT to do when running a script you created:
 - DO NOT DRAG THE CREATED SCRIPT INTO THE TERMINAL! The script only works if run in place, [see point 5 above](#what-to-do).
@@ -100,7 +96,6 @@ If you press "N" (or leave blank) instead, you have a lot of configurations you 
 6. Run the script.
 
 -----------------------------------------------------------
-
 ## Requirements of an AppImage
 To be valid, an AppImage must contain, in the root of the .AppDir directory:
 1. a valid .desktop file (the application one is selected by default, otherwise a custom one is created);
@@ -110,7 +105,6 @@ To be valid, an AppImage must contain, in the root of the .AppDir directory:
 If this requirement is not met, no AppImage will be created.
 
 -----------------------------------------------------------
-
 ## Archimage structure
 An Archimage is a Type3 AppImage, i.e. one that does not require libfuse2 to function.
 
@@ -129,7 +123,12 @@ Hidden directories are those used in a normal Junest installation. The directory
 The Archimage is first built, and then reassembled with only the essential files indicated in the script you created.
 
 -----------------------------------------------------------
+## Test the AppImage
 
+
+### Repeat the build
+
+-----------------------------------------------------------
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
@@ -157,7 +156,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
 
 -----------------------------------------------------------
-
 # Troubleshooting
 1. If the AppImage is already bundled, extract the AppImage using `./*.AppImage --appimage-extract`
 2. Execute the AppRun file:
@@ -185,14 +183,12 @@ and then add the missing libraries from the directory "junest-backups" and try a
 If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
 
 -----------------------------------------------------------
-
 # Credits
 This project wont be possible without:
 - JuNest https://github.com/fsquillace/junest
 - Arch Linux https://archlinux.org
 
 -----------------------------------------------------------
-
 # Related projects
 - "AM", the package manager for AppImage an portable apps for GNU/Linux https://github.com/ivan-hc/AM
 - "AppImagen", build AppImage packages using .deb packages from Debian and Ubuntu https://github.com/ivan-hc/AppImaGen
