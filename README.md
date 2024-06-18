@@ -18,6 +18,7 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 - [Requirements of an AppImage](#requirements-of-an-appimage)
 - [Archimage structure](#archimage-structure)
 - [Test the AppImage](#test-the-appimage)
+  - [Dotfiles tip](#dotfiles-tip)
   - [Repeat the build](#repeat-the-build)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
@@ -137,9 +138,42 @@ The Archimage is first built, and then reassembled with only the essential files
 
 -----------------------------------------------------------
 ## Test the AppImage
+Once the script has finished and the AppImage has been created, run the AppImage from the terminal, and check that there are no errors (e.g. libraries not found, missing dependencies...):
+```
+./Sample-1.2.3-x86_64.AppImage
+```
+For more verbose output, use `LD_DEBUG`, like this:
+```
+LD_DEBUG=libs ./Sample-1.2.3-x86_64.AppImage
+```
+to see the missing libraries, or
+```
+LD_DEBUG=files ./Sample-1.2.3-x86_64.AppImage
+```
+to see the missing files.
 
+I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
+
+### Dotfiles tip
+To not flood your $HOME with dotfiles, I recommend creating a .home directory with the same name as the AppImage:
+```
+mkdir Sample-1.2.3-x86_64.AppImage.home
+./Sample-1.2.3-x86_64.AppImage
+```
+I suggest you empty it or remove/recreate it at the end of each test, in order to rewrite the dotfiles using a clean configuration.
 
 ### Repeat the build
+If you encounter any problems after testing, manually edit the script by adding dependencies or keywords in the respective listed variables, then run the script again to build the AppImage.
+```
+./sample-junest.sh
+```
+This will repeat the construction of the AppImage starting from the shortcomings of the Arch Linux container.
+
+On-screen messages will tell you what's happening.
+
+Wait until the end and try the AppImage again.
+
+Run the tests until you get the desired result.
 
 ------------------------------------------------------------------------
 
