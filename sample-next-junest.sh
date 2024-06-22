@@ -215,9 +215,7 @@ rm -R -f ./deps/*
 function _download_missing_packages() {
 	localpackage=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
 	if ! test -f "$localpackage"; then
-		cd ./"$APP".AppDir
-		./.local/share/junest/bin/junest -- yay --noconfirm -Sw "$arg"
-		cd ..
+		./"$APP".AppDir/.local/share/junest/bin/junest -- yay --noconfirm -Sw "$arg"
 	fi
 }
 
@@ -229,6 +227,9 @@ function _extract_package() {
 			echo "◆ Extracting $(echo "$pkgname" | sed 's:.*/::')"
 			tar fx "$pkgname" -C ./deps/
 			echo "$(echo "$pkgname" | sed 's:.*/::')" >> ./packages
+		else
+			tar fx "$pkgname" -C ./deps/
+			echo "$(echo "$pkgname" | sed 's:.*/::')" >> ./packages
 		fi
 	fi
 }
@@ -237,30 +238,35 @@ ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
 	_extract_package
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 	rm -f ./deps/.*
 done
 
 DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
 	_extract_package
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 	rm -f ./deps/.*
 done
 
 DEPS2=$(cat ./depdeps 2>/dev/null | uniq)
 for arg in $DEPS2; do
 	_extract_package
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
+ 	rm -f ./deps/.*
 done
 
 DEPS3=$(cat ./depdeps2 2>/dev/null | uniq)
 for arg in $DEPS3; do
 	_extract_package
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
+ 	rm -f ./deps/.*
 done
 
 DEPS4=$(cat ./depdeps3 2>/dev/null | uniq)
 for arg in $DEPS4; do
 	_extract_package
  	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
+ 	rm -f ./deps/.*
 done
 
 rm -f ./packages
