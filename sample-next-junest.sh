@@ -7,74 +7,97 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 #BASICSTUFF="binutils debugedit gzip"
 #COMPILERS="base-devel"
 
-# CREATE THE APPDIR (DON'T TOUCH THIS)...
+# CREATE AND ENTER THE APPDIR
 if ! test -f ./appimagetool; then
 	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
 	chmod a+x appimagetool
 fi
-mkdir -p "$APP".AppDir
+mkdir -p "$APP".AppDir && cd "$APP".AppDir || exit 1
 
-# ENTER THE APPDIR
-cd "$APP".AppDir || return
-
-# SET APPDIR AS A TEMPORARY $HOME DIRECTORY, THIS WILL DO ALL WORK INTO THE APPDIR
+# SET APPDIR AS A TEMPORARY $HOME DIRECTORY
 HOME="$(dirname "$(readlink -f $0)")"
 
-# DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
-if ! test -d "$HOME/.local/share/junest"; then
+# DOWNLOAD AND INSTALL JUNEST
+function _enable_multilib() {
+	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+}
+
+function _install_libselinux_if_dependence() {
+	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
+		echo -e "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
+	fi
+}
+
+function _enable_chaoticaur() {
+	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
+	./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+	./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
+	./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
+	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+	echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+}
+
+function _custom_mirrorlist() {
+	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
+	COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+	rm -R ./.junest/etc/pacman.d/mirrorlist
+	# Uncomment only one of the following two lines
+	wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
+	#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
+}
+
+function _bypass_signature_check_level() {
+	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
+	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
+}
+
+function _pacman_patches() {
+	_enable_multilib
+	_install_libselinux_if_dependence
+	###_enable_chaoticaur
+	_custom_mirrorlist
+	_bypass_signature_check_level
+}
+
+function _install_junest() {
+	# Clone JuNest from upstream developer, at https://github.com/fsquillace/junest
 	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
+	# Use the always updated junest-x86_64.tar.gz file from https://github.com/ivan-hc/junest
 	if wget --version | head -1 | grep -q ' 1.'; then
 		wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
 	else
 		wget https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
 	fi
+	# Setup JuNest
 	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
 
-	# ENABLE MULTILIB (optional)
-	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	_pacman_patches
 
-	# ENABLE LIBSELINUX FROM THIRD PARTY REPOSITORY
-	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
-		echo -e "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
-	fi
-
-	# ENABLE CHAOTIC-AUR
-	function _enable_chaoticaur(){
-		./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-		./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
-		./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
-		./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-		echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
-	}
-	###_enable_chaoticaur
-
-	# CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-	function _custom_mirrorlist(){
-		#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
-		rm -R ./.junest/etc/pacman.d/mirrorlist
-		wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
-		#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
-	}
-	_custom_mirrorlist
-
-	# BYPASS SIGNATURE CHECK LEVEL
-	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
-	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
-
-	# UPDATE ARCH LINUX IN JUNEST
+	# Update arch linux in junest
 	./.local/share/junest/bin/junest -- sudo pacman -Syy
 	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
-else
+}
+
+function _restore_junest() {
 	cd ..
 	echo "-------------------------------------"
 	echo " RESTORATION OF BACKUPS IN PROGRESS"
 	echo "-------------------------------------"
-	rsync -av ./junest-backups/* ./"$APP".AppDir/.junest/ | echo -e "\n◆ Restore the content of the Arch Linux container, please wait"
+	echo ""
+	rsync -av ./junest-backups/* ./"$APP".AppDir/.junest/ | echo "◆ Restore the content of the Arch Linux container, please wait"
 	rsync -av ./stock-cache/* ./"$APP".AppDir/.cache/ | echo "◆ Restore the content of JuNest's ~/.cache directory"
-	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo -e "◆ Restore the content of JuNest's ~/.local directory\n"
-	echo -e "-----------------------------------------------------------\n"
-	cd ./"$APP".AppDir || return
+	rsync -av ./stock-local/* ./"$APP".AppDir/.local/ | echo "◆ Restore the content of JuNest's ~/.local directory"
+	echo ""
+	echo "-----------------------------------------------------------"
+	echo ""
+	cd ./"$APP".AppDir || exit 1
+}
+
+if ! test -d "$HOME/.local/share/junest"; then
+	_install_junest
+else
+	_restore_junest
 fi
 
 # INSTALL THE PROGRAM USING YAY
@@ -92,7 +115,7 @@ fi
 if [ ! -z "$APP" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 else
-	echo "No app found, exiting" exit 0
+	echo "No app found, exiting"; exit 1
 fi
 
 # DO A BACKUP OF THE CURRENT STATE OF JUNEST
@@ -287,8 +310,8 @@ echo -e "-----------------------------------------------------------\n"
 
 # SAVE FILES USING KEYWORDS
 BINSAVED="SAVEBINSPLEASE" # Enter here keywords to find and save in /usr/bin
-SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
-LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/folder names to save in /usr/lib
+SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
+LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/directory names to save in /usr/lib
 
 # STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
@@ -310,7 +333,7 @@ function _savebins(){
 }
 #_savebins 2> /dev/null
 
-# STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP FOLDER (FOR TESTING PURPOSES)
+# STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP DIRECTORY (FOR TESTING PURPOSES)
 mkdir save
 
 function _binlibs(){
@@ -410,7 +433,7 @@ function _mvlibs(){
 rmdir save
 
 # STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
-# IF YOU NEED TO SAVE MORE FOLDERS, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
+# IF YOU NEED TO SAVE MORE DIRECTORIES, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
 function _saveshare(){
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/share/*$APP* ./save/
