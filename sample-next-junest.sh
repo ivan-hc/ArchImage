@@ -19,12 +19,12 @@ HOME="$(dirname "$(readlink -f $0)")"
 
 # DOWNLOAD AND INSTALL JUNEST
 function _enable_multilib() {
-	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
 function _install_libselinux_if_dependence() {
 	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
-		echo -e "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
+		printf "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
 	fi
 }
 
@@ -34,7 +34,7 @@ function _enable_chaoticaur() {
 	./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
 	./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
 	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-	echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
 function _custom_mirrorlist() {
@@ -172,9 +172,13 @@ function _add_launcher_and_icon() {
 
 	# test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
 	if test -f ./*.desktop; then
-		echo -e "◆ The .desktop file is available in $APP.AppDir/\n"
+		echo ""
+		echo "◆ The .desktop file is available in $APP.AppDir/"
+		echo
 	elif test -f ./.junest/usr/bin/"$BIN"; then
-	 	echo -e "◆ No .desktop file available for $APP, creating a new one...\n"
+	 	echo ""
+	 	echo "◆ No .desktop file available for $APP, creating a new one..."
+	 	echo ""
 	 	cat <<-HEREDOC >> ./"$APP".desktop
 		[Desktop Entry]
 		Version=1.0
@@ -480,12 +484,12 @@ function _rsync_main_package() {
 	echo ""
 	echo "-----------------------------------------------------------"
 	rm -R -f ./base/.*
-	rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync the content of the \"$APP\" package"
+	rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
 }
 
 function _rsync_dependences() {
 	rm -R -f ./deps/.*
-	#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync all dependeces, please wait..."
+	#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependeces, please wait..."
 	echo "-----------------------------------------------------------"
 	echo ""
 }
