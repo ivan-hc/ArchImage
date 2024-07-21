@@ -339,9 +339,8 @@ BINSAVED="SAVEBINSPLEASE" # Enter here keywords to find and save in /usr/bin
 SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
 LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/directory names to save in /usr/lib
 
-# STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
-# IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
-function _savebins(){
+# Save files in /usr/bin
+function _savebins() {
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/bin/*$BIN* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/bash ./save/
@@ -357,12 +356,9 @@ function _savebins(){
 	mv ./save/* ./"$APP".AppDir/.junest/usr/bin/
 	rmdir save
 }
-#_savebins 2> /dev/null
 
-# STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP DIRECTORY (FOR TESTING PURPOSES)
-mkdir save
-
-function _binlibs(){
+# Save files in /usr/lib
+function _binlibs() {
 	readelf -d ./"$APP".AppDir/.junest/usr/bin/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	mv ./"$APP".AppDir/.junest/usr/lib/ld-linux-x86-64.so* ./save/
 	mv ./"$APP".AppDir/.junest/usr/lib/*$APP* ./save/
@@ -381,18 +377,18 @@ function _binlibs(){
 	rm list
 }
 
-function _include_swrast_dri(){
+function _include_swrast_dri() {
 	mkdir ./save/dri
 	mv ./"$APP".AppDir/.junest/usr/lib/dri/swrast_dri.so ./save/dri/
 }
 
-function _libkeywords(){
+function _libkeywords() {
 	for arg in $LIBSAVED; do
 		mv ./"$APP".AppDir/.junest/usr/lib/*"$arg"* ./save/
 	done
 }
 
-function _readelf_save(){
+function _readelf_save() {
 	readelf -d ./save/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -408,7 +404,7 @@ function _readelf_save(){
 	rm list
 }
 
-function _readelf_base(){
+function _readelf_base() {
 	readelf -d ./base/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./base/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./base/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -416,7 +412,7 @@ function _readelf_base(){
 	readelf -d ./base/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 }
 
-function _readelf_deps(){
+function _readelf_deps() {
 	readelf -d ./deps/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -424,7 +420,7 @@ function _readelf_deps(){
 	readelf -d ./deps/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 }
 
-function _liblibs(){
+function _liblibs() {
  	_readelf_base
   	_readelf_deps
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
@@ -441,26 +437,23 @@ function _liblibs(){
 	_readelf_save
 }
 
-function _mvlibs(){
+function _mvlibs() {
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/*
 	mv ./save/* ./"$APP".AppDir/.junest/usr/lib/
 }
 
-#_binlibs 2> /dev/null
+function _savelibs() {
+	mkdir save
+	#_binlibs 2> /dev/null
+	#_include_swrast_dri 2> /dev/null
+	#_libkeywords 2> /dev/null
+	#_liblibs 2> /dev/null
+	#_mvlibs 2> /dev/null
+	rmdir save
+}
 
-#_include_swrast_dri 2> /dev/null
-
-#_libkeywords 2> /dev/null
-
-#_liblibs 2> /dev/null
-
-#_mvlibs 2> /dev/null
-
-rmdir save
-
-# STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
-# IF YOU NEED TO SAVE MORE DIRECTORIES, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
-function _saveshare(){
+# Save files in /usr/share
+function _saveshare() {
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/share/*$APP* ./save/
  	mv ./"$APP".AppDir/.junest/usr/share/*$BIN* ./save/
@@ -477,6 +470,9 @@ function _saveshare(){
 	mv ./save/* ./"$APP".AppDir/.junest/usr/share/
  	rmdir save
 }
+
+#_savebins 2> /dev/null
+_savelibs
 #_saveshare 2> /dev/null
 
 # RSYNC THE CONTENT OF THE APP'S PACKAGE
