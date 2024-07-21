@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=SAMPLE
@@ -18,17 +18,17 @@ mkdir -p "$APP".AppDir && cd "$APP".AppDir || exit 1
 HOME="$(dirname "$(readlink -f $0)")"
 
 # DOWNLOAD AND INSTALL JUNEST
-function _enable_multilib() {
+_enable_multilib() {
 	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
-function _install_libselinux_if_dependence() {
-	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
+_install_libselinux_if_dependence() {
+	if echo "$DEPENDENCES" | grep -q "libselinux"; then
 		printf "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
 	fi
 }
 
-function _enable_chaoticaur() {
+_enable_chaoticaur() {
 	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
 	./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
 	./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
@@ -37,7 +37,7 @@ function _enable_chaoticaur() {
 	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
-function _custom_mirrorlist() {
+_custom_mirrorlist() {
 	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
 	COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 	rm -R ./.junest/etc/pacman.d/mirrorlist
@@ -46,12 +46,12 @@ function _custom_mirrorlist() {
 	#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
 }
 
-function _bypass_signature_check_level() {
+_bypass_signature_check_level() {
 	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
 	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
 }
 
-function _pacman_patches() {
+_pacman_patches() {
 	_enable_multilib
 	_install_libselinux_if_dependence
 	###_enable_chaoticaur
@@ -59,7 +59,7 @@ function _pacman_patches() {
 	_bypass_signature_check_level
 }
 
-function _install_junest() {
+_install_junest() {
 	# Clone JuNest from upstream developer, at https://github.com/fsquillace/junest
 	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
 	# Use the always updated junest-x86_64.tar.gz file from https://github.com/ivan-hc/junest
@@ -79,7 +79,7 @@ function _install_junest() {
 	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
 }
 
-function _restore_junest() {
+_restore_junest() {
 	cd ..
 	echo "-------------------------------------"
 	echo " RESTORATION OF BACKUPS IN PROGRESS"
@@ -101,7 +101,7 @@ else
 fi
 
 # INSTALL THE PROGRAM USING YAY
-function _backup_junest() {
+_backup_junest() {
 	cd ..
 	echo ""
 	echo "n-----------------------------------------------------------"
@@ -122,16 +122,16 @@ function _backup_junest() {
 
 ./.local/share/junest/bin/junest -- yay -Syy
 #./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-if [ ! -z "$BASICSTUFF" ]; then
+if [ -n "$BASICSTUFF" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$BASICSTUFF"
 fi
-if [ ! -z "$COMPILERS" ]; then
+if [ -n "$COMPILERS" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$COMPILERS"
 fi
-if [ ! -z "$DEPENDENCES" ]; then
+if [ -n "$DEPENDENCES" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 fi
-if [ ! -z "$APP" ]; then
+if [ -n "$APP" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 else
 	echo "No app found, exiting"; exit 1
@@ -140,7 +140,7 @@ fi
 _backup_junest
 
 # PREPARE THE APPIMAGE
-function _set_locale() {
+_set_locale() {
 	#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
 	#sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
 	#rm ./.junest/etc/locale.gen
@@ -152,7 +152,7 @@ function _set_locale() {
 	#./.local/share/junest/bin/junest -- sudo locale-gen
 }
 
-function _add_launcher_and_icon() {
+_add_launcher_and_icon() {
 	rm -R -f ./*.desktop
 	LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 	cp -r "$LAUNCHER" ./
@@ -198,7 +198,7 @@ function _add_launcher_and_icon() {
 	fi
 }
 
-function _create_AppRun() {
+_create_AppRun() {
 	rm -R -f ./AppRun
 	cat <<-'HEREDOC' >> ./AppRun
 	#!/bin/sh
@@ -225,7 +225,7 @@ function _create_AppRun() {
 	chmod a+x ./AppRun
 }
 
-function _made_JuNest_a_potable_app() {
+_made_JuNest_a_potable_app() {
 	# REMOVE "READ-ONLY FILE SYSTEM" ERRORS
 	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
@@ -234,7 +234,7 @@ function _made_JuNest_a_potable_app() {
 	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 }
 
-function _remove_some_bloatwares() {
+_remove_some_bloatwares() {
 	echo Y | rm -R -f ./"$APP".AppDir/.cache/yay/*
 	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -254,7 +254,7 @@ _remove_some_bloatwares
 cd .. || exit 1 # EXIT THE APPDIR
 
 # EXTRACT PACKAGES
-function _extract_main_package() {
+_extract_main_package() {
 	mkdir -p base
 	rm -R -f ./base/*
 	tar fx "$(find ./"$APP".AppDir -name "$APP-[0-9]*zst" | head -1)" -C ./base/
@@ -263,29 +263,29 @@ function _extract_main_package() {
 	rm -R -f ./deps/*
 }
 
-function _download_missing_packages() {
+_download_missing_packages() {
 	localpackage=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
 	if ! test -f "$localpackage"; then
 		./"$APP".AppDir/.local/share/junest/bin/junest -- yay --noconfirm -Sw "$arg"
 	fi
 }
 
-function _extract_package() {
-	_download_missing_packages &> /dev/null
+_extract_package() {
+	_download_missing_packages 2>&1
 	pkgname=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
 	if test -f "$pkgname"; then
 		if ! grep -q "$(echo "$pkgname" | sed 's:.*/::')" ./packages 2>/dev/null;then
 			echo "◆ Extracting $(echo "$pkgname" | sed 's:.*/::')"
 			tar fx "$pkgname" -C ./deps/
-			echo "$(echo "$pkgname" | sed 's:.*/::')" >> ./packages
+			echo "$pkgname" | sed 's:.*/::' >> ./packages
 		else
 			tar fx "$pkgname" -C ./deps/
-			echo "$(echo "$pkgname" | sed 's:.*/::')" >> ./packages
+			echo "$pkgname" | sed 's:.*/::' >> ./packages
 		fi
 	fi
 }
 
-function _extract_all_dependences() {
+_extract_all_dependences() {
 	ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 	for arg in $ARGS; do
 		_extract_package
@@ -344,7 +344,7 @@ SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/directory names to sa
 LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/directory names to save in /usr/lib
 
 # Save files in /usr/bin
-function _savebins() {
+_savebins() {
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/bin/*$BIN* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/bash ./save/
@@ -362,7 +362,7 @@ function _savebins() {
 }
 
 # Save files in /usr/lib
-function _binlibs() {
+_binlibs() {
 	readelf -d ./"$APP".AppDir/.junest/usr/bin/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	mv ./"$APP".AppDir/.junest/usr/lib/ld-linux-x86-64.so* ./save/
 	mv ./"$APP".AppDir/.junest/usr/lib/*$APP* ./save/
@@ -381,18 +381,18 @@ function _binlibs() {
 	rm list
 }
 
-function _include_swrast_dri() {
+_include_swrast_dri() {
 	mkdir ./save/dri
 	mv ./"$APP".AppDir/.junest/usr/lib/dri/swrast_dri.so ./save/dri/
 }
 
-function _libkeywords() {
+_libkeywords() {
 	for arg in $LIBSAVED; do
 		mv ./"$APP".AppDir/.junest/usr/lib/*"$arg"* ./save/
 	done
 }
 
-function _readelf_save() {
+_readelf_save() {
 	readelf -d ./save/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./save/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -408,7 +408,7 @@ function _readelf_save() {
 	rm list
 }
 
-function _readelf_base() {
+_readelf_base() {
 	readelf -d ./base/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./base/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./base/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -416,7 +416,7 @@ function _readelf_base() {
 	readelf -d ./base/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 }
 
-function _readelf_deps() {
+_readelf_deps() {
 	readelf -d ./deps/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
@@ -424,7 +424,7 @@ function _readelf_deps() {
 	readelf -d ./deps/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 }
 
-function _liblibs() {
+_liblibs() {
  	_readelf_base
   	_readelf_deps
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
@@ -441,12 +441,12 @@ function _liblibs() {
 	_readelf_save
 }
 
-function _mvlibs() {
+_mvlibs() {
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/*
 	mv ./save/* ./"$APP".AppDir/.junest/usr/lib/
 }
 
-function _savelibs() {
+_savelibs() {
 	mkdir save
 	#_binlibs 2> /dev/null
 	#_include_swrast_dri 2> /dev/null
@@ -457,7 +457,7 @@ function _savelibs() {
 }
 
 # Save files in /usr/share
-function _saveshare() {
+_saveshare() {
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/share/*$APP* ./save/
  	mv ./"$APP".AppDir/.junest/usr/share/*$BIN* ./save/
@@ -480,27 +480,27 @@ _savelibs
 #_saveshare 2> /dev/null
 
 # ASSEMBLING THE APPIMAGE PACKAGE
-function _rsync_main_package() {
+_rsync_main_package() {
 	echo ""
 	echo "-----------------------------------------------------------"
 	rm -R -f ./base/.*
 	rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
 }
 
-function _rsync_dependences() {
+_rsync_dependences() {
 	rm -R -f ./deps/.*
 	#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependeces, please wait..."
 	echo "-----------------------------------------------------------"
 	echo ""
 }
 
-function _remove_more_bloatwares() {
+_remove_more_bloatwares() {
 	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
 	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* # included in the compilation phase, can sometimes be excluded for daily use
 }
 
-function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
+_enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	mkdir -p ./"$APP".AppDir/.junest/home
 	mkdir -p ./"$APP".AppDir/.junest/media
 	mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
