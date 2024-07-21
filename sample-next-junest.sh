@@ -101,6 +101,25 @@ else
 fi
 
 # INSTALL THE PROGRAM USING YAY
+function _backup_junest() {
+	cd ..
+	echo ""
+	echo "n-----------------------------------------------------------"
+	echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
+	echo "-----------------------------------------------------------"
+	mkdir -p ./junest-backups
+	mkdir -p ./stock-cache
+	mkdir -p ./stock-local
+	echo ""
+	rsync -av --ignore-existing ./"$APP".AppDir/.junest/* ./junest-backups/ | echo "◆ Backup the content of the Arch Linux container, please wait"
+	rsync -av --ignore-existing ./"$APP".AppDir/.cache/* ./stock-cache/ | echo "◆ Backup the content of JuNest's ~/.cache directory"
+	rsync -av --ignore-existing ./"$APP".AppDir/.local/* ./stock-local/ | echo "◆ Backup the content of JuNest's ~/.local directory"
+	echo ""
+	echo "-----------------------------------------------------------"
+	echo ""
+	cd ./"$APP".AppDir || exit 1
+}
+
 ./.local/share/junest/bin/junest -- yay -Syy
 #./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
 if [ ! -z "$BASICSTUFF" ]; then
@@ -118,108 +137,105 @@ else
 	echo "No app found, exiting"; exit 1
 fi
 
-# DO A BACKUP OF THE CURRENT STATE OF JUNEST
-cd ..
-echo -e "\n-----------------------------------------------------------"
-echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
-echo "-----------------------------------------------------------"
-mkdir -p ./junest-backups
-mkdir -p ./stock-cache
-mkdir -p ./stock-local
-rsync -av --ignore-existing ./"$APP".AppDir/.junest/* ./junest-backups/ | echo -e "\n◆ Backup the content of the Arch Linux container, please wait"
-rsync -av --ignore-existing ./"$APP".AppDir/.cache/* ./stock-cache/ | echo "◆ Backup the content of JuNest's ~/.cache directory"
-rsync -av --ignore-existing ./"$APP".AppDir/.local/* ./stock-local/ | echo -e "◆ Backup the content of JuNest's ~/.local directory\n"
-echo -e "-----------------------------------------------------------\n"
-cd ./"$APP".AppDir || return
+_backup_junest
 
-# SET THE LOCALE (DON'T TOUCH THIS)
-#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
-#sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
-#rm ./.junest/etc/locale.gen
-#mv ./locale.gen ./.junest/etc/locale.gen
-rm ./.junest/etc/locale.conf
-#echo "LANG=$LANG" >> ./.junest/etc/locale.conf
-sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
-#./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
-#./.local/share/junest/bin/junest -- sudo locale-gen
+# PREPARE THE APPIMAGE
+function _set_locale() {
+	#sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
+	#sed "s/#$(echo $LANG)/$(echo $LANG)/g" ./.junest/etc/locale.gen >> ./locale.gen # ENABLE ONLY YOUR LANGUAGE, COMMENT IF YOU NEED MORE THAN ONE
+	#rm ./.junest/etc/locale.gen
+	#mv ./locale.gen ./.junest/etc/locale.gen
+	rm ./.junest/etc/locale.conf
+	#echo "LANG=$LANG" >> ./.junest/etc/locale.conf
+	sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
+	#./.local/share/junest/bin/junest -- sudo pacman --noconfirm -S glibc gzip
+	#./.local/share/junest/bin/junest -- sudo locale-gen
+}
 
-# ...ADD THE ICON AND THE DESKTOP FILE AT THE ROOT OF THE APPDIR...
-rm -R -f ./*.desktop
-LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
-cp -r "$LAUNCHER" ./
-ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
-cp -r ./.junest/usr/share/icons/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* ./ 2>/dev/null
-cp -r ./.junest/usr/share/pixmaps/*"$ICON"* ./ 2>/dev/null
+function _add_launcher_and_icon() {
+	rm -R -f ./*.desktop
+	LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
+	cp -r "$LAUNCHER" ./
+	ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
+	cp -r ./.junest/usr/share/icons/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* ./ 2>/dev/null
+	cp -r ./.junest/usr/share/pixmaps/*"$ICON"* ./ 2>/dev/null
 
-# TEST IF THE DESKTOP FILE AND THE ICON ARE IN THE ROOT OF THE FUTURE APPIMAGE (./*AppDir/*)
-if test -f ./*.desktop; then
-	echo -e "◆ The .desktop file is available in $APP.AppDir/\n"
-elif test -f ./.junest/usr/bin/"$BIN"; then
- 	echo -e "◆ No .desktop file available for $APP, creating a new one...\n"
- 	cat <<-HEREDOC >> ./"$APP".desktop
-	[Desktop Entry]
-	Version=1.0
-	Type=Application
-	Name=$(echo "$APP" | tr a-z A-Z)
-	Comment=
-	Exec=$BIN
-	Icon=tux
-	Categories=Utility;
-	Terminal=true
-	StartupNotify=true
+	# test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
+	if test -f ./*.desktop; then
+		echo -e "◆ The .desktop file is available in $APP.AppDir/\n"
+	elif test -f ./.junest/usr/bin/"$BIN"; then
+	 	echo -e "◆ No .desktop file available for $APP, creating a new one...\n"
+	 	cat <<-HEREDOC >> ./"$APP".desktop
+		[Desktop Entry]
+		Version=1.0
+		Type=Application
+		Name=$(echo "$APP" | tr a-z A-Z)
+		Comment=
+		Exec=$BIN
+		Icon=tux
+		Categories=Utility;
+		Terminal=true
+		StartupNotify=true
+		HEREDOC
+		wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./tux.png
+	else
+		echo "No binary in path... aborting all the processes."
+		exit 0
+	fi
+}
+
+function _create_AppRun() {
+	rm -R -f ./AppRun
+	cat <<-'HEREDOC' >> ./AppRun
+	#!/bin/sh
+	HERE="$(dirname "$(readlink -f $0)")"
+	export UNION_PRELOAD=$HERE
+	export JUNEST_HOME=$HERE/.junest
+	export PATH=$PATH:$HERE/.local/share/junest/bin
+
+	if test -f /etc/resolv.conf; then ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
+	if test -d /media; then MNT_MEDIA_DIR=' --bind /media /media '; fi
+	if test -d /mnt; then MNT_DIR=' --bind /mnt /mnt '; fi
+	if test -d /opt; then OPT_DIR=' --bind /opt /opt '; fi
+	if test -d /run/user; then USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
+	if test -d /usr/share/fonts; then USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
+	if test -d /usr/share/themes; then USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
+
+	BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
+
+	if test -f $JUNEST_HOME/usr/lib/libselinux.so; then export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"; fi
+
+	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+	$HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
 	HEREDOC
-	wget https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico -O ./tux.png
-else
-	echo "No binary in path... aborting all the processes."
-	exit 0
-fi
+	chmod a+x ./AppRun
+}
 
-# ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
-# EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
-rm -R -f ./AppRun
-cat >> ./AppRun << 'EOF'
-#!/bin/sh
-HERE="$(dirname "$(readlink -f $0)")"
-export UNION_PRELOAD=$HERE
-export JUNEST_HOME=$HERE/.junest
-export PATH=$PATH:$HERE/.local/share/junest/bin
+function _made_JuNest_a_potable_app() {
+	# REMOVE "READ-ONLY FILE SYSTEM" ERRORS
+	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
+	sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
+}
 
-if test -f /etc/resolv.conf; then ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
-if test -d /media; then MNT_MEDIA_DIR=' --bind /media /media '; fi
-if test -d /mnt; then MNT_DIR=' --bind /mnt /mnt '; fi
-if test -d /opt; then OPT_DIR=' --bind /opt /opt '; fi
-if test -d /run/user; then USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
-if test -d /usr/share/fonts; then USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
-if test -d /usr/share/themes; then USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
+_set_locale
+_add_launcher_and_icon
+_create_AppRun
+_made_JuNest_a_potable_app
 
-BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
-
-if test -f $JUNEST_HOME/usr/lib/libselinux.so; then export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"; fi
-
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
-EOF
-chmod a+x ./AppRun
-
-# REMOVE "READ-ONLY FILE SYSTEM" ERRORS
-sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
-sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
-
-# EXIT THE APPDIR
-cd ..
+cd .. || exit 1 # EXIT THE APPDIR
 
 # EXTRACT PACKAGE CONTENT
 echo "-----------------------------------------------------------"
