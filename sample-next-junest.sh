@@ -328,8 +328,8 @@ echo "-----------------------------------------------------------"
 echo " EXTRACTING DEPENDENCES"
 echo "-----------------------------------------------------------"
 echo ""
-_extract_all_dependences
 _extract_main_package
+_extract_all_dependences
 
 # SAVE ESSENTIAL FILES AND LIBRARIES
 echo ""
