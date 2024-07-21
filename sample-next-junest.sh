@@ -230,26 +230,34 @@ function _made_JuNest_a_potable_app() {
 	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 }
 
+function _remove_some_bloatwares() {
+	echo Y | rm -R -f ./"$APP".AppDir/.cache/yay/*
+	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+	rm -R -f ./"$APP".AppDir/.junest/etc/makepkg.conf
+	rm -R -f ./"$APP".AppDir/.junest/etc/pacman.conf
+	rm -R -f ./"$APP".AppDir/.junest/usr/include #FILES RELATED TO THE COMPILER
+	rm -R -f ./"$APP".AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
+	rm -R -f ./"$APP".AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+}
+
 _set_locale
 _add_launcher_and_icon
 _create_AppRun
 _made_JuNest_a_potable_app
+_remove_some_bloatwares
 
 cd .. || exit 1 # EXIT THE APPDIR
 
-# EXTRACT PACKAGE CONTENT
-echo "-----------------------------------------------------------"
-echo " EXTRACTING DEPENDENCES"
-echo -e "-----------------------------------------------------------\n"
-
-mkdir -p base
-rm -R -f ./base/*
-
-tar fx "$(find ./"$APP".AppDir -name "$APP-[0-9]*zst" | head -1)" -C ./base/
-VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
-
-mkdir -p deps
-rm -R -f ./deps/*
+# EXTRACT PACKAGES
+function _extract_main_package() {
+	mkdir -p base
+	rm -R -f ./base/*
+	tar fx "$(find ./"$APP".AppDir -name "$APP-[0-9]*zst" | head -1)" -C ./base/
+	VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
+	mkdir -p deps
+	rm -R -f ./deps/*
+}
 
 function _download_missing_packages() {
 	localpackage=$(find ./"$APP".AppDir -name "$arg-[0-9]*zst")
@@ -273,56 +281,58 @@ function _extract_package() {
 	fi
 }
 
-ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
-for arg in $ARGS; do
-	_extract_package
- 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
- 	rm -f ./deps/.*
-done
+function _extract_all_dependences() {
+	ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
+	for arg in $ARGS; do
+		_extract_package
+	 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+	 	rm -f ./deps/.*
+	done
 
-DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
-for arg in $DEPS; do
-	_extract_package
- 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
- 	rm -f ./deps/.*
-done
+	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
+	for arg in $DEPS; do
+		_extract_package
+	 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+	 	rm -f ./deps/.*
+	done
 
-DEPS2=$(cat ./depdeps 2>/dev/null | uniq)
-for arg in $DEPS2; do
-	_extract_package
- 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
- 	rm -f ./deps/.*
-done
+	DEPS2=$(cat ./depdeps 2>/dev/null | uniq)
+	for arg in $DEPS2; do
+		_extract_package
+	 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
+	 	rm -f ./deps/.*
+	done
 
-DEPS3=$(cat ./depdeps2 2>/dev/null | uniq)
-for arg in $DEPS3; do
-	_extract_package
- 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
- 	rm -f ./deps/.*
-done
+	DEPS3=$(cat ./depdeps2 2>/dev/null | uniq)
+	for arg in $DEPS3; do
+		_extract_package
+	 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
+	 	rm -f ./deps/.*
+	done
 
-DEPS4=$(cat ./depdeps3 2>/dev/null | uniq)
-for arg in $DEPS4; do
-	_extract_package
- 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
- 	rm -f ./deps/.*
-done
+	DEPS4=$(cat ./depdeps3 2>/dev/null | uniq)
+	for arg in $DEPS4; do
+		_extract_package
+	 	cat ./deps/.PKGINFO 2>/dev/null | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
+	 	rm -f ./deps/.*
+	done
 
-rm -f ./packages
+	rm -f ./packages
+}
 
-# REMOVE SOME BLOATWARES
-echo Y | rm -R -f ./"$APP".AppDir/.cache/yay/*
-find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
-rm -R -f ./"$APP".AppDir/.junest/etc/makepkg.conf
-rm -R -f ./"$APP".AppDir/.junest/etc/pacman.conf
-rm -R -f ./"$APP".AppDir/.junest/usr/include #FILES RELATED TO THE COMPILER
-rm -R -f ./"$APP".AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
-rm -R -f ./"$APP".AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+echo "-----------------------------------------------------------"
+echo " EXTRACTING DEPENDENCES"
+echo "-----------------------------------------------------------"
+echo ""
+_extract_all_dependences
+_extract_main_package
 
-echo -e "\n-----------------------------------------------------------"
+# SAVE ESSENTIAL FILES AND LIBRARIES
+echo ""
+echo "-----------------------------------------------------------"
 echo " IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)"
-echo -e "-----------------------------------------------------------\n"
+echo "-----------------------------------------------------------"
+echo ""
 
 # SAVE FILES USING KEYWORDS
 BINSAVED="SAVEBINSPLEASE" # Enter here keywords to find and save in /usr/bin
