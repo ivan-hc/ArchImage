@@ -475,34 +475,44 @@ function _saveshare() {
 _savelibs
 #_saveshare 2> /dev/null
 
-# RSYNC THE CONTENT OF THE APP'S PACKAGE
-echo -e "\n-----------------------------------------------------------"
-rm -R -f ./base/.*
-rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync the content of the \"$APP\" package"
+# ASSEMBLING THE APPIMAGE PACKAGE
+function _rsync_main_package() {
+	echo ""
+	echo "-----------------------------------------------------------"
+	rm -R -f ./base/.*
+	rsync -av ./base/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync the content of the \"$APP\" package"
+}
 
-# RSYNC DEPENDENCES
-rm -R -f ./deps/.*
-#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync all dependeces, please wait..."
-echo -e "-----------------------------------------------------------\n"
+function _rsync_dependences() {
+	rm -R -f ./deps/.*
+	#rsync -av ./deps/* ./"$APP".AppDir/.junest/ | echo -e "◆ Rsync all dependeces, please wait..."
+	echo "-----------------------------------------------------------"
+	echo ""
+}
 
-# ADDITIONAL REMOVALS
-#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
-rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
+function _remove_more_bloatwares() {
+	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
+	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* # included in the compilation phase, can sometimes be excluded for daily use
+}
 
-# REMOVE THE INBUILT HOME
-rm -R -f ./"$APP".AppDir/.junest/home
+function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
+	mkdir -p ./"$APP".AppDir/.junest/home
+	mkdir -p ./"$APP".AppDir/.junest/media
+	mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
+	mkdir -p ./"$APP".AppDir/.junest/usr/share/fonts
+	mkdir -p ./"$APP".AppDir/.junest/usr/share/themes
+	mkdir -p ./"$APP".AppDir/.junest/run/user
+}
 
-# ENABLE MOUNTPOINTS
-mkdir -p ./"$APP".AppDir/.junest/home
-mkdir -p ./"$APP".AppDir/.junest/media
-mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
-mkdir -p ./"$APP".AppDir/.junest/usr/share/fonts
-mkdir -p ./"$APP".AppDir/.junest/usr/share/themes
-mkdir -p ./"$APP".AppDir/.junest/run/user
+_rsync_main_package
+_rsync_dependences
+_remove_more_bloatwares
+_enable_mountpoints_for_the_inbuilt_bubblewrap
 
 # CREATE THE APPIMAGE
 if test -f ./*.AppImage; then
 	rm -R -f ./*archimage*.AppImage
 fi
 ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./"$APP".AppDir
-mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.3-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.4-x86_64.AppImage
