@@ -1,62 +1,221 @@
 #!/usr/bin/env bash
 
-VERSION="3.4"
+VERSION="3.4.4"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
+# Function to show the help message
+function _help() {
+	echo -e "\n ArchImage CLI v$VERSION \n\n A command line interface to build AppImages based on JuNest, the lightweight\n Arch Linux based distro that runs, without root privileges, on top of any\n other Linux distro."
+	echo -e "\n USAGE:\n\n   archimage-cli [OPTION]\n   archimage-cli [OPTION] [PROGRAM]\n"
+	echo -e " OPTIONS:\n\n   -h,--help		Shows this message.\n   -v,--version		Shows the version.\n   -b,--build		Create the script to build the AppImage.\n   -s,--sync		Update archimage-cli to the latest version."
+	echo -e "\n SITES: \n\n   - https://github.com/IVAN-HC	\n\n   - https://github.com/IVAN-HC/ARCHIMAGE	\n\n   - https://github.com/FSQUILLACE/JUNEST\n"
+}
+
+# Function to update this script
+function _sync() {
+	cd "$DIR" || exit 1
+	echo -ne " ◆ Synchronizing Archimage CLI v$(./archimage-cli -v)...\r"; sleep 0.5
+  	wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
+  	mv ~/.cache/archimage-cli ./archimage-cli; echo " ◆ ArchImage CLI is now updated to the version $(./archimage-cli -v) "
+}
+
+# FUNCTIONS TO CUSTOMIZE THE SCRIPTS
+function _usr_bin_executable_name() {
+	echo -e "\n---------------------------------------------------------------------------\n"
+	read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
+    	case $response in
+    	'')
+    		;;
+	*)
+		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
+		sed -n '1,4p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
+		echo 'BIN="'$response'"' >> ./"$APP"-junest.sh
+		sed -n '6,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
+		rm -f ./"$APP"-junest.sh.old;;
+	esac
+}
+
+function _add_dependences() {
+	read -r -ep "◆ ADD (OPTIONAL) DEPENDENCES OR LEAVE BLANK: " RESPONSE
+	case $RESPONSE in
+	*)
+		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
+		sed -n '1,5p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
+		echo 'DEPENDENCES="'$RESPONSE'"' >> ./"$APP"-junest.sh
+		sed -n '7,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
+		rm -f ./"$APP"-junest.sh.old;;
+	esac
+}
+
+function _include_all_dependences() {
+	echo "◆ Automatic library checking should be more than enough. However..."
+	read -p "  DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
+    	case $yn in
+	[Yy]* ) 
+		sed -i 's/#rsync -av/rsync -av/g' ./"$APP"-junest.sh;;
+	[Nn]*|* ) 
+		;;
+	esac
+}
+
+function _enable_chaoticaur() {
+	echo -e "\n---------------------------------------------------------------------------\n"
+	read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
+    	case $yn in
+	[Yy]* ) 
+		sed -i 's/###_enable_chaoticaur/_enable_chaoticaur/g' ./"$APP"-junest.sh;;
+	[Nn]*|* ) 
+		;;
+	esac
+}
+
+function _enable_basicstuff() {
+	read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
+    	case $yn in
+	[Yy]* ) 
+		sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh;;
+	[Nn]*|* ) 
+		;;
+	esac
+}
+
+function _enable_compilers(){
+	read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
+    	case $yn in
+	[Yy]* )
+		sed -i 's/#COMPILERS/COMPILERS/g' ./"$APP"-junest.sh
+		sed -i '/-- gpg --keyserver/ s/^#*//' ./"$APP"-junest.sh;;
+	[Nn]*|* )
+		;;
+	esac
+}
+
+function _keywords_to_save_in_usr_bin() {
+	read -r -ep "◆ LIST BINARIES TO SAVE IN /usr/bin OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
+	case "$savebins" in
+	'')
+		;;
+	*)
+		sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh
+		sed -i "s/SAVEBINSPLEASE/$savebins/g" ./"$APP"-junest.sh
+		;;
+	esac
+}
+
+function _keywords_to_save_in_usr_share() {
+	read -r -ep "◆ LIST DIRECTORIES TO SAVE IN /usr/share OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
+	case "$saveshare" in
+	'')
+		;;
+	*)
+		sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh
+		sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./"$APP"-junest.sh
+		;;
+	esac
+}
+
+function _keywords_to_save_in_usr_lib() {
+	read -r -ep "◆ LIST LIBRARIES AND DIRECTORIES TO SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
+	case "$savelibs" in
+	'')
+		;;
+	*)
+		sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh
+		sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./"$APP"-junest.sh
+		;;
+	esac
+}
+
+function _include_swrast() {
+	read -p "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
+    	case $yn in
+	[Yy]* )
+		sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./"$APP"-junest.sh;;
+	[Nn]*|* )
+		;;
+	esac
+}
+
+function _include_audio_keywords() {
+	read -r -ep "◆ DO YOU WISH TO ADD KEYWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
+	case $yn in
+	[Yy]* ) 
+		sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./"$APP"-junest.sh;;
+	[Nn]*|* )
+		;;
+	esac
+}
+
+function _include_internet_keywords() {
+	read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TRYING TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
+	case $yn in
+	[Yy]* ) 
+		sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./"$APP"-junest.sh
+		sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./"$APP"-junest.sh
+		sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh
+		sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./"$APP"-junest.sh
+		sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh
+		sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./"$APP"-junest.sh
+		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
+		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh;;
+	[Nn]*|* )
+		;;
+	esac
+}
+
+function _select_libraries() {
+	read -r -ep "◆ DO YOU WISH TO SELECT LIBRARIES TO SAVE (y,N)?" yn
+	case $yn in
+	[Yy]* ) 
+		sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh
+		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh
+		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
+		echo -e "\n---------------------------------------------------------------------------\n"
+		_include_swrast
+		echo -e "\n---------------------------------------------------------------------------\n"
+		_keywords_to_save_in_usr_lib
+		echo -e "\n---------------------------------------------------------------------------\n"
+		_include_audio_keywords
+		echo -e "\n---------------------------------------------------------------------------\n"
+		_include_internet_keywords
+		;;
+	[Nn]*|* )
+		;;
+	esac
+}
+
 case "$1" in
 
-	'') 
+	'')
 		echo -e "\n ArchImage CLI requires an argument, run -h for more info.\n";;
 
-	--help|-h) 
-		echo -e "\n ArchImage CLI v$VERSION \n\n A command line interface to build AppImages based on JuNest, the lightweight\n Arch Linux based distro that runs, without root privileges, on top of any\n other Linux distro."
-		echo -e "\n USAGE:\n\n   archimage-cli [OPTION]\n   archimage-cli [OPTION] [PROGRAM]\n"
-		echo -e " OPTIONS:\n\n   -h,--help		Shows this message.\n   -v,--version		Shows the version.\n   -b,--build		Create the script to build the AppImage.\n   -s,--sync		Update archimage-cli to the latest version."
-		echo -e "\n SITES: \n\n   - https://github.com/IVAN-HC	\n\n   - https://github.com/IVAN-HC/ARCHIMAGE	\n\n   - https://github.com/FSQUILLACE/JUNEST\n"
+	--help|-h)
+		_help
 		;;
 
 	--build|-b)
 		while [ -n "$1" ]; do
-		cd $(xdg-user-dir DESKTOP)
+		cd "$(xdg-user-dir DESKTOP)" || exit 1
 		case "$2" in
-		'') 
+		'')
 			echo -e "\n USAGE:	archimage-cli -b [PROGRAM]\n"
 			exit;;
 		*)
-			wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-next-junest.sh -O $2-junest.sh
-			sed -i "s#APP=SAMPLE#APP=$2#g" $2-junest.sh
+			APP="$2"
+			wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/sample-next-junest.sh -O "$APP"-junest.sh
+			sed -i "s#APP=SAMPLE#APP=$APP#g" "$APP"-junest.sh
+
+			_usr_bin_executable_name
+
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -r -ep '◆ NAME THE MAIN EXECUTABLE IN "$PATH", OR LEAVE BLANK IF IT IS THE SAME: ' response
-    			case $response in
-    			'')
-    				;;
-			*)
-				mv ./$2-junest.sh ./$2-junest.sh.old
-				sed -n '1,4p' ./$2-junest.sh.old >> ./$2-junest.sh
-				echo 'BIN="'$response'"' >> ./$2-junest.sh
-				sed -n '6,20000000p' ./$2-junest.sh.old >> ./$2-junest.sh
-				rm -f ./$2-junest.sh.old;;
-			esac
+
+			_add_dependences
+
 			echo -e "\n---------------------------------------------------------------------------\n"
-			read -r -ep "◆ ADD (OPTIONAL) DEPENDENCES OR LEAVE BLANK: " RESPONSE
-  	  		case $RESPONSE in
-			*)
-				mv ./$2-junest.sh ./$2-junest.sh.old
-				sed -n '1,5p' ./$2-junest.sh.old >> ./$2-junest.sh
-				echo 'DEPENDENCES="'$RESPONSE'"' >> ./$2-junest.sh
-				sed -n '7,20000000p' ./$2-junest.sh.old >> ./$2-junest.sh
-				rm -f ./$2-junest.sh.old;;
-			esac
-			echo -e "\n---------------------------------------------------------------------------\n"
-			echo "◆ Automatic library checking should be more than enough. However..."
-			read -p "  DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
-    			case $yn in
-			[Yy]* ) 
-				sed -i 's/#rsync -av/rsync -av/g' ./$2-junest.sh;;
-			[Nn]*|* ) 
-				;;
-			esac
+
+			_include_all_dependences
+
 			echo -e "\n---------------------------------------------------------------------------\n"
 			echo -e '◆ Choose to finish using a standard configuration with the bare minimum or'
 			echo -e '  continue by customizing the script as much as possible (default).\n'
@@ -71,166 +230,66 @@ case "$1" in
 			read -p "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			case $yn in
 			[Yy]* )
-				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
-				sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
-				sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
-				sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
-				sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
-				sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh # INSTALL CA-CERTIFICATES
-				sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/bin
-				sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/bin
-				sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
-				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
-				sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh # SAVE KEYWORDS IN /usr/share
-				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
-				if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/$2 2> /dev/null; then
-					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh # INSTALL BINUTILS AND GZIP
-					sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh # INSTALL BASE-DEVEL
-					sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh # ENABLE AUR GPG VALIDATION
+				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
+				sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
+				sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
+				sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
+				sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
+				sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./"$APP"-junest.sh # INSTALL CA-CERTIFICATES
+				sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./"$APP"-junest.sh # SAVE CA-CERTIFICATES IN /usr/bin
+				sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/bin
+				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
+				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./"$APP"-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
+				sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/share
+				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./"$APP"-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
+				if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/"$APP" 2> /dev/null; then
+					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh # INSTALL BINUTILS AND GZIP
+					sed -i 's/#COMPILERS/COMPILERS/g' ./"$APP"-junest.sh # INSTALL BASE-DEVEL
+					sed -i '/-- gpg --keyserver/ s/^#*//' ./"$APP"-junest.sh # ENABLE AUR GPG VALIDATION
 				fi
 				;;
-			[Nn]*|* ) 
+			[Nn]*|* )
 				echo -e "\n---------------------------------------------------------------------------\n"
-				read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
-    				case $yn in
-				[Yy]* ) 
-					sed -i 's/###_enable_chaoticaur/_enable_chaoticaur/g' ./$2-junest.sh;;
-				[Nn]*|* ) 
-					;;
-				esac
+
+				_enable_chaoticaur
+
 				echo -e "\n---------------------------------------------------------------------------\n"
-				read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
-    				case $yn in
-				[Yy]* ) 
-					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./$2-junest.sh;;
-				[Nn]*|* ) 
-					;;
-				esac
+
+				_enable_basicstuff
+
 				echo -e "\n---------------------------------------------------------------------------\n"
-				read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
-    				case $yn in
-				[Yy]* ) 
-					sed -i 's/#COMPILERS/COMPILERS/g' ./$2-junest.sh
-					sed -i '/-- gpg --keyserver/ s/^#*//' ./$2-junest.sh;;
-				[Nn]*|* ) 
-					;;
-				esac
+
+				_enable_compilers
+
 				echo -e "\n---------------------------------------------------------------------------\n"
-				echo -e '◆ All of the following steps are intended for advanced users and aim to'
-				echo -e '  lighten the final AppImage archive. Always press ENTER if you are unsure.\n'
-				read -p "  DO YOU WANT TO REMOVE FILES IN /usr/bin AND SPECIFY WHAT TO SAVE (y,N)? " yn
-    				case $yn in
-				[Yy]* ) 
-					sed -i 's/#_savebins/_savebins/g' ./$2-junest.sh
-					echo -e "\n---------------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST BINARIES TO SAVE BEYOND THE ONE SPECIFIED ABOVE OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
-					case "$savebins" in
-					'')
-						;;
-					*)
-						sed -i "s/SAVEBINSPLEASE/$savebins/g" ./$2-junest.sh;;
-						esac;;
-				[Nn]*|* ) 
-					;;
-				esac
+
+				_keywords_to_save_in_usr_bin
+
 				echo -e "\n---------------------------------------------------------------------------\n"
-				echo -e '◆ Attempt to lighten the final AppImage by removing unnecessary folders.'
-				read -p "  DO YOU WANT TO REMOVE FOLDERS IN /usr/share AND SPECIFY WHAT TO SAVE (y,N)? " yn
-    				case $yn in
-				[Yy]* ) sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
-					echo -e "\n---------------------------------------------------------------------------\n"
-					read -r -ep "◆ LIST FOLDERS TO SAVE OR LEAVE BLANK$(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
-					case "$saveshare" in
-					'');;
-					*)
-						sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./$2-junest.sh;;
-						esac;;
-					[Nn]*|* ) 
-						;;
-					esac
+
+				_keywords_to_save_in_usr_share
+
 				echo -e "\n---------------------------------------------------------------------------\n"
-				echo -e '◆ The next step will take account of the folders in /usr/share that you have'
-				echo -e '  saved previously to automatically check libraries in /usr/lib that contain'
-				echo -e '  the keyword. If a file is missing the app may not work. Note that this step'
-				echo -e '  will use "readelf" and "find" to locate files directly dependent on the'
-				echo -e '  main executables saved in /usr/bin, the related libraries and the libraries'
-				echo -e '  related to these. The process could be much longer than normal.\n'
-				read -p "  DO YOU WANT TO LET THE SCRIPT DECIDE WHICH LIBRARIES TO SAVE (y,N)? " yn
-    				case $yn in
-				[Yy]* ) 
-					sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
-					sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh
-					sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
-					echo -e "\n---------------------------------------------------------------------------\n"
-					read -p "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
-    					case $yn in
-					[Yy]* ) 
-						sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./$2-junest.sh;;
-					[Nn]*|* ) 
-						;;
-					esac
-					echo -e "\n---------------------------------------------------------------------------\n"
-					read -p "◆ DO YOU WANT TO INCLUDE EXTRA ITEMS OF YOUR CHOICE IN /usr/lib (y,N)? " yn
-    					case $yn in
-					[Yy]* )
-						echo -e "\n---------------------------------------------------------------------------\n"
-						sed -i 's/#_libkeywords/_libkeywords/g' ./$2-junest.sh
-						read -r -ep "◆ LIST KEYWORDS TO SEARCH AND SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
-						case "$savelibs" in
-						'')	
-							;;
-						*)
-							sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./$2-junest.sh;;
-						esac
-						echo -e "\n---------------------------------------------------------------------------\n"
-						read -r -ep "◆ DO YOU WISH TO ADD KEIWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
-						case $yn in
-						[Yy]* ) 
-							sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./$2-junest.sh;;
-						[Nn]*|* ) 
-							;;
-						esac
-						echo -e "\n---------------------------------------------------------------------------\n"
-						read -r -ep "◆ I RECOMMEND TO USE CA-CERTIFICATES TRYING TO ENABLE THE INTERNET $(echo -e '\n  DO YOU WISH TO ADD IT INTO THE SCIPT (y,N)?') " yn
-						case $yn in
-						[Yy]* ) 
-							sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./$2-junest.sh
-							sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./$2-junest.sh
-							sed -i 's/#_binlibs/_binlibs/g' ./$2-junest.sh
-							sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./$2-junest.sh
-							sed -i 's/#_saveshare/_saveshare/g' ./$2-junest.sh
-							sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./$2-junest.sh
-							sed -i 's/#_mvlibs/_mvlibs/g' ./$2-junest.sh
-							sed -i 's/#_liblibs/_liblibs/g' ./$2-junest.sh;;
-						[Nn]*|* ) 
-							;;
-						esac;;
-					[Nn]*|* ) 
-						;;
-					esac;;
-				[Nn]*|* ) 
-					;;
-				esac
+
+				_select_libraries
+
+				;;
 			esac
-			chmod a+x ./$2-junest.sh
-			echo -e "\n---------------------------------------------------------------------------\n"
-			chmod a+x ./$2-junest.sh
-			echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
-			echo -e "\n SUGGESTIONS:\n\n - from line titled 'REMOVE SOME BLOATWARES', add a list of items to be\n   deleted to avoid an excess in the size of the final AppImage archive.\n"
-			exit
-			;;
 		esac
+		echo -e "\n---------------------------------------------------------------------------\n"
+		chmod a+x ./"$APP"-junest.sh
+		echo -e " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE! \n"
+		echo -e "\n SUGGESTIONS:\n\n - from line titled 'REMOVE SOME BLOATWARES', add a list of items to be\n   deleted to avoid an excess in the size of the final AppImage archive.\n"
+		exit
 		done
 		;;
 
 	--sync|-s) 
-		cd $DIR
-		echo -ne " ◆ Synchronizing Archimage CLI v$(./archimage-cli -v)...\r"; sleep 0.5
-  		wget -q https://raw.githubusercontent.com/ivan-hc/ArchImage/main/archimage-cli -O ~/.cache/archimage-cli && chmod a+x ~/.cache/archimage-cli;
-  		mv ~/.cache/archimage-cli ./archimage-cli; echo " ◆ ArchImage CLI is now updated to the version $(./archimage-cli -v) "
+		_sync
   		;;
 
-	--version|-v) echo "$VERSION"
+	--version|-v)
+		echo "$VERSION"
 		;;
 
   		*)
