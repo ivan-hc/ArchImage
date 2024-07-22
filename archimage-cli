@@ -30,7 +30,7 @@ function _usr_bin_executable_name() {
 	*)
 		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
 		sed -n '1,4p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		echo 'BIN="'$response'"' >> ./"$APP"-junest.sh
+		echo 'BIN="'"$response"'"' >> ./"$APP"-junest.sh
 		sed -n '6,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
 		rm -f ./"$APP"-junest.sh.old;;
 	esac
@@ -42,7 +42,7 @@ function _add_dependences() {
 	*)
 		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
 		sed -n '1,5p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		echo 'DEPENDENCES="'$RESPONSE'"' >> ./"$APP"-junest.sh
+		echo 'DEPENDENCES="'"$RESPONSE"'"' >> ./"$APP"-junest.sh
 		sed -n '7,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
 		rm -f ./"$APP"-junest.sh.old;;
 	esac
@@ -50,7 +50,7 @@ function _add_dependences() {
 
 function _include_all_dependences() {
 	echo "◆ Automatic library checking should be more than enough. However..."
-	read -p "  DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
+	read -r -ep "  DO YOU WANT TO INCLUDE ALL DEPENDENCES? THE PACKAGE MAY BE BLOATED (y,N) " yn
     	case $yn in
 	[Yy]* ) 
 		sed -i 's/#rsync -av/rsync -av/g' ./"$APP"-junest.sh;;
@@ -61,7 +61,7 @@ function _include_all_dependences() {
 
 function _enable_chaoticaur() {
 	echo -e "\n---------------------------------------------------------------------------\n"
-	read -p "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
+	read -r -ep "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
     	case $yn in
 	[Yy]* ) 
 		sed -i 's/###_enable_chaoticaur/_enable_chaoticaur/g' ./"$APP"-junest.sh;;
@@ -71,7 +71,7 @@ function _enable_chaoticaur() {
 }
 
 function _enable_basicstuff() {
-	read -p "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
+	read -r -ep "◆ DO YOU WANT TO INCLUDE BINUTILS AND GZIP (y,N)? " yn
     	case $yn in
 	[Yy]* ) 
 		sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh;;
@@ -81,7 +81,7 @@ function _enable_basicstuff() {
 }
 
 function _enable_compilers(){
-	read -p "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
+	read -r -ep "◆ DO YOU WANT TO INCLUDE THE BASE-DEVEL PACKAGE AND COMPILE FROM AUR (y,N)? " yn
     	case $yn in
 	[Yy]* )
 		sed -i 's/#COMPILERS/COMPILERS/g' ./"$APP"-junest.sh
@@ -128,7 +128,7 @@ function _keywords_to_save_in_usr_lib() {
 }
 
 function _include_swrast() {
-	read -p "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
+	read -r -ep "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
     	case $yn in
 	[Yy]* )
 		sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./"$APP"-junest.sh;;
@@ -227,7 +227,7 @@ case "$1" in
 			echo -e '  audio trying to enable them.'
 			echo -e '  The file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed.\n'
 			echo -e '  Choose "N" or leave blank instead to continue customization (RECOMMENDED).\n'
-			read -p "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
+			read -r -ep "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			case $yn in
 			[Yy]* )
 				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
