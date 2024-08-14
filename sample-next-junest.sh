@@ -249,7 +249,6 @@ _set_locale
 _add_launcher_and_icon
 _create_AppRun
 _made_JuNest_a_potable_app
-_remove_some_bloatwares
 
 cd .. || exit 1 # EXIT THE APPDIR
 
@@ -495,7 +494,8 @@ function _rsync_dependences() {
 }
 
 function _remove_more_bloatwares() {
-	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
+	_remove_some_bloatwares
+ 	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
 	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* # included in the compilation phase, can sometimes be excluded for daily use
 }
