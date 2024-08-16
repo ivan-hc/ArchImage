@@ -22,12 +22,6 @@ function _enable_multilib() {
 	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
-function _install_libselinux_if_dependence() {
-	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
-		printf "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
-	fi
-}
-
 function _enable_chaoticaur() {
 	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
 	./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
@@ -53,7 +47,6 @@ function _bypass_signature_check_level() {
 
 function _pacman_patches() {
 	_enable_multilib
-	_install_libselinux_if_dependence
 	###_enable_chaoticaur
 	_custom_mirrorlist
 	_bypass_signature_check_level
@@ -207,17 +200,26 @@ function _create_AppRun() {
 	export JUNEST_HOME=$HERE/.junest
 	export PATH=$PATH:$HERE/.local/share/junest/bin
 
-	if test -f /etc/resolv.conf; then ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
-	if test -d /media; then MNT_MEDIA_DIR=' --bind /media /media '; fi
-	if test -d /mnt; then MNT_DIR=' --bind /mnt /mnt '; fi
-	if test -d /opt; then OPT_DIR=' --bind /opt /opt '; fi
-	if test -d /run/user; then USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
-	if test -d /usr/share/fonts; then USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
-	if test -d /usr/share/themes; then USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
-
-	BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR "
-
-	if test -f $JUNEST_HOME/usr/lib/libselinux.so; then export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"; fi
+	BINDS=" --dev-bind /dev /dev \
+		--ro-bind /sys /sys \
+		--bind-try /tmp /tmp \
+		--proc /proc \
+		--ro-bind-try /etc/resolv.conf /etc/resolv.conf \
+		--ro-bind-try /etc/hosts /etc/hosts \
+		--ro-bind-try /etc/nsswitch.conf /etc/nsswitch.conf \
+		--ro-bind-try /etc/passwd /etc/passwd \
+		--ro-bind-try /etc/group /etc/group \
+		--ro-bind-try /etc/machine-id /etc/machine-id \
+		--ro-bind-try /etc/asound.conf /etc/asound.conf \
+		--ro-bind-try /etc/localtime /etc/localtime \
+		--bind-try /media /media \
+		--bind-try /mnt /mnt \
+		--bind-try /opt /opt \
+		--bind-try /usr/lib/locale /usr/lib/locale \
+		--bind-try /usr/share/fonts /usr/share/fonts \
+		--bind-try /usr/share/themes /usr/share/themes \
+		--bind-try /var /var \
+		"
 
 	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 	$HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
@@ -230,7 +232,7 @@ function _made_JuNest_a_potable_app() {
 	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-	sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+	sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
 	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 }
 
@@ -507,6 +509,7 @@ function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	mkdir -p ./"$APP".AppDir/.junest/usr/share/fonts
 	mkdir -p ./"$APP".AppDir/.junest/usr/share/themes
 	mkdir -p ./"$APP".AppDir/.junest/run/user
+	rm -f ./"$APP".AppDir/.junest/etc/localtime && touch ./"$APP".AppDir/.junest/etc/localtime
 }
 
 _rsync_main_package
@@ -519,4 +522,4 @@ if test -f ./*.AppImage; then
 	rm -R -f ./*archimage*.AppImage
 fi
 ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.4-1-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.4-2-x86_64.AppImage
