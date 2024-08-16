@@ -97,7 +97,7 @@ fi
 function _backup_junest() {
 	cd ..
 	echo ""
-	echo "n-----------------------------------------------------------"
+	echo "-----------------------------------------------------------"
 	echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
 	echo "-----------------------------------------------------------"
 	mkdir -p ./junest-backups
