@@ -125,6 +125,7 @@ if [ ! -z "$DEPENDENCES" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 fi
 if [ ! -z "$APP" ]; then
+	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 else
 	echo "No app found, exiting"; exit 1
@@ -342,7 +343,8 @@ echo ""
 # SAVE FILES USING KEYWORDS
 BINSAVED="SAVEBINSPLEASE" # Enter here keywords to find and save in /usr/bin
 SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
-LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/directory names to save in /usr/lib
+lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so" # Libraries and files needed to launche the default browser
+LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher" # Enter here keywords or file/directory names to save in /usr/lib
 
 # Save files in /usr/bin
 function _savebins() {
