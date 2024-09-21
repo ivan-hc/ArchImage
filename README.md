@@ -27,6 +27,8 @@ Being this a container into an AppImage, it has its own "bubblewrap" to work usi
 
 [Files removed by default](#files-removed-by-default)
 
+[Drafts](#drafts)
+
 [Troubleshooting](#troubleshooting)
 
 [Credits](#credits)
@@ -212,6 +214,17 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 - hardware acceleration is absent (for now), see https://github.com/ivan-hc/ArchImage/issues/20
+
+------------------------------------------------------------------------
+
+# Drafts
+You can download some experimental scripts made with this tool and to which I have not dedicated a repository (also because I have too many) at the following link:
+
+https://github.com/ivan-hc/ArchImage/tree/main/drafts
+
+in my experiments, if I uploaded them here, it means that they work quite well or at least start the graphical interface. I have not looked into their operation. If you want, you can download them and modify them to your liking, or even open a dedicated repository.
+
+------------------------------------------------------------------------
 
 # Files removed by default
 After the line "`# REMOVE SOME BLOATWARES`" I added a list of functions that you can use with Archimage 2.x and above. You can edit the script as you like to add/remove files in case they are not enough for your experiments.
