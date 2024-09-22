@@ -127,6 +127,7 @@ fi
 if [ ! -z "$APP" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
+	./.local/share/junest/bin/junest -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
 	echo "No app found, exiting"; exit 1
 fi
