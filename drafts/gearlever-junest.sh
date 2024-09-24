@@ -347,7 +347,7 @@ BINSAVED="certificates uname cat readelf" # Enter here keywords to find and save
 SHARESAVED="certificates SAVESHAREPLEASE" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
 lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so libgtk-3.so" # Libraries and files needed to launche the default browser
 LIBSAVED="pk p11 alsa jack pipewire pulse girepository Graphene cairo libgstplayer libcups \
-	libprintbackend libgstgl libmedia-gstreamer libcolord python libibus libdebuginfod.so \
+	libprintbackend libgstgl libmedia-gstreamer libcolord python libibus libdebuginfod \
 	gdk-pixbuf librsvg libdav $lib_browser_launcher" # Enter here keywords or file/directory names to save in /usr/lib
 
 # Save files in /usr/bin
