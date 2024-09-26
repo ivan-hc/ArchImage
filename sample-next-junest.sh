@@ -519,6 +519,8 @@ function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 _rsync_main_package
 _rsync_dependences
 _remove_more_bloatwares
+strip --strip-debug ./$APP.AppDir/.junest/usr/lib/*
+strip --strip-unneeded ./$APP.AppDir/.junest/usr/bin/*
 _enable_mountpoints_for_the_inbuilt_bubblewrap
 
 # CREATE THE APPIMAGE
