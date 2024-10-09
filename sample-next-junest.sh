@@ -519,8 +519,9 @@ function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 _rsync_main_package
 _rsync_dependences
 _remove_more_bloatwares
-strip --strip-debug ./$APP.AppDir/.junest/usr/lib/*
-strip --strip-unneeded ./$APP.AppDir/.junest/usr/bin/*
+find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \;
+find ./"$APP".AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
+find ./"$APP".AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
 _enable_mountpoints_for_the_inbuilt_bubblewrap
 
 # CREATE THE APPIMAGE
