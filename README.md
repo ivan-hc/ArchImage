@@ -210,6 +210,10 @@ like this:
 
 https://github.com/user-attachments/assets/06308a6d-24db-417f-917c-8e1a9d78fe0b
 
+Once I created the script, I create a "tmp" directory (you can name it the way you want) and I put the script into it.
+
+I run the script and after 2 minutes I got the AppImage.
+
 The AppImage is 296 MB. Here is what happens when I run it:
 
 https://github.com/user-attachments/assets/b0d6474c-c7bc-4df0-bc91-bcde8d764176
