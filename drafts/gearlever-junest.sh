@@ -4,7 +4,7 @@
 APP=gearlever
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="ca-certificates python python-gobject glib2 python-dbus python-graphene graphene python-cairo cairo fuse3 \
-	libadwaita ibus libibus file python-filetype desktop-file-utils xdg-desktop-portal xapp"
+	libadwaita ibus libibus file python-filetype desktop-file-utils xdg-desktop-portal xapp nss nspr"
 BASICSTUFF="binutils debugedit gzip"
 COMPILERS="base-devel"
 
@@ -218,10 +218,12 @@ function _create_AppRun() {
 		--bind-try /media /media \
 		--bind-try /mnt /mnt \
 		--bind-try /opt /opt \
+		--bind-try /run /run \
 		--bind-try /usr/lib/locale /usr/lib/locale \
 		--bind-try /usr/share/fonts /usr/share/fonts \
 		--bind-try /usr/share/themes /usr/share/themes \
 		--bind-try /var /var \
+		--cap-add CAP_SYS_ADMIN \
 		"
 
 	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
@@ -343,12 +345,12 @@ echo "-----------------------------------------------------------"
 echo ""
 
 # SAVE FILES USING KEYWORDS
-BINSAVED="certificates uname cat readelf" # Enter here keywords to find and save in /usr/bin
+BINSAVED="certificates uname cat readelf readlink dirname" # Enter here keywords to find and save in /usr/bin
 SHARESAVED="certificates SAVESHAREPLEASE" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
 lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so libgtk-3.so" # Libraries and files needed to launche the default browser
 LIBSAVED="pk p11 alsa jack pipewire pulse girepository Graphene cairo libgstplayer libcups \
 	libprintbackend libgstgl libmedia-gstreamer libcolord python libibus libdebuginfod \
-	gdk-pixbuf librsvg libdav $lib_browser_launcher" # Enter here keywords or file/directory names to save in /usr/lib
+	gdk-pixbuf librsvg libdav libLLVM libGL libgdk-3 libgtk-3 $lib_browser_launcher" # Enter here keywords or file/directory names to save in /usr/lib
 
 # Save files in /usr/bin
 function _savebins() {
@@ -505,8 +507,11 @@ function _remove_more_bloatwares() {
 	_remove_some_bloatwares
  	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
-	rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
+	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/gtk*/*/media/libmedia-gstreamer.so
+	find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \;
+	find ./"$APP".AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
+	find ./"$APP".AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
 }
 
 function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
