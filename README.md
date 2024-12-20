@@ -2,7 +2,10 @@ ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest]
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
-Being this a container into an AppImage, it has its own "bubblewrap" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
+Being this a container into an AppImage, it has its own "bubblewrap" or "proot" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions:
+
+- [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
+- [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh) uses proot to be more portable but less integrated with the host system
 
 ------------------------------------------------------------------------
 ### Index
