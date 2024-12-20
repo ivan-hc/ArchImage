@@ -203,32 +203,24 @@ function _create_AppRun() {
 	export PATH=$HERE/.local/share/junest/bin/:$PATH
 	mkdir -p $HOME/.cache
 
+	BINDINGS=""
+	bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
+	for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --bind=$f"; done
+	bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes "
+	for d in $bind_dirs; do	[ -d "$d" ] && BINDINGS=" $BINDINGS --bind=$d";	done
+
 	BINDS=" --bind=/dev \
 		--bind=/sys \
 		--bind=/tmp \
 		--bind=/proc \
-		--bind=/etc/resolv.conf \
-		--bind=/etc/hosts \
-		--bind=/etc/nsswitch.conf \
-		--bind=/etc/passwd \
-		--bind=/etc/group \
-		--bind=/etc/machine-id \
-		--bind=/etc/asound.conf \
-		--bind=/etc/localtime \
-		--bind=/media \
-		--bind=/mnt \
-		--bind=/opt \
- 		--bind=/run/media \
-		--bind=/usr/lib/locale \
-		--bind=/usr/share/fonts \
-		--bind=/usr/share/themes \
+		$BINDINGS \
 		--bind=/var \
 		--bind=/home \
 		--bind=/home/$(echo $USER) \
 		"
 
 	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-	$HERE/.local/share/junest/bin/junest proot -n -b  "$BINDS" 2>/dev/null -- $EXEC "$@"
+	$HERE/.local/share/junest/bin/junest proot -n -b "$BINDS" -- $EXEC "$@"
 	HEREDOC
 	chmod a+x ./AppRun
 }
@@ -238,6 +230,7 @@ function _made_JuNest_a_potable_app() {
 	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 }
 
 function _remove_some_bloatwares() {
