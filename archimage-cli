@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.5"
+VERSION="4"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
@@ -158,6 +158,14 @@ _include_all_dependences() {
 	fi
 }
 
+# Allow Nvidia check in the final AppImage
+_enable_nvidia() {
+	read -r -ep "◆ DO YOU WANT TO ENABLE HARDWARE ACCELERATION FOR NVIDIA USERS? (y,N) " yn
+    	if echo "$yn" | grep -q "^y"; then
+    		sed -i 's/NVIDIA_ON=0/NVIDIA_ON=1/g' ./"$APP"-junest.sh
+	fi
+}
+
 # Start configuration
 STANDARD_CONFIGURATION_MSG="◆ Choose to finish using a standard configuration with the bare minimum or continue by customizing the script as much as possible (default).
 The standard configuration includes a package availability check in the Arch User Repository (if so, enable AUR and installs \"binutils\", \"gzip\" and \"basedevel\", all of them are only required to compile from and will not be included in the AppImage package), the AUR is enabled, installs \"ca-certificates\", includes keywords for the internet connections and audio trying to enable them.
@@ -287,6 +295,8 @@ case "$1" in
 			_add_dependences
 			echo "$DIVIDING_LINE"
 			_include_all_dependences
+			echo "$DIVIDING_LINE"
+			_enable_nvidia
 			echo "$DIVIDING_LINE"
 			echo "$STANDARD_CONFIGURATION_MSG" | _fit | sed "s/^/ /g; s/  ◆/◆/g"
 			read -r -ep "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
