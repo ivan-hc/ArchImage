@@ -202,7 +202,7 @@ function _create_AppRun() {
 	export JUNEST_HOME=$HERE/.junest
 	export PATH=$PATH:$HERE/.local/share/junest/bin
 
-	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
 	if [ "$NVIDIA_ON" = 1 ]; then
 	  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
 	  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
