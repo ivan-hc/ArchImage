@@ -203,6 +203,33 @@ function _create_AppRun() {
 	export PATH=$HERE/.local/share/junest/bin/:$PATH
 	mkdir -p $HOME/.cache
 
+	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+	if [ "$NVIDIA_ON" = 1 ]; then
+	  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+	  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+	  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+	  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+	  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
+	  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+	     if command -v curl >/dev/null 2>&1; then
+	        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
+	          notify-send "You are offline, cannot use Nvidia drivers"
+	        else
+	          notify-send "Configuring Nvidia drivers for this AppImage..."
+	          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
+	          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
+	          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
+	        fi
+	     else
+	        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
+	        echo "You need \"curl\" to download this script"
+	     fi
+	  fi
+	  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+	fi
+
 	BINDINGS=""
 	bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
 	for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --bind=$f"; done
@@ -525,4 +552,4 @@ if test -f ./*.AppImage; then
 	rm -R -f ./*archimage*.AppImage
 fi
 ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.4-2.2-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage4-x86_64.AppImage
