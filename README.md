@@ -289,33 +289,36 @@ The check is enabled in the AppRun, the script inside the AppImage, using the va
   <summary>Click here to see the part of the AppRun that handles Nvidia drivers</summary>
 
 ```
-	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
-	if [ "$NVIDIA_ON" = 1 ]; then
-	  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
-	  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
-	  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-	  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
-	  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
-	  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
-	     if command -v curl >/dev/null 2>&1; then
-	        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
-	          notify-send "You are offline, cannot use Nvidia drivers"
-	        else
-	          notify-send "Configuring Nvidia drivers for this AppImage..."
-	          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
-	          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
-	          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
-	        fi
-	     else
-	        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
-	        echo "You need \"curl\" to download this script"
-	     fi
-	  fi
-	  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
-	  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
-	  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
-	fi
+[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+if [ "$NVIDIA_ON" = 1 ]; then
+  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
+  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+     if command -v curl >/dev/null 2>&1; then
+        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
+          notify-send "You are offline, cannot use Nvidia drivers"
+        else
+          notify-send "Configuring Nvidia drivers for this AppImage..."
+          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
+          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
+          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
+        fi
+     else
+        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
+        echo "You need \"curl\" to download this script"
+     fi
+  fi
+  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
+  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+fi
 ```
+
+For the existing Archimages, its enough to add this part to the AppRun.
+
 </details>
 
 The function is set to warn the user if the necessary drivers are installed/updated or not. If this fails, the Archimage can still be run, but without hardware acceleration.
