@@ -1,4 +1,4 @@
-ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest).
+ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest). Hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty) instead.
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
@@ -6,6 +6,8 @@ Being this a container into an AppImage, it has its own "bubblewrap" or "proot" 
 
 - [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
 - [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh) uses proot to be more portable but less integrated with the host system
+
+Archimage combines the flexibility of JuNest with the power of Conty, the two portable Arch Linux containers that run on any other GNU/Linux distribution, offering the ability to package all the software available in the official Arch Linux repositories, the AUR and ChaoticAUR.
 
 ------------------------------------------------------------------------
 ### Index
@@ -25,6 +27,8 @@ Being this a container into an AppImage, it has its own "bubblewrap" or "proot" 
   - [Repeat the build](#repeat-the-build)
 
 [Tutorial](#tutorial)
+
+[Hardware Acceleration](#hardware-acceleration)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
@@ -109,7 +113,8 @@ Before proceeding, make sure you have understood "[What to do](#what-to-do)" and
 2. The script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank. Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it). If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
 3. The script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependency is needed.
 4. The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
-5. This phase, shown in the [video](#example), has a last message asking you to use a standard configuration with the following defaults if you press "Y":
+5. **A new question has been added from version 4**, "*DO YOU WANT TO ENABLE HARDWARE ACCELERATION FOR NVIDIA USERS?*", leave blank not to allow the AppImage to configure Nvidia drivers via Conty for the AppImage, or press "y" to set `NVIDIA_ON=1`. This will use [Conty](https://github.com/Kron4ek/Conty) to check and setup the Nvidia drivers locally if needed, only fo Nvidia users. See "[Hardware Acceleration](#hardware-acceleration)" for more.
+6. This phase, shown in the [video](#example), has a last message asking you to use a standard configuration with the following defaults if you press "Y":
 - a package availability check in the Arch User Repository (if so, enable AUR and installs "binutils", "gzip" and "basedevel", all of them are only required to compile from and will not be included in the AppImage package)
 - the AUR is enabled
 - installs "ca-certificates"
@@ -269,6 +274,69 @@ If you do all this correctly, the package will be even smaller.
 | - |
 
 ------------------------------------------------------------------------
+# Hardware Acceleration
+If you are an Nvidia user, hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty). At first start it will install Nvidia drivers locally to allow the builtin Arch Linux container the use of hardware accelleration.
+
+In this video I'll show how Nvidia drivers are detected by running a v4 Archimage
+
+https://github.com/user-attachments/assets/782dd318-8176-471d-ade2-df2a660e21fc
+
+According to the Conty project, the drivers will be placed in a "Conty" directory located in $HOME/.local/share. If you already use a Conty container or run other Archimages v4 or higher, you will be able to use the same drivers.
+
+The check is enabled in the AppRun, the script inside the AppImage, using the variable `NVIDIA_ON` with a value equal to `1`. To disable it, simply assign a different value to this variable, for example `0`. The creators of the AppImage will be able to decide whether to enable it during the creation of the script, via `archimage-cli`, from version 4 onwards, or they can enable it manually.
+
+<details>
+  <summary>Click here to see the part of the AppRun that handles Nvidia drivers</summary>
+
+```
+	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+	if [ "$NVIDIA_ON" = 1 ]; then
+	  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+	  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+	  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+	  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+	  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
+	  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+	     if command -v curl >/dev/null 2>&1; then
+	        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
+	          notify-send "You are offline, cannot use Nvidia drivers"
+	        else
+	          notify-send "Configuring Nvidia drivers for this AppImage..."
+	          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
+	          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
+	          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
+	        fi
+	     else
+	        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
+	        echo "You need \"curl\" to download this script"
+	     fi
+	  fi
+	  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+	fi
+```
+</details>
+
+The function is set to warn the user if the necessary drivers are installed/updated or not. If this fails, the Archimage can still be run, but without hardware acceleration.
+
+By default the value inside the templates and AppRuns is set to "`0`"
+```
+NVIDIA_ON=0
+```
+
+The script that downloads and runs Conty to create the Nvidia drivers locally is this one instead:
+
+https://github.com/ivan-hc/ArchImage/blob/main/nvidia-junest.sh
+
+The script is kept outside of AppRuns so that I can improve it in the future, trying to provide better installation and update systems for Archimages that require hardware acceleration. And as an Nvidia user I can assure you that improvements to the service will not be lacking.
+
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
 # Compared to classic AppImage construction
 In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
 
@@ -290,7 +358,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 - all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
 
 ### Disadvantages
-- hardware acceleration is absent (for now), see https://github.com/ivan-hc/ArchImage/issues/20
+- hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty), so the first start will install Nvidia drivers locally to allow the builtin Arch Linux container the use of hardware accelleration. This may take seconds or minutes, depending on how fast your internet connection is. The `curl` command must be present.
 
 ------------------------------------------------------------------------
 
@@ -350,6 +418,7 @@ If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchIm
 ------------------------------------------------------------------------
 # Credits
 This project wont be possible without:
+- Conty https://github.com/Kron4ek/Conty
 - JuNest https://github.com/fsquillace/junest
 - Arch Linux https://archlinux.org
 
