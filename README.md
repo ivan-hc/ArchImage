@@ -275,15 +275,16 @@ If you do all this correctly, the package will be even smaller.
 
 ------------------------------------------------------------------------
 # Hardware Acceleration
-If you are an Nvidia user, hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty). At first start it will install Nvidia drivers locally to allow the builtin Arch Linux container the use of hardware accelleration.
-
-In this video I'll show how Nvidia drivers are detected by running a v4 Archimage
-
-https://github.com/user-attachments/assets/782dd318-8176-471d-ade2-df2a660e21fc
+If you are an Nvidia user, hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty). At first start it will copy Nvidia libraries locally to allow the builtin Arch Linux container the use of hardware accelleration.
 
 According to the Conty project, the drivers will be placed in a "Conty" directory located in $HOME/.local/share. If you already use a Conty container or run other Archimages v4 or higher, you will be able to use the same drivers.
 
 The check is enabled in the AppRun, the script inside the AppImage, using the variable `NVIDIA_ON` with a value equal to `1`. To disable it, simply assign a different value to this variable, for example `0`. The creators of the AppImage will be able to decide whether to enable it during the creation of the script, via `archimage-cli`, from version 4 onwards, or they can enable it manually.
+
+- Archimage v4 was able to download a script that used a mini `conty.sh` to compile the Nvidia drivers using the official online installer, and it took a few minutes to complete the process
+- Archimage v4.1 instead is able to intercept the drivers installed on the system and copy them locally, taking less than a second
+
+**It is recommended to keep your Archimages up to date with the portion of the code available in new releases.**
 
 <details>
   <summary>Click here to see the part of the AppRun that handles Nvidia drivers</summary>
@@ -291,29 +292,27 @@ The check is enabled in the AppRun, the script inside the AppImage, using the va
 ```
 [ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
 if [ "$NVIDIA_ON" = 1 ]; then
-  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
-  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
-  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
-  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
-  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
-     if command -v curl >/dev/null 2>&1; then
-        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
-          notify-send "You are offline, cannot use Nvidia drivers"
-        else
-          notify-send "Configuring Nvidia drivers for this AppImage..."
-          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
-          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
-          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
-        fi
-     else
-        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
-        echo "You need \"curl\" to download this script"
-     fi
-  fi
-  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
-  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
-  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+   DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+   CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+   [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+   if [ -n "$nvidia_driver_version" ]; then
+      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib "${CONTY_DIR}"/up/usr/share
+      nvidia_data_dirs="egl glvnd nvidia vulkan"
+      for d in $nvidia_data_dirs; do [ ! -d "${CONTY_DIR}"/up/usr/share/"$d" ] && ln -s /usr/share/"$d" "${CONTY_DIR}"/up/usr/share/ 2>/dev/null; done
+      [ ! -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
+      [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty=$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)
+      if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+         rm -f "${CONTY_DIR}"/up/usr/lib/*; echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
+      fi
+      /sbin/ldconfig -p > "${CONTY_DIR}"/nvidia/host_libs
+      grep -i "nvidia\|libcuda" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2 > "${CONTY_DIR}"/nvidia/host_nvidia_libs
+      libnv_paths=$(grep "libnv" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2)
+      for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && echo "${f}" >> "${CONTY_DIR}"/nvidia/host_nvidia_libs; done
+      nvidia_libs=$(cat "${CONTY_DIR}"/nvidia/host_nvidia_libs)
+      for n in $nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${CONTY_DIR}"/up/usr/lib/"$libname" ] && cp "$n" "${CONTY_DIR}"/up/usr/lib/; done
+      [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+      [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+   fi
 fi
 ```
 
@@ -359,9 +358,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 - easy and immediate compilation;
 - AppRun script very minimal and easy to configure;
 - all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
-
-### Disadvantages
-- hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty), so the first start will install Nvidia drivers locally to allow the builtin Arch Linux container the use of hardware accelleration. This may take seconds or minutes, depending on how fast your internet connection is. The `curl` command must be present.
 
 ------------------------------------------------------------------------
 
