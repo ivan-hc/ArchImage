@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="4"
+VERSION="4.1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
