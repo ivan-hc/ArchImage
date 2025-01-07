@@ -323,18 +323,12 @@ For the existing Archimages, its enough to add this part to the AppRun.
 
 </details>
 
-The function is set to warn the user if the necessary drivers are installed/updated or not. If this fails, the Archimage can still be run, but without hardware acceleration.
-
 By default the value inside the templates and AppRuns is set to "`0`"
 ```
 NVIDIA_ON=0
 ```
 
-The script that downloads and runs Conty to create the Nvidia drivers locally is this one instead:
-
-https://github.com/ivan-hc/ArchImage/blob/main/nvidia-junest.sh
-
-The script is kept outside of AppRuns so that I can improve it in the future, trying to provide better installation and update systems for Archimages that require hardware acceleration. And as an Nvidia user I can assure you that improvements to the service will not be lacking.
+NOTE, make sure your release has Archimage version 4.1 or higher in the file name.
 
 ------------------------------------------------------------------------
 
