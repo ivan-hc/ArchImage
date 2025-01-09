@@ -70,8 +70,8 @@ _install_junest() {
 	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
 	echo " Apply patches to PacMan..."
-	_enable_multilib
-	###_enable_chaoticaur
+	#_enable_multilib
+	#_enable_chaoticaur
 	_custom_mirrorlist
 	_bypass_signature_check_level
 
