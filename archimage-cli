@@ -114,25 +114,13 @@ You can re-run the same script at the end of the process in case the AppImage cr
 _usr_bin_executable_name() {
 	echo "$DIVIDING_LINE"
 	read -r -ep "◆ NAME THE MAIN EXECUTABLE IN \$PATH, OR LEAVE BLANK IF IT IS THE SAME: " response
-    	if [ -n "$response" ]; then
-		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
-		sed -n '1,4p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		echo "BIN=\"$response\"" >> ./"$APP"-junest.sh
-		sed -n '6,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		rm -f ./"$APP"-junest.sh.old
-	fi
+    	[ -n "$response" ] && sed -i "s/^BIN=\"\$APP\"/BIN=\"$response\"/g" ./"$APP"-junest.sh
 }
 
 # Add optional dependencies
 _add_dependences() {
 	read -r -ep "◆ ADD (OPTIONAL) DEPENDENCES OR LEAVE BLANK: " RESPONSE
-	if [ -n "$RESPONSE" ]; then
-		mv ./"$APP"-junest.sh ./"$APP"-junest.sh.old
-		sed -n '1,5p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		echo "DEPENDENCES=\"$RESPONSE\"" >> ./"$APP"-junest.sh
-		sed -n '7,20000000p' ./"$APP"-junest.sh.old >> ./"$APP"-junest.sh
-		rm -f ./"$APP"-junest.sh.old
-	fi
+	[ -n "$RESPONSE" ] && sed -i "s/^DEPENDENCES=\"\"/DEPENDENCES=\"$RESPONSE\"/g" ./"$APP"-junest.sh
 }
 
 # Include all dependencies in the final AppImage
