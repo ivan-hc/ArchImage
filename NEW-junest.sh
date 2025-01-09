@@ -579,10 +579,10 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap
 [ -f ./*.AppImage ] && rm -Rf ./*archimage*.AppImage
 
 REPO=""
-[ -z "$REPO" ] && REPO="$APPNAME"
+[ -z "$REPO" ] && REPO="$APPNAME-appimage"
 TAG="continuous"
 APPNAME=$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
 
 ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
-	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO-appimage|$TAG|*x86_64.AppImage.zsync" \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync" \
 	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.2-x86_64.AppImage
