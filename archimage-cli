@@ -153,11 +153,7 @@ _enable_nvidia() {
 }
 
 # Start configuration
-STANDARD_CONFIGURATION_MSG="◆ Choose to finish using a standard configuration with the bare minimum or continue by customizing the script as much as possible (default).
-The standard configuration includes a package availability check in the Arch User Repository (if so, enable AUR and installs \"binutils\", \"gzip\" and \"basedevel\", all of them are only required to compile from and will not be included in the AppImage package), the AUR is enabled, installs \"ca-certificates\", includes keywords for the internet connections and audio trying to enable them.
-The file \"/usr/lib/dri/swrast_dri.so\" will NOT be included if not needed.
-
-Choose \"N\" or leave blank instead to continue customization (RECOMMENDED).
+STANDARD_CONFIGURATION_MSG="◆ Press \"y\" to finish using a standard configuration with the bare minimum for network and audio support, press \"N\" or leave blank instead to continue customization (RECOMMENDED).
 "
 
 _enable_chaoticaur() {
