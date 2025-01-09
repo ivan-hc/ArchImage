@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-VERSION="4.1"
+VERSION="4.2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
+ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/dev"
 DIVIDING_LINE="
 -----------------------------------------------------------------------------
 "
@@ -108,21 +108,7 @@ $DIVIDING_LINE
 After creating the script, make sure to run it in a dedicated directory. Do not run the script in directories that are already occupied!
 
 You can re-run the same script at the end of the process in case the AppImage creation failed and the program does not work as you wanted, as long as everything happens always in the same dedicated directory.
-$DIVIDING_LINE
-Choose whether to build the AppImage using:
-
-1. BubbleWrap (default), uses Linux namespaces for greater host compatibility
-2. Proot (new), maximum portability, but still experimental
 "
-_get_started() {
-	printf "%b\n" "$GETTING_STARTED_MSG" | _fit | sed "s/ --/--/g"
-	read -r -ep "◆ Choose between BubbleWrap (1, default) and Proot (2): " choose
-	if [ "$choose" = 2 ]; then
-		TEMPLATE="sample-junest.sh"
-	else
-		TEMPLATE="sample-next-junest.sh"
-	fi
-}
 
 # Name the executable in /usr/bin if different from the appname
 _usr_bin_executable_name() {
@@ -175,10 +161,16 @@ Choose \"N\" or leave blank instead to continue customization (RECOMMENDED).
 "
 
 _enable_chaoticaur() {
-	echo "$DIVIDING_LINE"
 	read -r -ep "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
     	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/###_enable_chaoticaur/_enable_chaoticaur/g' ./"$APP"-junest.sh
+		sed -i 's/#_enable_chaoticaur/_enable_chaoticaur/g' ./"$APP"-junest.sh
+	fi
+}
+
+_enable_multilib() {
+	read -r -ep "◆ DO YOU WANT TO ENABLE MULTILIB WITH 32BIT LIBRARIES (y,N)? " yn
+    	if echo "$yn" | grep -qi "^y"; then
+		sed -i 's/#_enable_multilib/_enable_multilib/g' ./"$APP"-junest.sh
 	fi
 }
 
@@ -286,15 +278,23 @@ case "$1" in
 			echo " USAGE:	archimage-cli -b [PROGRAM]"
 			exit 0
 		else
-			_get_started
 			APP="$2"
-			wget -q "$ARCHIMAGE_REPO/$TEMPLATE" -O "$APP"-junest.sh
+			wget -q "$ARCHIMAGE_REPO/NEW-junest.sh" -O "$APP"-junest.sh
 			sed -i "s#APP=SAMPLE#APP=$APP#g" "$APP"-junest.sh
 			_usr_bin_executable_name
 			echo "$DIVIDING_LINE"
 			_add_dependences
 			echo "$DIVIDING_LINE"
 			_include_all_dependences
+			echo "$DIVIDING_LINE"
+			if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/"$APP" 2> /dev/null; then
+				sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh # INSTALL BINUTILS AND GZIP
+				sed -i 's/#COMPILERS/COMPILERS/g' ./"$APP"-junest.sh # INSTALL BASE-DEVEL
+				sed -i '/-- gpg --keyserver/ s/^#*//' ./"$APP"-junest.sh # ENABLE AUR GPG VALIDATION
+				_enable_chaoticaur
+				echo "$DIVIDING_LINE"
+			fi
+			_enable_multilib
 			echo "$DIVIDING_LINE"
 			_enable_nvidia
 			echo "$DIVIDING_LINE"
@@ -313,18 +313,9 @@ case "$1" in
 				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./"$APP"-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
 				sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/share
 				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./"$APP"-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
-				if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/"$APP" 2> /dev/null; then
-					sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh # INSTALL BINUTILS AND GZIP
-					sed -i 's/#COMPILERS/COMPILERS/g' ./"$APP"-junest.sh # INSTALL BASE-DEVEL
-					sed -i '/-- gpg --keyserver/ s/^#*//' ./"$APP"-junest.sh # ENABLE AUR GPG VALIDATION
-				fi
 			else
-				echo "$DIVIDING_LINE"
-				_enable_chaoticaur
-				echo "$DIVIDING_LINE"
-				_enable_basicstuff
-				echo "$DIVIDING_LINE"
-				_enable_compilers
+				grep -q "^#BASICSTUFF" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_basicstuff
+				grep -q "^#COMPILERS" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_compilers
 				echo "$DIVIDING_LINE"
 				_keywords_to_save_in_usr_bin
 				echo "$DIVIDING_LINE"
@@ -337,7 +328,10 @@ case "$1" in
 		chmod a+x ./"$APP"-junest.sh
 		echo " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE!"
 		echo ""
-		printf "\nSUGGESTIONS:\n\n- from line titled 'REMOVE SOME BLOATWARES', add a list of items to be deleted to avoid an excess in the size of the final AppImage archive.\n\n" | _fit
+		echo " SUGGESTIONS:"
+		printf "\n- you can manually complete the function named \"_remove_more_bloatwares\" with a list of items to be deleted to avoid an excess in the size of the final AppImage archive\n" | _fit
+		printf "\n- in the footer of the script you can manually add TAG and REPO in case you want to host an updatable AppImage on github.com\n" | _fit
+		echo ""
 		exit 0
 		done
 		;;
