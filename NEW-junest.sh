@@ -335,9 +335,7 @@ _determine_packages_and_libraries() {
 _extract_deps() {
 	DEPS=$(sort -u ./depdeps)
 	for arg in $DEPS; do
-		if ! grep -q "^$arg$" ./depdeps; then
-			_determine_packages_and_libraries
-		fi
+		_determine_packages_and_libraries
 	done
 }
 
@@ -350,14 +348,9 @@ _extract_all_dependences() {
 
 	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^depend = " | cut -c 10- | sed 's/=.*//')
 	for arg in $DEPS; do
-		if ! grep -q "^$arg$" ./depdeps; then
-			_determine_packages_and_libraries
-		fi
+		_determine_packages_and_libraries
 	done
 
-	_extract_deps
-	_extract_deps
-	_extract_deps
 	_extract_deps
 	_extract_deps
 
