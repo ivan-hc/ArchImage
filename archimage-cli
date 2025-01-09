@@ -207,7 +207,7 @@ _include_swrast() {
 _include_audio_keywords() {
 	read -r -ep "◆ DO YOU WISH TO ADD KEYWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
 	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./"$APP"-junest.sh
+		sed -i 's/^#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh
 	fi
 }
 
@@ -222,6 +222,7 @@ _include_internet_keywords() {
 		sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./"$APP"-junest.sh
 		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
 		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh
+		sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh
 	fi
 }
 
@@ -289,14 +290,11 @@ case "$1" in
 				sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
 				sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
 				sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
-				sed -i 's/LIBSAVED="/LIBSAVED="alsa jack pipewire pulse /g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
-				sed -i 's/DEPENDENCES="/DEPENDENCES="ca-certificates /g'  ./"$APP"-junest.sh # INSTALL CA-CERTIFICATES
-				sed -i 's/BINSAVED="/BINSAVED="certificates /g'  ./"$APP"-junest.sh # SAVE CA-CERTIFICATES IN /usr/bin
+				sed -i 's/#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
 				sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/bin
 				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
-				sed -i 's/SHARESAVED="/SHARESAVED="certificates /g'  ./"$APP"-junest.sh # SAVE CA-CERTIFICATES IN /usr/share
 				sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/share
-				sed -i 's/LIBSAVED="/LIBSAVED="pk p11 /g'  ./"$APP"-junest.sh # SAVE SOME KEYWORDS NEEDED FOR INTERNET
+				sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh # ALLOW THE PROGRAM TO OPEN THE SYSTEM BROWSER
 			else
 				grep -q "^#BASICSTUFF" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_basicstuff
 				grep -q "^#COMPILERS" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_compilers
