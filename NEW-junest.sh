@@ -12,8 +12,9 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 
 BINSAVED="SAVEBINSPLEASE"
 SHARESAVED="SAVESHAREPLEASE"
-lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so libxapp-gtk3-module.so"
-LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
+#lib_audio_keywords="alsa jack pipewire pulse"
+#lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so libxapp-gtk3-module.so libgtk-3.so.0"
+LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 
 #############################################################################
 #	SETUP THE ENVIRONMENT
@@ -117,7 +118,7 @@ if [ -n "$DEPENDENCES" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 fi
 if [ -n "$APP" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib
+	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib gtk3 xapp
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 	./.local/share/junest/bin/junest -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
@@ -137,7 +138,6 @@ rsync -av --ignore-existing ./"$APP".AppDir/.junest/ ./junest-backups/ | echo "�
 rsync -av --ignore-existing ./"$APP".AppDir/.local/ ./stock-local/ | echo "◆ Backup the content of JuNest's ~/.local directory"
 echo ""
 echo "-----------------------------------------------------------------------------"
-echo ""
 cd ./"$APP".AppDir || exit 1
 
 #############################################################################
@@ -313,10 +313,10 @@ _extract_package() {
 	if test -f "$pkg_full_path"; then
 		if ! grep -q "$pkgname" ./packages 2>/dev/null;then
 			echo "◆ Extracting $pkgname"
-			tar fx "$pkg_full_path" -C ./deps/
+			tar fx "$pkg_full_path" -C ./deps/ --warning=no-unknown-keyword
 			echo "$pkgname" >> ./packages
 		else
-			tar fx "$pkg_full_path" -C ./deps/
+			tar fx "$pkg_full_path" -C ./deps/ --warning=no-unknown-keyword
 			echo "$pkgname" >> ./packages
 		fi
 	fi
@@ -325,7 +325,7 @@ _extract_package() {
 _determine_packages_and_libraries() {
 	if echo "$arg" | grep -q "\.so"; then
 		LIBSAVED="$LIBSAVED $arg"
-	else
+	elif [ "$arg" != autoconf ] && [ "$arg" != autoconf ] && [ "$arg" != automake ] && [ "$arg" != bison ] && [ "$arg" != debugedit ] && [ "$arg" != dkms ] && [ "$arg" != fakeroot ] && [ "$arg" != flatpak ] && [ "$arg" != linux ] && [ "$arg" != gcc ] && [ "$arg" != make ] && [ "$arg" != pacman ] && [ "$arg" != patch ] && [ "$arg" != systemd ]; then
 		_extract_package
 		cat ./deps/.PKGINFO 2>/dev/null | grep "^depend = " | cut -c 10- | sed 's/=.*//' >> depdeps
 		rm -f ./deps/.*
@@ -346,7 +346,7 @@ _extract_all_dependences() {
 		_determine_packages_and_libraries
 	done
 
-	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^depend = " | cut -c 10- | sed 's/=.*//')
+	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^depend = \|^optdepend = " | sed 's/optdepend = //g' | sed 's/depend = //g' | sed 's/=.*//' | sed 's/:.*//')
 	for arg in $DEPS; do
 		_determine_packages_and_libraries
 	done
@@ -537,10 +537,13 @@ _remove_more_bloatwares() {
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
 	rm -Rf ./"$APP".AppDir/.junest/etc/makepkg.conf
 	rm -Rf ./"$APP".AppDir/.junest/etc/pacman*
-	rm -Rf ./"$APP".AppDir/.junest/usr/include #FILES RELATED TO THE COMPILER
-	rm -Rf ./"$APP".AppDir/.junest/usr/man #APPIMAGES ARE NOT MENT TO HAVE MAN COMMAND
-	rm -Rf ./"$APP".AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PACKAGE MANAGER
+	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
+	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
+	rm -Rf ./"$APP".AppDir/.junest/var/* # remove all packages downloaded with the package manager
  	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
+	rm -Rf ./"$APP".AppDir/.junest/usr/bin/gcc* \
+		./"$APP".AppDir/.junest/usr/lib/gcc* \
+		./"$APP".AppDir/.junest/usr/share/gcc* # comment if you plan to use a compiler
 	rm -Rf ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
 }
