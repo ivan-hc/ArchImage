@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-#############################################################################
-#	PACKAGES
-#############################################################################
-
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCES ARE NEEDED
@@ -20,17 +16,6 @@ lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasou
 LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
 
 #############################################################################
-#	GLOBAL SETTINGS
-#############################################################################
-
-# Determine whether the Archimage will use Bubblewrap (1) or Proot (0)
-BWRAP_ON=1
-# Determine whether to add a hardware acceleration feature in AppRun
-NVIDIA_ON=0
-
-DIVIDING_LINE="-----------------------------------------------------------------------------"
-
-#############################################################################
 #	SETUP THE ENVIRONMENT
 #############################################################################
 
@@ -44,7 +29,7 @@ mkdir -p "$APP".AppDir && cd "$APP".AppDir || exit 1
 HOME="$(dirname "$(readlink -f $0)")"
 
 #############################################################################
-#	DOWNLOAD AND INSTALL JUNEST
+#	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
 #############################################################################
 
 _enable_multilib() {
@@ -74,8 +59,13 @@ _bypass_signature_check_level() {
 }
 
 _install_junest() {
+	echo "-----------------------------------------------------------------------------"
+	echo "◆ Clone JuNest from https://github.com/fsquillace/junest"
+	echo "-----------------------------------------------------------------------------"
 	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
-	echo " Downloading JuNest from https://github.com/ivan-hc/junest"
+	echo "-----------------------------------------------------------------------------"
+	echo "◆ Downloading JuNest archive from https://github.com/ivan-hc/junest"
+	echo "-----------------------------------------------------------------------------"
 	curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
 	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
@@ -92,15 +82,15 @@ _install_junest() {
 
 _restore_junest() {
 	cd ..
-	echo "$DIVIDING_LINE"
+	echo "-----------------------------------------------------------------------------"
 	echo " RESTORATION OF BACKUPS IN PROGRESS..."
-	echo "$DIVIDING_LINE"
+	echo "-----------------------------------------------------------------------------"
 	echo ""
 	rsync -av ./junest-backups/ ./"$APP".AppDir/.junest/ | echo "◆ Restore the content of the Arch Linux container, please wait"
 	[ -d ./"$APP".AppDir/.cache ] && rsync -av ./stock-cache/ ./"$APP".AppDir/.cache/ | echo "◆ Restore the content of JuNest's ~/.cache directory"
 	rsync -av ./stock-local/ ./"$APP".AppDir/.local/ | echo "◆ Restore the content of JuNest's ~/.local directory"
 	echo ""
-	echo "$DIVIDING_LINE"
+	echo "-----------------------------------------------------------------------------"
 	echo ""
 	cd ./"$APP".AppDir || exit 1
 }
@@ -112,7 +102,7 @@ else
 fi
 
 #############################################################################
-#	INSTALL THE PROGRAM USING YAY
+#	INSTALL PROGRAMS USING YAY
 #############################################################################
 
 ./.local/share/junest/bin/junest -- yay -Syy
@@ -137,21 +127,21 @@ fi
 # Backup JuNest for furter tests
 cd ..
 echo ""
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 mkdir -p ./junest-backups ./stock-cache ./stock-local
 echo ""
 rsync -av --ignore-existing ./"$APP".AppDir/.junest/ ./junest-backups/ | echo "◆ Backup the content of the Arch Linux container, please wait"
 [ -d ./"$APP".AppDir/.cache ] && rsync -av --ignore-existing ./"$APP".AppDir/.cache/ ./stock-cache/ | echo "◆ Backup the content of JuNest's ~/.cache directory"
 rsync -av --ignore-existing ./"$APP".AppDir/.local/ ./stock-local/ | echo "◆ Backup the content of JuNest's ~/.local directory"
 echo ""
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo ""
 cd ./"$APP".AppDir || exit 1
 
 #############################################################################
-#	PREPARE THE APPIMAGE
+#	LAUNCHER AND ICON / MADE JUNEST A PORTABLE CONTAINER
 #############################################################################
 
 # Set locale
@@ -209,112 +199,83 @@ sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappe
 sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
 
 #############################################################################
-#	CREATE THE APPRUN
+#	APPRUN
 #############################################################################
 
-echo '#!/bin/sh
-HERE="$(dirname "$(readlink -f $0)")"
+rm -f ./AppRun
+cat <<-'HEREDOC' >> ./AppRun
+#!/bin/sh
+HERE="$(dirname "$(readlink -f "$0")")"
 export UNION_PRELOAD="$HERE"
-export JUNEST_HOME="$HERE"/.junest' > ./AppRun
+export JUNEST_HOME="$HERE"/.junest
 
-if [ "$BWRAP_ON" = 1 ]; then
-	echo 'export PATH="$PATH":"$HERE"/.local/share/junest/bin' >> ./AppRun
+if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
+   PROOT_ON=1
+   export PATH="$HERE"/.local/share/junest/bin/:"$PATH"
+   mkdir -p "$HOME"/.cache
 else
-	echo 'export PATH="$HERE"/.local/share/junest/bin/:"$PATH"' >> ./AppRun
-	echo 'mkdir -p "$HOME"/.cache' >> ./AppRun
+   export PATH="$PATH":"$HERE"/.local/share/junest/bin
 fi
-echo ""  >> ./AppRun
 
+[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
 if [ "$NVIDIA_ON" = 1 ]; then
-	cat <<-'HEREDOC' >> ./AppRun
-	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
-	if [ "$NVIDIA_ON" = 1 ]; then
-	   DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
-	   CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
-	   [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
-	   if [ -n "$nvidia_driver_version" ]; then
-	      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib "${CONTY_DIR}"/up/usr/share
-	      nvidia_data_dirs="egl glvnd nvidia vulkan"
-	      for d in $nvidia_data_dirs; do [ ! -d "${CONTY_DIR}"/up/usr/share/"$d" ] && ln -s /usr/share/"$d" "${CONTY_DIR}"/up/usr/share/ 2>/dev/null; done
-	      [ ! -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
-	      [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty=$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)
-	      if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
-	         rm -f "${CONTY_DIR}"/up/usr/lib/*; echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
-	      fi
-	      /sbin/ldconfig -p > "${CONTY_DIR}"/nvidia/host_libs
-	      grep -i "nvidia\|libcuda" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2 > "${CONTY_DIR}"/nvidia/host_nvidia_libs
-	      libnv_paths=$(grep "libnv" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2)
-	      for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && echo "${f}" >> "${CONTY_DIR}"/nvidia/host_nvidia_libs; done
-	      nvidia_libs=$(cat "${CONTY_DIR}"/nvidia/host_nvidia_libs)
-	      for n in $nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${CONTY_DIR}"/up/usr/lib/"$libname" ] && cp "$n" "${CONTY_DIR}"/up/usr/lib/; done
-	      libvdpau_nvidia="${CONTY_DIR}/up/usr/lib/libvdpau_nvidia.so"
-	      if ! test -f "${libvdpau_nvidia}*"; then cp "$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)" "${CONTY_DIR}"/up/usr/lib/; fi
-	      [ -f "${libvdpau_nvidia}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau_nvidia}" ] && ln -s "${libvdpau_nvidia}"."${nvidia_driver_version}" "${libvdpau_nvidia}"
-	      [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
-	      [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
-	   fi
-	fi
-
-	HEREDOC
+   DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+   CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+   [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+   if [ -n "$nvidia_driver_version" ]; then
+      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib "${CONTY_DIR}"/up/usr/share
+      nvidia_data_dirs="egl glvnd nvidia vulkan"
+      for d in $nvidia_data_dirs; do [ ! -d "${CONTY_DIR}"/up/usr/share/"$d" ] && ln -s /usr/share/"$d" "${CONTY_DIR}"/up/usr/share/ 2>/dev/null; done
+      [ ! -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
+      [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty=$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)
+      if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+         rm -f "${CONTY_DIR}"/up/usr/lib/*; echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
+      fi
+      /sbin/ldconfig -p > "${CONTY_DIR}"/nvidia/host_libs
+      grep -i "nvidia\|libcuda" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2 > "${CONTY_DIR}"/nvidia/host_nvidia_libs
+      libnv_paths=$(grep "libnv" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2)
+      for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && echo "${f}" >> "${CONTY_DIR}"/nvidia/host_nvidia_libs; done
+      nvidia_libs=$(cat "${CONTY_DIR}"/nvidia/host_nvidia_libs)
+      for n in $nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${CONTY_DIR}"/up/usr/lib/"$libname" ] && cp "$n" "${CONTY_DIR}"/up/usr/lib/; done
+      libvdpau_nvidia="${CONTY_DIR}/up/usr/lib/libvdpau_nvidia.so"
+      if ! test -f "${libvdpau_nvidia}*"; then cp "$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)" "${CONTY_DIR}"/up/usr/lib/; fi
+      [ -f "${libvdpau_nvidia}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau_nvidia}" ] && ln -s "${libvdpau_nvidia}"."${nvidia_driver_version}" "${libvdpau_nvidia}"
+      [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+      [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+   fi
 fi
 
-if [ "$BWRAP_ON" = 1 ]; then
-	# For normal JuNest usage with BubbleWrap and namespaces
-	cat <<-'HEREDOC' >> ./AppRun
-	BINDS=" --dev-bind /dev /dev \
-		--ro-bind /sys /sys \
-		--bind-try /tmp /tmp \
-		--proc /proc \
-		--ro-bind-try /etc/resolv.conf /etc/resolv.conf \
-		--ro-bind-try /etc/hosts /etc/hosts \
-		--ro-bind-try /etc/nsswitch.conf /etc/nsswitch.conf \
-		--ro-bind-try /etc/passwd /etc/passwd \
-		--ro-bind-try /etc/group /etc/group \
-		--ro-bind-try /etc/machine-id /etc/machine-id \
-		--ro-bind-try /etc/asound.conf /etc/asound.conf \
-		--ro-bind-try /etc/localtime /etc/localtime \
-		--bind-try /media /media \
-		--bind-try /mnt /mnt \
-		--bind-try /opt /opt \
-		--bind-try /run/media /run/media \
-		--bind-try /usr/lib/locale /usr/lib/locale \
-		--bind-try /usr/share/fonts /usr/share/fonts \
-		--bind-try /usr/share/themes /usr/share/themes \
-		--bind-try /var /var \
-		"
+PROOT_BINDINGS=""
+BWRAP_BINDINGS=""
 
-	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-	"$HERE"/.local/share/junest/bin/junest -n -b "$BINDS" -- "$EXEC" "$@"
-	HEREDOC
-else
-	# For PROOT usage
-	cat <<-'HEREDOC' >> ./AppRun
-	BINDINGS=""
-	bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
-	for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --bind=$f"; done
-	bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes "
-	for d in $bind_dirs; do	[ -d "$d" ] && BINDINGS=" $BINDINGS --bind=$d";	done
+bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
+for f in $bind_files; do [ -f "$f" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=$f" && BWRAP_BINDINGS=" $BWRAP_BINDINGS --ro-bind-try $f $f"; done
 
-	BINDS=" --bind=/dev \
-		--bind=/sys \
-		--bind=/tmp \
-		--bind=/proc \
-		$BINDINGS \
-		--bind=/var \
-		--bind=/home \
-		--bind=/home/$(echo $USER) \
-		"
+bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var"
+for d in $bind_dirs; do [ -d "$d" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=$d" && BWRAP_BINDINGS=" $BWRAP_BINDINGS --bind-try $d $d"; done
 
-	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-	"$HERE"/.local/share/junest/bin/junest proot -n -b "$BINDS" -- "$EXEC" "$@"
-	HEREDOC
-fi
+PROOT_BINDS=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $PROOT_BINDINGS --bind=/home --bind=/home/$USER) "
+BWRAP_BINDS=" --dev-bind /dev /dev --ro-bind /sys /sys --bind-try /tmp /tmp --proc /proc $BWRAP_BINDINGS "
+
+_JUNEST_CMD() {
+   if [ "$PROOT_ON" = 1 ]; then
+      "$HERE"/.local/share/junest/bin/junest proot -n -b "$PROOT_BINDS" "$@"
+   else
+      "$HERE"/.local/share/junest/bin/junest -n -b "$BWRAP_BINDS" "$@"
+   fi
+}
+
+EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+
+_JUNEST_CMD -- "$EXEC" "$@"
+
+HEREDOC
 chmod a+x ./AppRun
 
 cd .. || exit 1
 
 #############################################################################
-#	EXTRACT ALL NEEDED PACKAGES
+#	EXTRACT PACKAGES
 #############################################################################
 
 # EXTRACT PACKAGES
@@ -403,18 +364,18 @@ _extract_all_dependences() {
 	rm -f ./packages
 }
 
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo " EXTRACTING DEPENDENCES"
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo ""
 _extract_main_package
 _extract_all_dependences
 
 # SAVE ESSENTIAL FILES AND LIBRARIES
 echo ""
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo " IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)"
-echo "$DIVIDING_LINE"
+echo "-----------------------------------------------------------------------------"
 echo ""
 
 #############################################################################
@@ -424,11 +385,8 @@ echo ""
 # Save files in /usr/bin
 _savebins() {
 	mkdir save
-	if [ "$BWRAP_ON" = 1 ]; then
-		mv ./"$APP".AppDir/.junest/usr/bin/bwrap ./save/
-	else
-		mv ./"$APP".AppDir/.junest/usr/bin/proot* ./save/
-	fi
+	mv ./"$APP".AppDir/.junest/usr/bin/bwrap ./save/
+	mv ./"$APP".AppDir/.junest/usr/bin/proot* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/*$BIN* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/bash ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/env ./save/
@@ -564,7 +522,7 @@ _savelibs
 # ASSEMBLING THE APPIMAGE PACKAGE
 _rsync_main_package() {
 	echo ""
-	echo "$DIVIDING_LINE"
+	echo "-----------------------------------------------------------------------------"
 	rm -Rf ./base/.*
 	rsync -av ./base/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
 }
@@ -572,7 +530,7 @@ _rsync_main_package() {
 _rsync_dependences() {
 	rm -Rf ./deps/.*
 	#rsync -av ./deps/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependeces, please wait..."
-	echo "$DIVIDING_LINE"
+	echo "-----------------------------------------------------------------------------"
 	echo ""
 }
 
@@ -618,8 +576,13 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap
 #	CREATE THE APPIMAGE
 #############################################################################
 
-if test -f ./*.AppImage; then
-	rm -Rf ./*archimage*.AppImage
-fi
-ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage4.1-x86_64.AppImage
+[ -f ./*.AppImage ] && rm -Rf ./*archimage*.AppImage
+
+REPO=""
+[ -z "$REPO" ] && REPO="$APPNAME"
+TAG="continuous"
+APPNAME=$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
+
+ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO-appimage|$TAG|*x86_64.AppImage.zsync" \
+	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.2-x86_64.AppImage
