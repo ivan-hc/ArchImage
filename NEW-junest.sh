@@ -377,6 +377,7 @@ echo ""
 
 # Save files in /usr/bin
 _savebins() {
+	echo "◆ Saving files in /usr/bin"
 	mkdir save
 	mv ./"$APP".AppDir/.junest/usr/bin/bwrap ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/proot* ./save/
@@ -396,6 +397,7 @@ _savebins() {
 
 # Save files in /usr/lib
 _binlibs() {
+	echo "◆ Saving libraries related to /usr/bin files"
 	readelf -d ./"$APP".AppDir/.junest/usr/bin/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	mv ./"$APP".AppDir/.junest/usr/lib/ld-linux-x86-64.so* ./save/
 	mv ./"$APP".AppDir/.junest/usr/lib/*$APP* ./save/
@@ -420,12 +422,14 @@ _include_swrast_dri() {
 }
 
 _libkeywords() {
+	echo "◆ Saving libraries using keywords"
 	for arg in $LIBSAVED; do
 		mv ./"$APP".AppDir/.junest/usr/lib/*"$arg"* ./save/
 	done
 }
 
 _readelf_save() {
+	echo "◆ Saving libraries related to previously saved files"
 	find_libs=$(find ./save -type f -name *.so* | uniq)
 	for f in $find_libs; do
 		readelf -d "$f" | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list &
@@ -442,6 +446,7 @@ _readelf_save() {
 }
 
 _readelf_base() {
+	echo "◆ Detect libraries of the main package"
 	find_libs=$(find ./base -type f | uniq)
 	for f in $find_libs; do
 		readelf -d "$f" | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list &
@@ -450,7 +455,8 @@ _readelf_base() {
 }
 
 _readelf_deps() {
-	find_libs=$(find ./deps -type f | uniq)
+	echo "◆ Detect libraries of the dependencies"
+	find_libs=$(find ./deps -executable -type f | uniq)
 	for f in $find_libs; do
 		readelf -d "$f" | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list &
 	done
@@ -460,6 +466,7 @@ _readelf_deps() {
 _liblibs() {
  	_readelf_base
   	_readelf_deps
+	echo "◆ Saving libraries related to the previously extracted packages"
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		mv ./"$APP".AppDir/.junest/usr/lib/"$arg"* ./save/
@@ -475,6 +482,7 @@ _liblibs() {
 }
 
 _mvlibs() {
+	echo "◆ Restore saved libraries to /usr/lib"
 	rm -Rf ./"$APP".AppDir/.junest/usr/lib/*
 	mv ./save/* ./"$APP".AppDir/.junest/usr/lib/
 }
