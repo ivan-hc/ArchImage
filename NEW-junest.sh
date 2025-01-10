@@ -346,12 +346,20 @@ _extract_deps() {
 
 _extract_all_dependences() {
 	rm -f ./depdeps
+
+	OPTDEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^optdepend = " | sed 's/optdepend = //g' | sed 's/=.*//' | sed 's/:.*//')
+	for arg in $OPTDEPS; do
+		_determine_packages_and_libraries
+	done
+	_extract_deps
+	rm -f ./depdeps
+
 	ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 	for arg in $ARGS; do
 		_determine_packages_and_libraries
 	done
 
-	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^depend = \|^optdepend = " | sed 's/optdepend = //g' | sed 's/depend = //g' | sed 's/=.*//' | sed 's/:.*//')
+	DEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^depend = " | sed 's/depend = //g' | sed 's/=.*//')
 	for arg in $DEPS; do
 		_determine_packages_and_libraries
 	done
