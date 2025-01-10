@@ -20,27 +20,12 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 #	SETUP THE ENVIRONMENT
 #############################################################################
 
-ARCHIMAGEV=4.2
-
-# Set the kind of compression you want to use
-COMP_TOOL="1"
-
-if [ "$COMP_TOOL" = 1 ]; then
-	# Download appimagetool
-	if [ ! -f ./appimagetool ]; then
-		echo "-----------------------------------------------------------------------------"
-		echo "◆ Downloading \"appimagetool\" from https://github.com/AppImage/appimagetool"
-		echo "-----------------------------------------------------------------------------"
-		curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage && chmod a+x appimagetool
-	fi
-elif [ "$COMP_TOOL" = 2 ]; then
-	# Download uruntime for better AppImage compression
-	if [ ! -f ./uruntime ]; then
-		echo "-----------------------------------------------------------------------------"
-		echo "◆ Downloading \"uruntime\" from https://github.com/VHSgunzo/uruntime"
-		echo "-----------------------------------------------------------------------------"
-		curl -#Lo uruntime "$(curl -Ls https://api.github.com/repos/VHSgunzo/uruntime/releases | sed 's/[()",{} ]/\n/g' | grep -oi "https.*appimage.*dwarfs.*x86_64$" | head -1)" 2>/dev/null && chmod a+x uruntime
-	fi
+# Download appimagetool
+if [ ! -f ./appimagetool ]; then
+	echo "-----------------------------------------------------------------------------"
+	echo "◆ Downloading \"appimagetool\" from https://github.com/AppImage/appimagetool"
+	echo "-----------------------------------------------------------------------------"
+	curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage && chmod a+x appimagetool
 fi
 
 # Create and enter the AppDir
@@ -615,31 +600,6 @@ TAG="continuous"
 VERSION="$VERSION"
 UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
 
-if [ "$COMP_TOOL" = 1 ]; then
-	ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
-		-u "$UPINFO" \
-		./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage"$ARCHIMAGEV"-x86_64.AppImage
-elif [ "$COMP_TOOL" = 2 ]; then
-	# Add udpate info to runtime
-	if command -v llvm-objcopy &>/dev/null; then
-		LLVM_ON=1
-		echo "Adding update information \"$UPINFO\" to runtime..."
-		printf "%b" "$UPINFO" > data.upd_info
-		llvm-objcopy --update-section=.upd_info=data.upd_info --set-section-flags=.upd_info=noload,readonly ./uruntime
-		printf 'AI\x02' | dd of=./uruntime bs=1 count=3 seek=8 conv=notrunc
-	fi
-	# Export to AppImage
-	./uruntime --appimage-mkdwarfs -f --set-owner 0 --set-group 0 --no-history --no-create-timestamp \
-		--compression zstd:level=22 -S20 -B16 --header uruntime \
-		-i ./"$APP".AppDir -o "$APPNAME"_"$VERSION"-archimage"$ARCHIMAGEV"-x86_64.AppImage
-	chmod a+x ./*AppImage
-	[ -n "$LLVM_ON" ] && zsyncmake *.AppImage -u *.AppImage
-fi
-
-if test -f ./*AppImage; then
-	echo "-----------------------------------------------------------------------------"
-	echo ""
-	echo "			YOUR APPIMAGE IS READY!"
-	echo ""
-	echo "-----------------------------------------------------------------------------"
-fi
+ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
+	-u "$UPINFO" \
+	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.2-x86_64.AppImage
