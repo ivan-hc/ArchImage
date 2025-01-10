@@ -351,7 +351,7 @@ _extract_all_dependences() {
 	for arg in $OPTDEPS; do
 		_determine_packages_and_libraries
 	done
-	_extract_deps
+	[ -f ./depdeps ] && _extract_deps
 	rm -f ./depdeps
 
 	ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
