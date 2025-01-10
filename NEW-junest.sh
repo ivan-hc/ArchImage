@@ -365,7 +365,6 @@ _extract_all_dependences() {
 	done
 
 	_extract_deps
-	_extract_deps
 
 	rm -f ./packages
 }
@@ -395,11 +394,11 @@ _savebins() {
 	mv ./"$APP".AppDir/.junest/usr/bin/bwrap ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/proot* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/*$BIN* ./save/
-	mv ./"$APP".AppDir/.junest/usr/bin/bash ./save/
-	mv ./"$APP".AppDir/.junest/usr/bin/env ./save/
-	mv ./"$APP".AppDir/.junest/usr/bin/sh ./save/
- 	mv ./"$APP".AppDir/.junest/usr/bin/tr ./save/
-   	mv ./"$APP".AppDir/.junest/usr/bin/tty ./save/
+	coreutils="[ basename cat chmod chown cp cut dir du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
+	utils_bin="bash $coreutils grep ld sed sh"
+	for b in $utils_bin; do
+ 		mv ./"$APP".AppDir/.junest/usr/bin/"$b" ./save/
+   	done
 	for arg in $BINSAVED; do
 		mv ./"$APP".AppDir/.junest/usr/bin/*"$arg"* ./save/
 	done
