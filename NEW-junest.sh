@@ -616,7 +616,7 @@ chmod a+x ./*AppImage
 if test -f ./*AppImage; then
 	echo "-----------------------------------------------------------------------------"
 	echo ""
-	echo "				YOUR APPIMAGE IS READY!"
+	echo "			YOUR APPIMAGE IS READY!"
 	echo ""
 	echo "-----------------------------------------------------------------------------"
 fi
