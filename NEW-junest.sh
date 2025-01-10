@@ -259,7 +259,7 @@ for f in $bind_files; do [ -f "$f" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=
 bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var"
 for d in $bind_dirs; do [ -d "$d" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=$d" && BWRAP_BINDINGS=" $BWRAP_BINDINGS --bind-try $d $d"; done
 
-PROOT_BINDS=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $PROOT_BINDINGS --bind=/home --bind=/home/$USER) "
+PROOT_BINDS=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $PROOT_BINDINGS --bind=/home --bind=/home/$USER "
 BWRAP_BINDS=" --dev-bind /dev /dev --ro-bind /sys /sys --bind-try /tmp /tmp --proc /proc $BWRAP_BINDINGS "
 
 _JUNEST_CMD() {
