@@ -364,7 +364,9 @@ _extract_all_dependences() {
 		_determine_packages_and_libraries
 	done
 
-	_extract_deps
+	# Set the level of sub-dependencies extraction, the higher the number, the bigger the AppImage will be
+	[ -z "$extraction_count" ] && extraction_count=1
+	for e in $(seq "$extraction_count"); do _extract_deps; done
 
 	rm -f ./packages
 }
