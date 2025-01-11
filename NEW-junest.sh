@@ -555,17 +555,34 @@ _remove_more_bloatwares() {
 	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
 	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rm -Rf ./"$APP".AppDir/.junest/etc/makepkg.conf
-	rm -Rf ./"$APP".AppDir/.junest/etc/pacman*
+
+	etc_remove="makepkg.conf pacman"
+	for r in $etc_remove; do
+		rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*
+	done
+
+	bin_remove="gcc"
+	for r in $bin_remove; do
+		rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*
+	done
+
+	lib_remove="gcc"
+	for r in $lib_remove; do
+		rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*
+	done
+
+	share_remove="gcc"
+	for r in $share_remove; do
+		rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*
+	done
+	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	rm -Rf ./"$APP".AppDir/.junest/var/* # remove all packages downloaded with the package manager
- 	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
-	rm -Rf ./"$APP".AppDir/.junest/usr/bin/gcc* \
-		./"$APP".AppDir/.junest/usr/lib/gcc* \
-		./"$APP".AppDir/.junest/usr/share/gcc* # comment if you plan to use a compiler
 	rm -Rf ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
+	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgallium*
+	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgo.so*
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
+	rm -Rf ./"$APP".AppDir/.junest/var/* # remove all packages downloaded with the package manager
 }
 
 _enable_mountpoints_for_the_inbuilt_bubblewrap() {
