@@ -394,8 +394,8 @@ _savebins() {
 	mv ./"$APP".AppDir/.junest/usr/bin/bwrap ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/proot* ./save/
 	mv ./"$APP".AppDir/.junest/usr/bin/*$BIN* ./save/
-	coreutils="[ basename cat chmod chown cp cut dir du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
-	utils_bin="bash $coreutils grep ld sed sh"
+	coreutils="[ basename cat chmod chown cp cut dir dirname du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
+	utils_bin="bash $coreutils grep ld sed sh strings"
 	for b in $utils_bin; do
  		mv ./"$APP".AppDir/.junest/usr/bin/"$b" ./save/
    	done
