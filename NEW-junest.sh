@@ -552,29 +552,25 @@ _rsync_dependences() {
 #############################################################################
 
 _remove_more_bloatwares() {
-	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
-	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-
 	etc_remove="makepkg.conf pacman"
 	for r in $etc_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*
 	done
-
 	bin_remove="gcc"
 	for r in $bin_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*
 	done
-
 	lib_remove="gcc"
 	for r in $lib_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*
 	done
-
 	share_remove="gcc"
 	for r in $share_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*
 	done
+	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
+	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
 	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
