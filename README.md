@@ -2,8 +2,13 @@ ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest]
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
-Being this a container into an AppImage, it has its own "bubblewrap" or "proot" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions:
+Being this a container into an AppImage, it has its own "bubblewrap" or "proot" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
 
+From version 4.2 is available a NEW template that creates AppImages that can work on both systems with or without Namespaces restrictions:
+
+- [NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/NEW-junest.sh)
+
+It is the mix of the two previous templates used until version 4.1:
 - [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
 - [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh) uses proot to be more portable but less integrated with the host system
 
@@ -106,22 +111,97 @@ Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example]
 ### Step by step guide
 Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
-1. Create the script, use the option `-b` or `--build`, example with "firefox" (see the above "[video](#example)"):
+1. Create the script, use the option `-b` or `--build`, example with "obs-studio"
 ```
-./archimage-cli -b firefox
+./archimage-cli -b obs-studio
 ```
-2. The script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. Being the executable `/usr/bin/firefox` of "firefox" named "firefox", press ENTER to leave blank. Some apps, have a different name for their executable (for example "handbrake" have `/usr/bin/ghb`, so just write "ghb" for it). If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
-3. The script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`), leave blank if no dependency is needed.
-4. The next questions are about implementing or not all dependences, choose "Y" to bundle all the dependences, or "N" to do this in other steps.
-5. **A new question has been added from version 4**, "*DO YOU WANT TO ENABLE HARDWARE ACCELERATION FOR NVIDIA USERS?*", leave blank not to allow the AppImage to configure Nvidia drivers via Conty for the AppImage, or press "y" to set `NVIDIA_ON=1`. This will use [Conty](https://github.com/Kron4ek/Conty) to check and setup the Nvidia drivers locally if needed, only fo Nvidia users. See "[Hardware Acceleration](#hardware-acceleration)" for more.
-6. This phase, shown in the [video](#example), has a last message asking you to use a standard configuration with the following defaults if you press "Y":
-- a package availability check in the Arch User Repository (if so, enable AUR and installs "binutils", "gzip" and "basedevel", all of them are only required to compile from and will not be included in the AppImage package)
-- the AUR is enabled
-- installs "ca-certificates"
-- includes keywords for the internet connections and audio trying to enable them
-- the file "/usr/lib/dri/swrast_dri.so" will NOT be included if not needed
-If you press "N" (or leave blank) instead, you have a lot of configurations you can do by your own.
-6. Run the script.
+
+![1](https://github.com/user-attachments/assets/d9c7b29b-2ccc-4cf0-b3ff-5de10cf13e5b)
+
+this will download and rename the script [NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/dev/NEW-junest.sh) on your desktop.
+
+2. The script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. In most cases we can leave blank, but for some applications, like OBS Studio, the executable name is different, in our case it is `obs`
+
+![2](https://github.com/user-attachments/assets/961d03ec-9c6a-4faa-a9ab-fa7dbb557b14)
+
+If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+
+3. The script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`)
+
+![3](https://github.com/user-attachments/assets/2d6a3a5a-9fab-4c32-9081-d5bf5f51fe28)
+
+leave blank if no dependency is needed. In our example, we are using Archimage version 4.2, so we don't need add dependencies for `obs-studio`. Previous versions were less automatic and to build `obs-studio` we needed to add `python`. You can add many more packages, according to your needs.
+
+4. Assign a number to the variable "`$extraction_count`". The higher the number, the more dependencies will be downloaded separately, the longer the process will be, the bigger the final AppImage package will be... but at the same time the easier our AppImage will work.
+
+![4](https://github.com/user-attachments/assets/7e46e63a-8a60-426f-91c3-6eca36effb15)
+
+By default the level is 1, so only the dependencies of the direct dependencies of the application we want to package are extracted. For OBS Studio I set a level of 2, and this is enough to have an AppImage that works out of the box, but only if you include all dependencies and set the "**standard  configuration**". Keep read.
+
+5. Do you want to include all dependencies? Press "y", or leave blank if you want to keep customize (recommended)
+
+![5](https://github.com/user-attachments/assets/d50dd4bc-9bd4-43d9-82d7-6819d7c86d74)
+
+In my workflows I usually include all dependencies, to remove the extra files after I confirm that the application works.
+
+If you press "N" or leave blank, only the main package will be included, near the libraries and files imported when the script is running.
+
+Please, see the [tutorial](#tutorial) to learn more on how to investigate on app's malfunctions.
+
+5,5. Between question 5 (include all dependencies) and 6 (enable multilib) exists another hidden question
+
+![Istantanea_2025-01-12_07-20-18](https://github.com/user-attachments/assets/ab650430-a2da-4663-ae9d-c4d97d3f4103)
+
+this question come up only if the program is not hosted on the official repositories, so it come from AUR.
+
+In this case `binutils`, `gzip` and `base-devel` are enabled by default. You can choose to enable ChaoticAUR to save time and resources while compiling the program. For example `gimp-git` lasts 5 minutes or less from ChaoticAUR, while from AUR it can take 30 minutes or more (with the risk that it fails).
+
+Of course, this question will not come up with `obs-studio`, since it is on the official Arch Linux repositories.
+
+6. Want to enable the "multilib" repo? It is usally needed for 32bit libraries, used in programs like WINE and frontends like Bottles
+
+![Istantanea_2025-01-12_06-53-42](https://github.com/user-attachments/assets/2e036728-49d5-4362-a042-f6b44efff393)
+
+in our case, we can leave blank or press "N". We don't need 32 bits libraries at all in this case.
+
+7. Do you want to allow hardware acceleration? This will enable Nvidia users to use your application where hardware acceleration is needed
+
+![Istantanea_2025-01-12_06-55-57](https://github.com/user-attachments/assets/2bd7483d-c521-4827-b7b8-20bb6301f704)
+
+to learn more on how hardware acceleration works with Archimages, see "[Hardware Acceleration](#hardware-acceleration)".
+
+8. Standard configuration only enables keywords for Networking and Audio. If you have choosen to include all dependencies at point 5, press "y". This will exit the wizard
+
+![8](https://github.com/user-attachments/assets/c0f55b4f-b28f-4153-8735-14cf23ea8b92)
+
+if you press N or leave blank, you can keep customize the script.
+
+9. Junest is a very minimal system, you can choose to include `gzip` and `binutils` if you know that none of the previous packages will install them as dependencies.
+10. If you need to build something from AUR, enable `base-devel` with all its related compilers
+
+This is how questions 9 and 10 appear
+
+![9-10](https://github.com/user-attachments/assets/0595778d-1687-4546-b3b4-3a26cffb095e)
+
+10. Questions about keywords for binaries in /usr/bin, directories in /usr/share and various files and directories (mostly libraries) in /usr/lib are up to you. For example, if you want to include all Qt related files and directories, write `Qt` for the question related to the interested path. In my case I included `libgallium.so`, the search will be done using `find` and `grep`
+
+![Istantanea_2025-01-12_07-08-55](https://github.com/user-attachments/assets/1cb78573-d653-4866-a770-fbc95207977f)
+
+11. Next two questions are related to a preset of keywords used to check files and libraries for networking and audio, the same that can be enabled in one go at point 8
+
+![Istantanea_2025-01-12_07-12-50](https://github.com/user-attachments/assets/adc17a3b-36b9-4d27-8d8b-7d5f1f32df94)
+
+Personally I never go further than point 8, and press "y", because the script is simple enough to understand, if you have the patience to read what is written. So i prefer to edit manually my scripts when they are ready.
+
+At the end of the wizard you will have a series of suggestions like this
+
+![Istantanea_2025-01-12_07-19-02](https://github.com/user-attachments/assets/139698b4-c2aa-4675-9840-4c7c93e73c39)
+
+now you can finally run the script in an empty and dedicated directory.
+
+Again, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
+
+Also, see the **[tutorial](#tutorial)** to debug and improve your AppImage.
 
 -----------------------------------------------------------
 ## Requirements of an AppImage
