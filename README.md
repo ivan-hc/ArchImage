@@ -291,12 +291,15 @@ To create the basic script I'll use a standard configuration:
 1. name: signal-desktop
 2. name binary: leave blank, its the same
 3. dependences: none
-4. include all dependences: y
-5. use defaults: y
+4. extraction level: 1, default... leave blank. Whit only one level, the app will be smaller, but will not easily run at first go (for the sake of this tutorial)
+5. include all dependences: y
+6. multilib: nope, leave blank
+7. hardware acceleration: nope, leave blank
+8. use defaults: y
 
 like this:
 
-https://github.com/user-attachments/assets/06308a6d-24db-417f-917c-8e1a9d78fe0b
+https://github.com/user-attachments/assets/0e373cbd-f473-4214-bf3c-8530867762dd
 
 Once I created the script, I create a "tmp" directory (you can name it the way you want) and I put the script into it.
 
