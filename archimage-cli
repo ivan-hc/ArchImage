@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="4.2"
+VERSION="4.2-1"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
@@ -209,13 +209,6 @@ _keywords_to_save_in_usr_lib() {
 	fi
 }
 
-_include_swrast() {
-	read -r -ep "◆ DO YOU WANT TO INCLUDE THE /usr/lib/dri/swrast_dri.so DRIVER (y,N)? " yn
-    	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/#_include_swrast_dri/_include_swrast_dri/g' ./"$APP"-junest.sh
-	fi
-}
-
 _include_audio_keywords() {
 	read -r -ep "◆ DO YOU WISH TO ADD KEYWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
 	if echo "$yn" | grep -qi "^y"; then
@@ -236,8 +229,6 @@ _select_libraries() {
 		sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh
 		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh
 		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
-		echo "$DIVIDING_LINE"
-		_include_swrast
 		echo "$DIVIDING_LINE"
 		_keywords_to_save_in_usr_lib
 		echo "$DIVIDING_LINE"
