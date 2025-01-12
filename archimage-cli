@@ -3,7 +3,7 @@
 VERSION="4.2"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/dev"
+ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
 DIVIDING_LINE="
 -----------------------------------------------------------------------------
 "
