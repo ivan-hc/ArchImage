@@ -206,7 +206,7 @@ This is how questions 9 and 10 appear
 ### 11. `BINSAVED`, `LIBSAVED` and `SHARESAVED`
 Questions about keywords for binaries in /usr/bin, directories in /usr/share and various files and directories (mostly libraries) in /usr/lib are up to you. For example, if you want to include all Qt related files and directories, write `Qt` for the question related to the interested path. In my case I included `libgallium.so`, the search will be done using `find` and `grep`
 
-![Istantanea_2025-01-12_07-08-55](https://github.com/user-attachments/assets/1cb78573-d653-4866-a770-fbc95207977f)
+![Istantanea_2025-01-12_21-18-09](https://github.com/user-attachments/assets/71b2584e-7209-4a59-98a1-145b0e4257f5)
 
 ### 12. Preset of Audio and Networking keywords
 Next two questions are related to a preset of keywords used to check files and libraries for networking and audio, the same that can be enabled in one go at point 8
