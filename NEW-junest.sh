@@ -293,7 +293,7 @@ _extract_main_package() {
 		pkg_full_path=$(find ./"$APP".AppDir -type f -name "$APP-*zst")
 	else
 		for p in $pkg_full_path; do
-			if tar "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
+			if tar fx "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
 				pkg_full_path="$p"
 			fi
 		done
