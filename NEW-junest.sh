@@ -158,6 +158,7 @@ rm -f ./*.desktop
 LAUNCHER=$(grep -iRl "$BIN" ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+[ -z "$ICON" ] && ICON="$BIN"
 cp -r ./.junest/usr/share/icons/*"$ICON"* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* ./ 2>/dev/null
