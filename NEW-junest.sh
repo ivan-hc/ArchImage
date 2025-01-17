@@ -465,11 +465,11 @@ _rsync_main_package() {
 _rsync_dependences() {
 	rm -Rf ./deps/.*
 	chmod -R 777 ./deps/*
-	rsync -av ./deps/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependencies, please wait"
+	#rsync -av ./deps/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependencies, please wait"
 }
 
 _rsync_main_package
-#_rsync_dependences
+_rsync_dependences
 
 #############################################################################
 #	REMOVE BLOATWARES, ENABLE MOUNTPOINTS
