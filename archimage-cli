@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="4.2-1"
+VERSION="4.3"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
@@ -12,13 +12,6 @@ DIVIDING_LINE="
 Gold='\033[0;33m'
 Green='\033[0;32m'
 LightBlue='\033[1;34m'
-
-# XDG Variables
-SCRIPTDIR="${SCRIPTDIR:-$(xdg-user-dir DESKTOP 2>/dev/null)}"
-[ -d "$SCRIPTDIR" ] || SCRIPTDIR="$PWD"
-
-CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-mkdir -p "$CACHEDIR"
 
 # Common functions
 _fit() {
@@ -32,6 +25,17 @@ less() {
 		echo "Install 'less' if you want to scroll this list"
 	fi
 }
+
+
+# XDG Variables
+SCRIPTDIR="${SCRIPTDIR:-$(xdg-user-dir DESKTOP 2>/dev/null)}"
+if [ ! -d "$SCRIPTDIR" ]; then
+	echo "◆ No \"XDG DESKTOP\" directory found, scripts will be saved in \"$PWD\"" | _fit
+	SCRIPTDIR="$PWD"
+fi
+
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+mkdir -p "$CACHEDIR"
 
 ################################################################################
 #				HELP
@@ -196,7 +200,6 @@ _keywords_to_save_in_usr_bin() {
 _keywords_to_save_in_usr_share() {
 	read -r -ep "◆ LIST DIRECTORIES TO SAVE IN /usr/share OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
 	if [ -n "$saveshare" ]; then
-		sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh
 		sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./"$APP"-junest.sh
 	fi
 }
@@ -204,7 +207,6 @@ _keywords_to_save_in_usr_share() {
 _keywords_to_save_in_usr_lib() {
 	read -r -ep "◆ LIST LIBRARIES AND DIRECTORIES TO SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
 	if [ -n "$savelibs" ]; then
-		sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh
 		sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./"$APP"-junest.sh
 	fi
 }
@@ -226,9 +228,6 @@ _include_internet_keywords() {
 _select_libraries() {
 	read -r -ep "◆ DO YOU WISH TO SELECT LIBRARIES TO SAVE (y,N)?" yn
 	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh
-		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh
-		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
 		echo "$DIVIDING_LINE"
 		_keywords_to_save_in_usr_lib
 		echo "$DIVIDING_LINE"
@@ -285,14 +284,7 @@ case "$1" in
 			echo "$STANDARD_CONFIGURATION_MSG" | _fit | sed "s/^/ /g; s/  ◆/◆/g"
 			read -r -ep "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			if echo "$yn" | grep -qi "^y"; then
-				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
-				sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
-				sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
-				sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
 				sed -i 's/#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
-				sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/bin
-				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
-				sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/share
 				sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh # ALLOW THE PROGRAM TO OPEN THE SYSTEM BROWSER
 			else
 				grep -q "^#BASICSTUFF" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_basicstuff
