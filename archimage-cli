@@ -37,6 +37,21 @@ fi
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 mkdir -p "$CACHEDIR"
 
+DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+mkdir -p "$DATADIR"
+
+# DEVELOPER MODE
+[ -d "$DATADIR/AM" ] && AMDATADIR="$DATADIR/AM"
+if [ -f "$AMDATADIR"/archimage-betatester ]; then
+	ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/dev"
+fi
+
+_betatester_message_on() {
+	if [ -f "$AMDATADIR"/archimage-betatester ]; then
+		echo "$DIVIDING_LINE" | grep -- "-"; echo "\"Archimage CLI\" $AMVERSION: DEVELOPER MODE"; echo "$DIVIDING_LINE" | grep -- "-"
+	fi
+}
+
 ################################################################################
 #				HELP
 ################################################################################
@@ -56,6 +71,18 @@ ${Gold}-b,--build\033[0m\033[0m
 	${LightBlue}archimage-cli -b {program}\033[0m
 
 Description: Create the script to build the AppImage.
+
+${Gold}--devmode-disable\033[0m
+
+	${LightBlue}$AMCLI --devmode-disable\033[0m
+
+Description: Undo \"--devmode-enable\" (see below).
+
+${Gold}--devmode-enable\033[0m
+
+	${LightBlue}$AMCLI --devmode-enable\033[0m
+
+Description: Use the development branch (at your own risk).
 
 ${Gold}-h,--help\033[0m
 
@@ -88,6 +115,23 @@ https://github.com/fsquillace/JuNest
 _help() {
 	printf "%b\n" "$HELP_MESSAGE" | _fit | sed "s/ --/--/g" | less -Ir
 }
+
+################################################################################
+#			BASH AND ZSH COMPLETION
+################################################################################
+completion_file="$DATADIR/bash-completion/completions/archimage-cli"
+mkdir -p "$DATADIR/bash-completion/completions" || exit 1
+if ! grep -o " archimage-cli$" "$completion_file" >/dev/null 2>&1 && [ -f "$AMDATADIR"/list ]; then
+	echo "complete -W \"\$(cat $AMDATADIR/list 2>/dev/null)\" archimage-cli" >> "$completion_file"
+	if [ -f "${ZDOTDIR:-$HOME}"/.zshrc ] && echo "$SHELL" | grep -q "zsh"; then
+		cat <<-HEREDOC >> "${ZDOTDIR:-$HOME}"/.zshrc
+		autoload bashcompinit
+		bashcompinit
+		source "$completion_file"
+		HEREDOC
+	fi
+	echo "Shell completion has been enabled!"
+fi
 
 ################################################################################
 #				SYNC
@@ -246,11 +290,11 @@ case "$1" in
 	'')
 		echo " ArchImage CLI requires an argument, run -h for more info.";;
 
-	--help|-h)
+	'--help'|'-h')
 		if [ -t 1 ]; then _help; else _help | sed -e 's/\x1b\[[0-9;]*m//g'; fi
 		;;
 
-	--build|-b)
+	'--build'|'-b')
 		while [ -n "$1" ]; do
 		cd "$SCRIPTDIR" || exit 1
 		if [ -z "$2" ]; then
@@ -258,6 +302,7 @@ case "$1" in
 			exit 0
 		else
 			printf "%b" "$GETTING_STARTED_HEADER"
+			[ -f "$AMDATADIR"/archimage-betatester ] && printf "Developer Mode%b" "$DIVIDING_LINE" | _fit | sed -- 's/^ -/-/g'
 			echo "$GETTING_STARTED_MSG" | _fit
 			APP="$2"
 			wget -q "$ARCHIMAGE_REPO/NEW-junest.sh" -O "$APP"-junest.sh
@@ -311,11 +356,19 @@ case "$1" in
 		done
 		;;
 
-	--sync|-s) 
+	'--devmode-disable')
+		mkdir -p "$AMDATADIR" && rm -f "$AMDATADIR"/archimage-betatester
+		;;
+
+	'--devmode-enable')
+		mkdir -p "$AMDATADIR" && touch "$AMDATADIR"/archimage-betatester && _betatester_message_on
+		;;
+
+	'--sync'|'-s') 
 		_sync
   		;;
 
-	--version|-v)
+	'--version'|'-v')
 		echo "$VERSION"
 		;;
 
