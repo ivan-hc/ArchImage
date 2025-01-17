@@ -432,7 +432,7 @@ _savelibs() {
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
 	done
 	for arg in $LIBPATHS; do
-		rsync -av ./archlinux/"$arg" "$APP".AppDir/"$arg" 2>&1 >/dev/null &
+		cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" 2>/dev/null &
 	done
 	wait
 	rm list
