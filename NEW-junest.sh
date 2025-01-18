@@ -410,23 +410,9 @@ _savelibs() {
 	echo "◆ Detect libraries related to /usr/bin files"
 	readelf -d ./"$APP".AppDir/.junest/usr/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so" | uniq >> ./list
 
-	echo "◆ Detect libraries of the main package"
-	base_libs=$(find ./base -type f | uniq)
-	for b in $base_libs; do
-		readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so" | uniq >> ./list &
-	done
-	wait
-
-	echo "◆ Detect libraries of the dependencies"
-	dep_libs=$(find ./deps -executable -type f | uniq)
-	for d in $dep_libs; do
-		readelf -d "$d" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so" | uniq >> ./list &
-	done
-	wait
-
-	echo "◆ Saving libraries"
+	echo "◆ Saving JuNest core libraries"
 	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* ./"$APP".AppDir/.junest/usr/lib/
-	lib_preset="$APP $BIN libdw libelf $(sort -u ./list)"
+	lib_preset="$APP $BIN gconv libdw libelf libresolv.so libtinfo.so $(sort -u ./list)"
 	LIBSAVED="$lib_preset $LIBSAVED $SHARESAVED"
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
@@ -435,7 +421,45 @@ _savelibs() {
 		cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" 2>/dev/null &
 	done
 	wait
-	rm list
+
+	echo "◆ Detect libraries of the main package"
+	base_libs=$(find ./base -type f | uniq)
+	lib_base_0=$(for b in $base_libs; do readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+
+	echo "◆ Detect libraries of the dependencies"
+	dep_libs=$(find ./deps -executable -name "*.so*")
+	lib_deps=$(for d in $dep_libs; do readelf -d "$d" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+
+	echo "◆ Detect and copy base libs"
+	basebin_libs=$(find ./base -executable -name "*.so*")
+	lib_base_1=$(for b in $basebin_libs; do readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_1=$(echo "$lib_base_1" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_2=$(for b in $lib_base_1; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_2=$(echo "$lib_base_2" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_3=$(for b in $lib_base_2; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_3=$(echo "$lib_base_3" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_4=$(for b in $lib_base_3; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_4=$(echo "$lib_base_4" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_5=$(for b in $lib_base_4; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_5=$(echo "$lib_base_5" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_6=$(for b in $lib_base_5; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_6=$(echo "$lib_base_6" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_7=$(for b in $lib_base_6; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_7=$(echo "$lib_base_7" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_8=$(for b in $lib_base_7; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_8=$(echo "$lib_base_8" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_9=$(for b in $lib_base_8; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
+	lib_base_9=$(echo "$lib_base_9" | tr ' ' '\n' | sort -u | xargs)
+	lib_base_libs="$lib_base_0 $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9 $lib_deps"
+	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
+	for l in $lib_base_libs; do
+		rsync -av ./archlinux/.junest/usr/lib/"$l"* ./"$APP".AppDir/.junest/usr/lib/ &
+	done
+	wait
+	for l in $lib_base_libs; do
+		rsync -av ./deps/usr/lib/"$l"* ./"$APP".AppDir/.junest/usr/lib/ &
+	done
+	wait
 }
 
 # Save files in /usr/share
