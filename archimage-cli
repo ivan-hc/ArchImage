@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="4.2-1"
+VERSION="4.3"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
@@ -13,13 +13,6 @@ Gold='\033[0;33m'
 Green='\033[0;32m'
 LightBlue='\033[1;34m'
 
-# XDG Variables
-SCRIPTDIR="${SCRIPTDIR:-$(xdg-user-dir DESKTOP 2>/dev/null)}"
-[ -d "$SCRIPTDIR" ] || SCRIPTDIR="$PWD"
-
-CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-mkdir -p "$CACHEDIR"
-
 # Common functions
 _fit() {
 	fold -sw 77 | sed 's/^/ /g'
@@ -30,6 +23,32 @@ less() {
 	if ! command less "$@" 2>/dev/null; then
 		while read -r line; do echo "$line"; done
 		echo "Install 'less' if you want to scroll this list"
+	fi
+}
+
+
+# XDG Variables
+SCRIPTDIR="${SCRIPTDIR:-$(xdg-user-dir DESKTOP 2>/dev/null)}"
+if [ ! -d "$SCRIPTDIR" ]; then
+	echo "◆ No \"XDG DESKTOP\" directory found, scripts will be saved in \"$PWD\"" | _fit
+	SCRIPTDIR="$PWD"
+fi
+
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+mkdir -p "$CACHEDIR"
+
+DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+mkdir -p "$DATADIR"
+
+# DEVELOPER MODE
+[ -d "$DATADIR/AM" ] && AMDATADIR="$DATADIR/AM"
+if [ -f "$AMDATADIR"/archimage-betatester ]; then
+	ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/dev"
+fi
+
+_betatester_message_on() {
+	if [ -f "$AMDATADIR"/archimage-betatester ]; then
+		echo "$DIVIDING_LINE" | grep -- "-"; echo "\"Archimage CLI\" $AMVERSION: DEVELOPER MODE"; echo "$DIVIDING_LINE" | grep -- "-"
 	fi
 }
 
@@ -52,6 +71,18 @@ ${Gold}-b,--build\033[0m\033[0m
 	${LightBlue}archimage-cli -b {program}\033[0m
 
 Description: Create the script to build the AppImage.
+
+${Gold}--devmode-disable\033[0m
+
+	${LightBlue}$AMCLI --devmode-disable\033[0m
+
+Description: Undo \"--devmode-enable\" (see below).
+
+${Gold}--devmode-enable\033[0m
+
+	${LightBlue}$AMCLI --devmode-enable\033[0m
+
+Description: Use the development branch (at your own risk).
 
 ${Gold}-h,--help\033[0m
 
@@ -84,6 +115,23 @@ https://github.com/fsquillace/JuNest
 _help() {
 	printf "%b\n" "$HELP_MESSAGE" | _fit | sed "s/ --/--/g" | less -Ir
 }
+
+################################################################################
+#			BASH AND ZSH COMPLETION
+################################################################################
+completion_file="$DATADIR/bash-completion/completions/archimage-cli"
+mkdir -p "$DATADIR/bash-completion/completions" || exit 1
+if ! grep -o " archimage-cli$" "$completion_file" >/dev/null 2>&1 && [ -f "$AMDATADIR"/list ]; then
+	echo "complete -W \"\$(cat $AMDATADIR/list 2>/dev/null)\" archimage-cli" >> "$completion_file"
+	if [ -f "${ZDOTDIR:-$HOME}"/.zshrc ] && echo "$SHELL" | grep -q "zsh"; then
+		cat <<-HEREDOC >> "${ZDOTDIR:-$HOME}"/.zshrc
+		autoload bashcompinit
+		bashcompinit
+		source "$completion_file"
+		HEREDOC
+	fi
+	echo "Shell completion has been enabled!"
+fi
 
 ################################################################################
 #				SYNC
@@ -196,7 +244,6 @@ _keywords_to_save_in_usr_bin() {
 _keywords_to_save_in_usr_share() {
 	read -r -ep "◆ LIST DIRECTORIES TO SAVE IN /usr/share OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
 	if [ -n "$saveshare" ]; then
-		sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh
 		sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./"$APP"-junest.sh
 	fi
 }
@@ -204,7 +251,6 @@ _keywords_to_save_in_usr_share() {
 _keywords_to_save_in_usr_lib() {
 	read -r -ep "◆ LIST LIBRARIES AND DIRECTORIES TO SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
 	if [ -n "$savelibs" ]; then
-		sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh
 		sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./"$APP"-junest.sh
 	fi
 }
@@ -226,9 +272,6 @@ _include_internet_keywords() {
 _select_libraries() {
 	read -r -ep "◆ DO YOU WISH TO SELECT LIBRARIES TO SAVE (y,N)?" yn
 	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh
-		sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh
-		sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh
 		echo "$DIVIDING_LINE"
 		_keywords_to_save_in_usr_lib
 		echo "$DIVIDING_LINE"
@@ -247,11 +290,11 @@ case "$1" in
 	'')
 		echo " ArchImage CLI requires an argument, run -h for more info.";;
 
-	--help|-h)
+	'--help'|'-h')
 		if [ -t 1 ]; then _help; else _help | sed -e 's/\x1b\[[0-9;]*m//g'; fi
 		;;
 
-	--build|-b)
+	'--build'|'-b')
 		while [ -n "$1" ]; do
 		cd "$SCRIPTDIR" || exit 1
 		if [ -z "$2" ]; then
@@ -259,6 +302,7 @@ case "$1" in
 			exit 0
 		else
 			printf "%b" "$GETTING_STARTED_HEADER"
+			[ -f "$AMDATADIR"/archimage-betatester ] && printf "Developer Mode%b" "$DIVIDING_LINE" | _fit | sed -- 's/^ -/-/g'
 			echo "$GETTING_STARTED_MSG" | _fit
 			APP="$2"
 			wget -q "$ARCHIMAGE_REPO/NEW-junest.sh" -O "$APP"-junest.sh
@@ -285,14 +329,7 @@ case "$1" in
 			echo "$STANDARD_CONFIGURATION_MSG" | _fit | sed "s/^/ /g; s/  ◆/◆/g"
 			read -r -ep "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
     			if echo "$yn" | grep -qi "^y"; then
-				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES
-				sed -i 's/#_liblibs/_liblibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO OTHER LIBRARIES
-				sed -i 's/#_mvlibs/_mvlibs/g' ./"$APP"-junest.sh # MV ALL LIBRARIES SAVED IN THE COMMANDS ABOVE AND BELOW
-				sed -i 's/#_libkeywords/_libkeywords/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO KEYWORD SAVED BELOW
 				sed -i 's/#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
-				sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/bin
-				sed -i 's/#_binlibs/_binlibs/g' ./"$APP"-junest.sh # CHECK LIBRARIES RELATED TO BINARIES IN /usr/bin
-				sed -i 's/#_saveshare/_saveshare/g' ./"$APP"-junest.sh # SAVE KEYWORDS IN /usr/share
 				sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh # ALLOW THE PROGRAM TO OPEN THE SYSTEM BROWSER
 			else
 				grep -q "^#BASICSTUFF" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_basicstuff
@@ -319,11 +356,19 @@ case "$1" in
 		done
 		;;
 
-	--sync|-s) 
+	'--devmode-disable')
+		mkdir -p "$AMDATADIR" && rm -f "$AMDATADIR"/archimage-betatester
+		;;
+
+	'--devmode-enable')
+		mkdir -p "$AMDATADIR" && touch "$AMDATADIR"/archimage-betatester && _betatester_message_on
+		;;
+
+	'--sync'|'-s') 
 		_sync
   		;;
 
-	--version|-v)
+	'--version'|'-v')
 		echo "$VERSION"
 		;;
 

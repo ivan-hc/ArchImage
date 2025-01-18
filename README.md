@@ -36,6 +36,7 @@ Archimage combines the flexibility of JuNest with the power of Conty, the two po
 - [Test the AppImage](#test-the-appimage)
   - [Dotfiles tip](#dotfiles-tip)
   - [Repeat the build](#repeat-the-build)
+  - [Extraction levels](#extraction-levels)
 
 [Tutorial](#tutorial)
 
@@ -298,6 +299,21 @@ On-screen messages will tell you what's happening.
 Wait until the end and try the AppImage again.
 
 Run the tests until you get the desired result.
+
+### Extraction levels
+Since version 4.2 you can set extraction levels by assigning the variable "$extraction_count" (in the middle of the script) a number from zero and up. The default value is 1. Here's what the number means:
+- level 0 extracts only the dependencies, the "optdepends" and the dependencies you specify in the variable "DEPENDENCES"
+- level 1 is the default, it extracts the dependencies of dependencies of the main package (not the "optdepends") and the dependencies of packages in "DEPENDENCES"
+- level 2 extracts the dependencies of the packages extracted at point 1
+- level 3 extracts the dependencies of the packages at point 2
+
+...and so on.
+
+If you decide to include all the dependencies, the package will be much larger, and at the same time you will have a better chance of running the program you are building.
+
+If you decide NOT to include the dependencies, you will still have all the files to check to include only the libraries shared between the dependencies.
+
+However, there is no guarantee that the AppImage will work immediately. Please refer to the "[tutorial](#tutorial)" to perform your own tests.
 
 ------------------------------------------------------------------------
 
