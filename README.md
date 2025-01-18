@@ -75,9 +75,11 @@ archimage-cli [OPTION] [PROGRAM]
 ### OPTIONS:
 ```
 -h,--help		Shows this message.
--v,--version	Shows the version.
+-v,--version		Shows the version.
 -b,--build		Create the script to build the AppImage.
 -s,--sync		Update archimage-cli to the latest version.
+--devmode-enable	Use the development branch (at your own risk).
+--devmode-disable	Undo "--devmode-enable" (see below).
 ```
 
 ------------------------------------------------------------------------
@@ -95,9 +97,27 @@ To prevent problems of any kind, dedicate a single directory to the created scri
 5. run the script inside the directory, like this: `./sample-junest.sh`
 
 #### EXAMPLE
-In this video I will show all the steps that I will describe in this section (Archimage 3.4.2):
 
-https://github.com/ivan-hc/ArchImage/assets/88724353/d7ecb9e5-1db7-4d5c-ae6b-374b6c32e87c
+The Archimage release used in this two-parts videos is 4.3
+
+| Create the script and the JuNest environment (part 1) | Create the AppImage (part 2) |
+| - | - |
+| <video src="https://github.com/user-attachments/assets/2c1165f7-879c-4120-a3b8-92c8253af7f1"> | <video src="https://github.com/user-attachments/assets/a32645e1-4cf8-4280-8dd5-d98404c919e3"> |
+
+NOTE, older versions are significantly slower to build.
+
+Pay attention to the file extension, it must contain the version of Archimage used, for example
+```
+Appname-$VERSION-archimage4.3-x86_64.AppImage
+```
+
+Always try to get the latest version to build your Appimages:
+
+- since version 4 hardware acceleration is available
+- since version 4.2 the AppImages created use PROOT as a fallback in case the host system has Namespaces restrictions (see Ubuntu), also the Appimages created are updatable
+- since version 4.3 the scripts are faster and more selective for libraries, automating much of the process
+
+Please refer to the [releases](https://github.com/ivan-hc/ArchImage/releases) page to see the developments and new features introduced in this project so far.
 
 ------------------------------------------
 ### What NOT to do
