@@ -421,6 +421,8 @@ _savelibs() {
 		cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" 2>/dev/null &
 	done
 	wait
+	core_libs=$(find ./"$APP".AppDir -type f)
+	lib_core=$(for c in $core_libs; do readelf -d "$c" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 
 	echo "◆ Detect libraries of the main package"
 	base_libs=$(find ./base -type f | uniq)
@@ -450,7 +452,7 @@ _savelibs() {
 	lib_base_8=$(echo "$lib_base_8" | tr ' ' '\n' | sort -u | xargs)
 	lib_base_9=$(for b in $lib_base_8; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_9=$(echo "$lib_base_9" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_libs="$lib_base_0 $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9 $lib_deps"
+	lib_base_libs="$lib_core $lib_base_0 $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9 $lib_deps"
 	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
 	for l in $lib_base_libs; do
 		rsync -av ./archlinux/.junest/usr/lib/"$l"* ./"$APP".AppDir/.junest/usr/lib/ &
