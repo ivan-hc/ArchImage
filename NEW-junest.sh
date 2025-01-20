@@ -418,7 +418,7 @@ _savelibs() {
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
 	done
 	for arg in $LIBPATHS; do
-		cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" 2>/dev/null &
+		[ ! -d "$APP".AppDir/"$arg" ] && cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" &
 	done
 	wait
 	core_libs=$(find ./"$APP".AppDir -type f)
