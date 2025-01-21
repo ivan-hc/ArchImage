@@ -112,7 +112,7 @@ if [ -n "$COMPILERS" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$COMPILERS"
 fi
 if [ -n "$DEPENDENCES" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
+	./.local/share/junest/bin/junest -- yay --noconfirm -S $DEPENDENCES
 fi
 if [ -n "$APP" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib gtk3 xapp
