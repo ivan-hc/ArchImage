@@ -53,6 +53,11 @@ _enable_chaoticaur() {
 	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
+_enable_archlinuxcn() {
+	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U "https://repo.archlinuxcn.org/x86_64/$(curl -Ls https://repo.archlinuxcn.org/x86_64/ | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)"
+	printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = http://repo.archlinuxcn.org/\$arch" >> ./.junest/etc/pacman.conf
+}
+
 _custom_mirrorlist() {
 	COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
 	if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
@@ -80,6 +85,7 @@ _install_junest() {
 	echo " Apply patches to PacMan..."
 	#_enable_multilib
 	#_enable_chaoticaur
+	#_enable_archlinuxcn
 	_custom_mirrorlist
 	_bypass_signature_check_level
 
