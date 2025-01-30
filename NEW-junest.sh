@@ -116,6 +116,7 @@ if [ -n "$BASICSTUFF" ]; then
 fi
 if [ -n "$COMPILERS" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S $COMPILERS
+	./.local/share/junest/bin/junest -- yay --noconfirm -S python
 fi
 if [ -n "$DEPENDENCES" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S $DEPENDENCES
