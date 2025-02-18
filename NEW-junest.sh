@@ -550,6 +550,11 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	[ ! -f ./"$APP".AppDir/.junest/etc/asound.conf ] && touch ./"$APP".AppDir/.junest/etc/asound.conf
 }
 
+# Fix libcurl
+if test -f ./"$APP".AppDir/.junest/usr/lib/libcurl*; then
+	rm -f ./"$APP".AppDir/.junest/usr/lib/libcurl* && cp -r ./archlinux/.junest/usr/lib/libcurl* ./"$APP".AppDir/.junest/usr/lib/
+fi
+
 _remove_more_bloatwares
 find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
 find ./"$APP".AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
