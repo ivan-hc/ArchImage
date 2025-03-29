@@ -207,6 +207,7 @@ done
 
 rsync -av archlinux/.junest/usr/bin_wrappers/ "$APP".AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
 rsync -av archlinux/.junest/etc/* "$APP".AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+[ -f "$APP".AppDir/.junest/etc/fuse.conf ] && sed -i 's/#user_allow_other/user_allow_other/' "$APP".AppDir/.junest/etc/fuse.conf
 
 #############################################################################
 #	APPRUN
