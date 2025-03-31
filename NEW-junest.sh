@@ -278,7 +278,7 @@ _JUNEST_CMD() {
 
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 
-_JUNEST_CMD -- $EXEC "$@"
+_JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/$EXEC "$@"
 
 HEREDOC
 chmod a+x "$APP".AppDir/AppRun
