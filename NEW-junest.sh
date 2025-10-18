@@ -38,7 +38,7 @@ FORCE_PACKAGES="hicolor-icon-theme|xapp"
 etc_remove="makepkg.conf pacman"
 bin_remove="gcc"
 lib_remove="gcc python*/__pycache__/"
-share_remove="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ man"
+share_remove="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
 
 ##########################################################################################################################################################
 #	SETUP THE ENVIRONMENT
@@ -549,6 +549,7 @@ _remove_more_bloatwares() {
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
 	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
+	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgallium*
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgo.so*
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
