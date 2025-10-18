@@ -22,17 +22,12 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 #	SETUP THE ENVIRONMENT
 #############################################################################
 
-_appimagetool() {
-	if ! command -v appimagetool 1>/dev/null; then
-		[ ! -f ./appimagetool ] && echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool
-		./appimagetool "$@"
-	else
-		appimagetool "$@"
-	fi
-}
-
 # Create and enter the AppDir
 mkdir -p "$APP".AppDir archlinux && cd archlinux || exit 1
+
+_JUNEST_CMD() {
+	./.local/share/junest/bin/junest "$@"
+}
 
 # Set archlinux as a temporary $HOME directory
 HOME="$(dirname "$(readlink -f "$0")")"
@@ -47,15 +42,15 @@ _enable_multilib() {
 
 _enable_chaoticaur() {
 	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
-	./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-	./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
-	./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
-	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+	_JUNEST_CMD -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+	_JUNEST_CMD -- sudo pacman-key --lsign-key 3056513887B78AEB
+	_JUNEST_CMD -- sudo pacman-key --populate chaotic
+	_JUNEST_CMD -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 }
 
 _enable_archlinuxcn() {
-	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U "https://repo.archlinuxcn.org/x86_64/$(curl -Ls https://repo.archlinuxcn.org/x86_64/ | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)"
+	_JUNEST_CMD -- sudo pacman --noconfirm -U "https://repo.archlinuxcn.org/x86_64/$(curl -Ls https://repo.archlinuxcn.org/x86_64/ | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)"
 	printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = http://repo.archlinuxcn.org/\$arch" >> ./.junest/etc/pacman.conf
 }
 
@@ -81,7 +76,7 @@ _install_junest() {
 	echo "◆ Downloading JuNest archive from https://github.com/ivan-hc/junest"
 	echo "-----------------------------------------------------------------------------"
 	curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
-	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
+	_JUNEST_CMD setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
 	echo " Apply patches to PacMan..."
 	#_enable_multilib
@@ -91,8 +86,8 @@ _install_junest() {
 	_bypass_signature_check_level
 
 	# Update arch linux in junest
-	./.local/share/junest/bin/junest -- sudo pacman -Syy
-	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
+	_JUNEST_CMD -- sudo pacman -Syy
+	_JUNEST_CMD -- sudo pacman --noconfirm -Syu
 }
 
 if ! test -d "$HOME/.local/share/junest"; then
@@ -110,51 +105,51 @@ fi
 #	INSTALL PROGRAMS USING YAY
 #############################################################################
 
-./.local/share/junest/bin/junest -- yay -Syy
-#./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
+_JUNEST_CMD -- yay -Syy
+#_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
 if [ -n "$BASICSTUFF" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S $BASICSTUFF
+	_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
 fi
 if [ -n "$COMPILERS" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S $COMPILERS
-	./.local/share/junest/bin/junest -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
+	_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
+	_JUNEST_CMD -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
 fi
 if [ -n "$DEPENDENCES" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S $DEPENDENCES
+	_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
 fi
 if [ -n "$APP" ]; then
-	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib gtk3 xapp
-	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
+	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 xapp
+	_JUNEST_CMD -- yay --noconfirm -S "$APP"
 	# Use debloated gdk-pixbuf2
 	if [ -f ./.junest/usr/lib/libgdk_pixbuf-2.0.so ]; then
 		if [ ! -f ./gdk-pixbuf2-2.x-x86_64.pkg.tar.zst ]; then
 			curl -#Lo gdk-pixbuf2-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/gdk-pixbuf2-mini-x86_64.pkg.tar.zst || exit 1
 		fi
-		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/gdk-pixbuf2-2.x-x86_64.pkg.tar.zst
+		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/gdk-pixbuf2-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated llvm-libs
 	if [ -f ./.junest/usr/lib/libLLVM.so ]; then
 		if [ ! -f ./llvm-libs-2.x-x86_64.pkg.tar.zst ]; then
 			curl -#Lo llvm-libs-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/llvm-libs-nano-x86_64.pkg.tar.zst || exit 1
 		fi
-		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/llvm-libs-2.x-x86_64.pkg.tar.zst
+		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/llvm-libs-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated mesa
 	if [ -f ./.junest/usr/lib/libEGL_mesa.so ] || [ -f ./junest/usr/lib/libGLX_mesa.so ]; then	
 		if [ ! -f ./mesa-2.x-x86_64.pkg.tar.zst ]; then
 			curl -#Lo mesa-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/mesa-nano-x86_64.pkg.tar.zst || exit 1
 		fi
-		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/mesa-2.x-x86_64.pkg.tar.zst
+		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/mesa-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated qt6-base
 	if [ -d ./.junest/usr/lib/qt6 ]; then
 		if [ ! -f ./qt6-base-2.x-x86_64.pkg.tar.zst ]; then
 			curl -#Lo qt6-base-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/qt6-base-mini-x86_64.pkg.tar.zst || exit 1
 		fi
-		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/qt6-base-2.x-x86_64.pkg.tar.zst
+		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/qt6-base-2.x-x86_64.pkg.tar.zst
 	fi
 	# Try to compile schema files
-	./.local/share/junest/bin/junest -- glib-compile-schemas /usr/share/glib-2.0/schemas/
+	_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
 	echo "No app found, exiting"; exit 1
 fi
@@ -605,6 +600,17 @@ REPO="$APPNAME-appimage"
 TAG="continuous"
 VERSION="$VERSION"
 UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
+
+_appimagetool() {
+	if ! command -v appimagetool 1>/dev/null; then
+		if [ ! -f ./appimagetool ]; then
+			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
+		fi
+		./appimagetool "$@"
+	else
+		appimagetool "$@"
+	fi
+}
 
 ARCH=x86_64 _appimagetool -u "$UPINFO" \
 	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.3-x86_64.AppImage
