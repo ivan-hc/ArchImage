@@ -19,7 +19,7 @@ SHARESAVED="SAVESHAREPLEASE"
 LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 [ -n "$lib_browser_launcher" ] && DEPENDENCES="$DEPENDENCES xapp hicolor-icon-theme"
 
-# Set the extraction level of dependences to be included. The larger the number, the more packages will be included, increasing the size of the final AppImage.
+# Set the extraction level of dependencies to be included. The larger the number, the more packages will be included, increasing the size of the final AppImage.
 #
 # - extraction_count=0 means that no dependence will be included
 # - extraction_count=1 (default) means that only dependencies of the main package will be inclided
