@@ -22,13 +22,14 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 #	SETUP THE ENVIRONMENT
 #############################################################################
 
-# Download appimagetool
-if [ ! -f ./appimagetool ]; then
-	echo "-----------------------------------------------------------------------------"
-	echo "◆ Downloading \"appimagetool\" from https://github.com/AppImage/appimagetool"
-	echo "-----------------------------------------------------------------------------"
-	curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage && chmod a+x appimagetool
-fi
+_appimagetool() {
+	if ! command -v appimagetool 1>/dev/null; then
+		[ ! -f ./appimagetool ] && echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool
+		./appimagetool "$@"
+	else
+		appimagetool "$@"
+	fi
+}
 
 # Create and enter the AppDir
 mkdir -p "$APP".AppDir archlinux && cd archlinux || exit 1
@@ -605,5 +606,5 @@ TAG="continuous"
 VERSION="$VERSION"
 UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
 
-ARCH=x86_64 ./appimagetool -u "$UPINFO" \
+ARCH=x86_64 _appimagetool -u "$UPINFO" \
 	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.3-x86_64.AppImage
