@@ -126,22 +126,30 @@ if [ -n "$APP" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
 	# Use debloated gdk-pixbuf2
 	if [ -f ./.junest/usr/lib/libgdk_pixbuf-2.0.so ]; then
-		[ ! -f ./gdk-pixbuf2-2.x-x86_64.pkg.tar.zst ] && curl -#Lo gdk-pixbuf2-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/gdk-pixbuf2-mini-x86_64.pkg.tar.zst || exit 1
+		if [ ! -f ./gdk-pixbuf2-2.x-x86_64.pkg.tar.zst ]; then
+			curl -#Lo gdk-pixbuf2-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/gdk-pixbuf2-mini-x86_64.pkg.tar.zst || exit 1
+		fi
 		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/gdk-pixbuf2-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated llvm-libs
 	if [ -f ./.junest/usr/lib/libLLVM.so ]; then
-		[ ! -f ./llvm-libs-2.x-x86_64.pkg.tar.zst ] && curl -#Lo llvm-libs-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/llvm-libs-nano-x86_64.pkg.tar.zst || exit 1
+		if [ ! -f ./llvm-libs-2.x-x86_64.pkg.tar.zst ]; then
+			curl -#Lo llvm-libs-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/llvm-libs-nano-x86_64.pkg.tar.zst || exit 1
+		fi
 		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/llvm-libs-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated mesa
 	if [ -f ./.junest/usr/lib/libEGL_mesa.so ] || [ -f ./junest/usr/lib/libGLX_mesa.so ]; then	
-		[ ! -f ./mesa-2.x-x86_64.pkg.tar.zst ] && curl -#Lo mesa-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/mesa-nano-x86_64.pkg.tar.zst || exit 1
+		if [ ! -f ./mesa-2.x-x86_64.pkg.tar.zst ]; then
+			curl -#Lo mesa-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/mesa-nano-x86_64.pkg.tar.zst || exit 1
+		fi
 		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/mesa-2.x-x86_64.pkg.tar.zst
 	fi
 	# Use debloated qt6-base
 	if [ -d ./.junest/usr/lib/qt6 ]; then
-		[ ! -f ./qt6-base-2.x-x86_64.pkg.tar.zst ] && curl -#Lo qt6-base-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/qt6-base-mini-x86_64.pkg.tar.zst || exit 1
+		if [ ! -f ./qt6-base-2.x-x86_64.pkg.tar.zst ]; then
+			curl -#Lo qt6-base-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/qt6-base-mini-x86_64.pkg.tar.zst || exit 1
+		fi
 		./.local/share/junest/bin/junest -- yay --noconfirm -U "$HOME"/qt6-base-2.x-x86_64.pkg.tar.zst
 	fi
 	# Try to compile schema files
