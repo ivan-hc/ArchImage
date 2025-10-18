@@ -9,8 +9,8 @@ Being this a container into an AppImage, it has its own "bubblewrap" or "proot" 
 - **[NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/NEW-junest.sh)**
 
 It is the mix of the two previous templates used until version 4.1:
-- [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
-- [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/sample-junest.sh) uses proot to be more portable but less integrated with the host system
+- [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/legacy/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
+- [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/legacy/sample-junest.sh) uses proot to be more portable but less integrated with the host system
 
 If you have already installed `archimage-cli`, please run
 ```
