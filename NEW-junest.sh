@@ -1,26 +1,48 @@
 #!/usr/bin/env bash
 
+##########################################################################################################################################################
+#	USER'S SETTINGS
+##########################################################################################################################################################
+
+# Set the main package name for Arch Linux (APP), the binary name (BIN) and the dependencies (DEPENDENCES).
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 #BASICSTUFF="binutils debugedit gzip"
 #COMPILERS="base-devel"
 
-#############################################################################
-#	KEYWORDS TO FIND AND SAVE WHEN COMPILING THE APPIMAGE
-#############################################################################
-
+# Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED)
 BINSAVED="SAVEBINSPLEASE"
 SHARESAVED="SAVESHAREPLEASE"
 #lib_audio_keywords="alsa jack pipewire pulse"
 #lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
 LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
-
 [ -n "$lib_browser_launcher" ] && DEPENDENCES="$DEPENDENCES xapp hicolor-icon-theme"
 
-#############################################################################
+# Set the extraction level of dependences to be included. The larger the number, the more packages will be included, increasing the size of the final AppImage.
+#
+# - extraction_count=0 means that no dependence will be included
+# - extraction_count=1 (default) means that only dependencies of the main package will be inclided
+# - extraction_count=2 means that also the dependencies of the dependencies will be included (this level often generates a large AppImage that may works out of the box)
+# - extraction_count=3 means that also the dependencies of the dependencies of the dependencies will be included
+#
+# ...and so on, until the whole Arch Linux system will be included into a gigantic AppImage package.
+[ -z "$extraction_count" ] && extraction_count=1
+
+# Set packages to be treated as if they were the main base package, syntax: "package1|package2|package3"
+FORCE_PACKAGES="hicolor-icon-theme|xapp"
+
+# Set the items you want to manually REMOVE in /etc, /usr/bin, /usr/lib and /usr/share respectively.
+# The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
+# Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
+etc_remove="makepkg.conf pacman"
+bin_remove="gcc"
+lib_remove="gcc python*/__pycache__/"
+share_remove="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ man"
+
+##########################################################################################################################################################
 #	SETUP THE ENVIRONMENT
-#############################################################################
+##########################################################################################################################################################
 
 # Create and enter the AppDir
 mkdir -p "$APP".AppDir archlinux && cd archlinux || exit 1
@@ -32,9 +54,9 @@ _JUNEST_CMD() {
 # Set archlinux as a temporary $HOME directory
 HOME="$(dirname "$(readlink -f "$0")")"
 
-#############################################################################
+##########################################################################################################################################################
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
-#############################################################################
+##########################################################################################################################################################
 
 _enable_multilib() {
 	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
@@ -93,9 +115,9 @@ else
 	printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
 fi
 
-#############################################################################
+##########################################################################################################################################################
 #	INSTALL PROGRAMS USING YAY
-#############################################################################
+##########################################################################################################################################################
 
 _JUNEST_CMD -- yay -Syy
 #_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
@@ -221,9 +243,9 @@ done
 rsync -av archlinux/.junest/usr/bin_wrappers/ "$APP".AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
 rsync -av archlinux/.junest/etc/* "$APP".AppDir/.junest/etc/ | echo "◆ Rsync /etc"
 
-#############################################################################
+##########################################################################################################################################################
 #	APPRUN
-#############################################################################
+##########################################################################################################################################################
 
 rm -f "$APP".AppDir/AppRun
 cat <<-'HEREDOC' >> "$APP".AppDir/AppRun
@@ -296,11 +318,10 @@ _JUNEST_CMD -- $EXEC "$@"
 HEREDOC
 chmod a+x "$APP".AppDir/AppRun
 
-#############################################################################
+##########################################################################################################################################################
 #	EXTRACT PACKAGES
-#############################################################################
+##########################################################################################################################################################
 
-[ -z "$extraction_count" ] && extraction_count=1
 [ ! -f ./autodeps ] && echo "$extraction_count" > ./autodeps
 [ -f ./autodeps ] && autodeps=$(cat ./autodeps)
 [ "$autodeps" != "$extraction_count" ] && rm -Rf ./deps ./packages && echo "$extraction_count" > ./autodeps
@@ -350,7 +371,7 @@ _extract_package() {
 			tar fx "$pkg_full_path" -C ./deps/ --warning=no-unknown-keyword
 			echo "$pkgname" >> ./packages
 		fi
-		[ -n "$lib_browser_launcher" ] && [[ "$arg" =~ (hicolor-icon-theme|xapp) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
+		[ -n "$lib_browser_launcher" ] && [[ "$arg" =~ ($FORCE_PACKAGES) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
 	fi
 }
 
@@ -506,24 +527,20 @@ _rsync_dependences() {
 _rsync_main_package
 _rsync_dependences
 
-#############################################################################
+##########################################################################################################################################################
 #	REMOVE BLOATWARES, ENABLE MOUNTPOINTS
-#############################################################################
+##########################################################################################################################################################
 
 _remove_more_bloatwares() {
-	etc_remove="makepkg.conf pacman"
 	for r in $etc_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*
 	done
-	bin_remove="gcc"
 	for r in $bin_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*
 	done
-	lib_remove="gcc"
 	for r in $lib_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*
 	done
-	share_remove="gcc"
 	for r in $share_remove; do
 		rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*
 	done
@@ -532,8 +549,6 @@ _remove_more_bloatwares() {
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
 	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
 	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
-	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	rm -Rf ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgallium*
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgo.so*
 	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
@@ -565,9 +580,9 @@ find ./"$APP".AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --s
 find ./"$APP".AppDir/.junest/usr -type d -empty -delete
 _enable_mountpoints_for_the_inbuilt_bubblewrap
 
-#############################################################################
+##########################################################################################################################################################
 #	CREATE THE APPIMAGE
-#############################################################################
+##########################################################################################################################################################
 
 if test -f ./*.AppImage; then rm -Rf ./*archimage*.AppImage; fi
 
@@ -589,4 +604,4 @@ _appimagetool() {
 }
 
 ARCH=x86_64 _appimagetool -u "$UPINFO" \
-	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.3-x86_64.AppImage
+	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.3.1-x86_64.AppImage
