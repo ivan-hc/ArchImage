@@ -68,13 +68,9 @@ _bypass_signature_check_level() {
 }
 
 _install_junest() {
-	echo "-----------------------------------------------------------------------------"
-	echo "◆ Clone JuNest from https://github.com/fsquillace/junest"
-	echo "-----------------------------------------------------------------------------"
+	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/fsquillace/junest\n-----------------------------------------------------------------------------\n"
 	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
-	echo "-----------------------------------------------------------------------------"
-	echo "◆ Downloading JuNest archive from https://github.com/ivan-hc/junest"
-	echo "-----------------------------------------------------------------------------"
+	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
 	curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
 	_JUNEST_CMD setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
@@ -91,14 +87,10 @@ _install_junest() {
 }
 
 if ! test -d "$HOME/.local/share/junest"; then
-	echo "-----------------------------------------------------------------------------"
-	echo " DOWNLOAD, INSTALL AND CONFIGURE JUNEST"
-	echo "-----------------------------------------------------------------------------"
+	printf -- "-----------------------------------------------------------------------------\n DOWNLOAD, INSTALL AND CONFIGURE JUNEST\n-----------------------------------------------------------------------------\n"
 	_install_junest
 else
-	echo "-----------------------------------------------------------------------------"
-	echo " RESTART JUNEST"
-	echo "-----------------------------------------------------------------------------"
+	printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
 fi
 
 #############################################################################
@@ -156,11 +148,7 @@ fi
 
 cd ..
 
-echo ""
-echo "-----------------------------------------------------------------------------"
-echo " CREATING THE APPDIR"
-echo "-----------------------------------------------------------------------------"
-echo ""
+printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n"
 
 # Set locale
 rm -f archlinux/.junest/etc/locale.conf
@@ -354,11 +342,7 @@ _extract_package() {
 	[ ! -f ./packages ] && rm -Rf ./deps/* && touch ./packages
 	if [ -z "$( ls -A './deps' )" ]; then
 		rm -f ./packages
-		echo ""
-		echo "-----------------------------------------------------------------------------"
-		echo " EXTRACTING PACKAGES"
-		echo "-----------------------------------------------------------------------------"
-		echo ""
+		printf -- "\n-----------------------------------------------------------------------------\n EXTRACTING PACKAGES\n-----------------------------------------------------------------------------\n"
 	fi
 	if test -f "$pkg_full_path"; then
 		if ! grep -q "$pkgname" ./packages 2>/dev/null;then
@@ -416,11 +400,7 @@ _extract_all_dependences() {
 _extract_main_package
 _extract_all_dependences
 
-echo ""
-echo "-----------------------------------------------------------------------------"
-echo " IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)"
-echo "-----------------------------------------------------------------------------"
-echo ""
+printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
 # Save files in /usr/bin
 _savebins() {
@@ -510,11 +490,7 @@ _savebins 2>/dev/null
 _savelibs 2>/dev/null
 _saveshare 2>/dev/null
 
-echo ""
-echo "-----------------------------------------------------------------------------"
-echo " ASSEMBLING THE APPIMAGE"
-echo "-----------------------------------------------------------------------------"
-echo ""
+printf -- "\n-----------------------------------------------------------------------------\n ASSEMBLING THE APPIMAGE\n-----------------------------------------------------------------------------\n"
 
 _rsync_main_package() {
 	rm -Rf ./base/.*
