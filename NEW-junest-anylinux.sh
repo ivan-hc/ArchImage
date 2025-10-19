@@ -105,6 +105,10 @@ fi
 if [ -n "$APP" ]; then
 	_JUNEST_CMD -- yay --noconfirm -S xorg-server-xvfb zsync
 	_JUNEST_CMD -- yay --noconfirm -S "$APP"
+	EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
+	wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
+	chmod +x ./get-debloated-pkgs.sh
+	_JUNEST_CMD -- ./get-debloated-pkgs.sh --add-common
 	_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
 	echo "No app found, exiting"; exit 1
