@@ -268,9 +268,7 @@ if [ "$NVIDIA_ON" = 1 ]; then
    CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
    [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
    if [ -n "$nvidia_driver_version" ]; then
-      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib "${CONTY_DIR}"/up/usr/share
-      nvidia_data_dirs="egl glvnd nvidia vulkan"
-      for d in $nvidia_data_dirs; do [ ! -d "${CONTY_DIR}"/up/usr/share/"$d" ] && ln -s /usr/share/"$d" "${CONTY_DIR}"/up/usr/share/ 2>/dev/null; done
+      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib
       [ ! -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
       [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty=$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)
       if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
@@ -286,7 +284,6 @@ if [ "$NVIDIA_ON" = 1 ]; then
       if ! test -f "${libvdpau_nvidia}*"; then cp "$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)" "${CONTY_DIR}"/up/usr/lib/; fi
       [ -f "${libvdpau_nvidia}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau_nvidia}" ] && ln -s "${libvdpau_nvidia}"."${nvidia_driver_version}" "${libvdpau_nvidia}"
       [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
-      [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
    fi
 fi
 
@@ -296,7 +293,8 @@ BWRAP_BINDINGS=""
 bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
 for f in $bind_files; do [ -f "$f" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=$f" && BWRAP_BINDINGS=" $BWRAP_BINDINGS --ro-bind-try $f $f"; done
 
-bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var"
+bind_nvidia_data_dirs="/usr/share/egl /usr/share/glvnd /usr/share/nvidia /usr/share/vulkan"
+bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var $bind_nvidia_data_dirs"
 for d in $bind_dirs; do [ -d "$d" ] && PROOT_BINDINGS=" $PROOT_BINDINGS --bind=$d" && BWRAP_BINDINGS=" $BWRAP_BINDINGS --bind-try $d $d"; done
 
 PROOT_BINDS=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $PROOT_BINDINGS --bind=/home --bind=/home/$USER "
@@ -532,18 +530,10 @@ _rsync_dependences
 ##########################################################################################################################################################
 
 _remove_more_bloatwares() {
-	for r in $etc_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*
-	done
-	for r in $bin_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*
-	done
-	for r in $lib_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*
-	done
-	for r in $share_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*
-	done
+	for r in $etc_remove; do rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*; done
+	for r in $bin_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*; done
+	for r in $lib_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*; done
+	for r in $share_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*; done
 	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
 	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -560,8 +550,8 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	mkdir -p ./"$APP".AppDir/.junest/home
 	mkdir -p ./"$APP".AppDir/.junest/media
 	mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
-	mkdir -p ./"$APP".AppDir/.junest/usr/share/fonts
-	mkdir -p ./"$APP".AppDir/.junest/usr/share/themes
+	share_dirs="egl fonts glvnd nvidia themes vulkan"
+	for d in $share_dirs; do mkdir -p ./"$APP".AppDir/.junest/usr/share/"$d"; done
 	mkdir -p ./"$APP".AppDir/.junest/run/media
 	mkdir -p ./"$APP".AppDir/.junest/run/user
 	rm -f ./"$APP".AppDir/.junest/etc/localtime && touch ./"$APP".AppDir/.junest/etc/localtime
