@@ -123,7 +123,7 @@ mkdir -p AppDir
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
-LAUNCHER=$(grep -iRl "$BIN" .junest/usr/share/applications/* | grep ".desktop" | head -1)
+LAUNCHER=$(grep -iRl "^Exec.*$BIN" .junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" AppDir/
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 [ -z "$ICON" ] && ICON="$BIN"
