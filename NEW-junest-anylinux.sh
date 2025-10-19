@@ -149,7 +149,6 @@ ARCH="x86_64"
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-export ADD_HOOKS="self-updater.bg.hook"
 export APPNAME=$(cat AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
 export REPO="$APPNAME-appimage"
 export TAG="latest"
