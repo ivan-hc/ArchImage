@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="4.3"
+VERSION="5"
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 ARCHIMAGE_REPO="https://raw.githubusercontent.com/ivan-hc/ArchImage/main"
@@ -123,14 +123,29 @@ completion_file="$DATADIR/bash-completion/completions/archimage-cli"
 mkdir -p "$DATADIR/bash-completion/completions" || exit 1
 if ! grep -o " archimage-cli$" "$completion_file" >/dev/null 2>&1 && [ -f "$AMDATADIR"/list ]; then
 	echo "complete -W \"\$(cat $AMDATADIR/list 2>/dev/null)\" archimage-cli" >> "$completion_file"
+	# Shell completion in zsh requires editing the main configuration file
 	if [ -f "${ZDOTDIR:-$HOME}"/.zshrc ] && echo "$SHELL" | grep -q "zsh"; then
-		cat <<-HEREDOC >> "${ZDOTDIR:-$HOME}"/.zshrc
-		autoload bashcompinit
-		bashcompinit
-		source "$completion_file"
-		HEREDOC
+		if ! grep -q "$completion_file" "${ZDOTDIR:-$HOME}"/.zshrc && [ ! -f "$AMDATADIR"/zsh-completion-off ]; then
+			printf $"Zsh completion requires editing the main configuration file, but it may cause problems.\nSee https://github.com/ivan-hc/AM/issues/1843\n" | _fit
+			read -r -p $"Want to proceed anyway? (y,N)" response
+			if echo "$response" | grep -qi "^y"; then
+				cat <<-HEREDOC >> "${ZDOTDIR:-$HOME}"/.zshrc
+				autoload bashcompinit
+				bashcompinit
+				source "$completion_file"
+				HEREDOC
+			else
+				touch "$AMDATADIR"/zsh-completion-off
+			fi
+		fi
 	fi
-	echo "Shell completion has been enabled!"
+	if [ ! -f "$AMDATADIR"/zsh-completion-off ]; then
+		echo $"Shell completion has been enabled!"
+	fi
+	# Shell completion in fish
+	if [ -d "$DATADIR"/fish/completions ] || [ -d /etc/fish/completions ] || [ -d /usr/share/fish/completions ]; then
+		command -v fish 1>/dev/null && [ ! -f "$CONFIGDIR"/fish/completions/archimage-cli.fish ] && mkdir -p "$CONFIGDIR"/fish/completions && echo "complete -c archimage-cli -f -a \"(cat $DATADIR/AM/list 2>/dev/null)\"" > "$CONFIGDIR"/fish/completions/archimage-cli.fish
+	fi
 fi
 
 ################################################################################
@@ -172,38 +187,6 @@ _add_dependencies() {
 	[ -n "$RESPONSE" ] && sed -i "s/^DEPENDENCES=\"\"/DEPENDENCES=\"$RESPONSE\"/g" ./"$APP"-junest.sh
 }
 
-# Set the level of sub-dependencies extraction, the higher the number, the bigger the AppImage will be
-_extraction_level() {
-	echo "◆ Set the level of sub-dependencies."
-	echo ""
-	echo "The variable \"\$extraction_count\" indicates the number of checks made on dependencies and dependencies of dependencies. The higher the number, the more packages will be included, the more successfully the app will work... the bigger the AppImage will be." | _fit | sed 's/^/ /g'
-	echo ""
-	read -r -ep "  LEAVE BLANK TO SET THE DEFAULT VALUE TO 1 (RECOMMENDED): " extraction_number
-    	[ -n "$extraction_number" ] && [[ "$extraction_number" =~ ^[0-9]+$ ]] && sed -i "s/extraction_count=1/extraction_count=$extraction_number/g" ./"$APP"-junest.sh
-}
-
-# Include all dependencies in the final AppImage
-_include_all_dependencies() {
-	echo "◆ Automatic library checking should be more than enough. However..."
-	echo ""
-	read -r -ep "  DO YOU WANT TO INCLUDE ALL DEPENDENCIES? THE PACKAGE MAY BE BLOATED (y,N) " yn
-    	if echo "$yn" | grep -qi "^y"; then
-    		sed -i 's/#rsync -av/rsync -av/g' ./"$APP"-junest.sh
-    	fi
-}
-
-# Allow Nvidia check in the final AppImage
-_enable_nvidia() {
-	read -r -ep "◆ DO YOU WANT TO ENABLE HARDWARE ACCELERATION FOR NVIDIA USERS? (y,N) " yn
-    	if echo "$yn" | grep -qi "^y"; then
-    		sed -i 's/NVIDIA_ON=0/NVIDIA_ON=1/g' ./"$APP"-junest.sh
-	fi
-}
-
-# Start configuration
-STANDARD_CONFIGURATION_MSG="◆ Press \"y\" to finish using a standard configuration with the bare minimum for network and audio support, press \"N\" or leave blank instead to continue customization (RECOMMENDED).
-"
-
 _enable_chaoticaur() {
 	read -r -ep "◆ DO YOU WANT TO ENABLE CHAOTIC-AUR (y,N)? " yn
     	if echo "$yn" | grep -qi "^y"; then
@@ -233,54 +216,6 @@ _enable_compilers(){
 	fi
 }
 
-_keywords_to_save_in_usr_bin() {
-	read -r -ep "◆ LIST BINARIES TO SAVE IN /usr/bin OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savebins
-	if [ -n "$savebins" ]; then
-		sed -i 's/#_savebins/_savebins/g' ./"$APP"-junest.sh
-		sed -i "s/SAVEBINSPLEASE/$savebins/g" ./"$APP"-junest.sh
-	fi
-}
-
-_keywords_to_save_in_usr_share() {
-	read -r -ep "◆ LIST DIRECTORIES TO SAVE IN /usr/share OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " saveshare
-	if [ -n "$saveshare" ]; then
-		sed -i "s/SAVESHAREPLEASE/$saveshare/g" ./"$APP"-junest.sh
-	fi
-}
-
-_keywords_to_save_in_usr_lib() {
-	read -r -ep "◆ LIST LIBRARIES AND DIRECTORIES TO SAVE IN /usr/lib OR LEAVE BLANK $(echo -e '\n  DO NOT ADD ASTERISKS, THEY ARE ALREADY PROVIDED IN THE SCRIPT\n:') " savelibs
-	if [ -n "$savelibs" ]; then
-		sed -i "s/SAVELIBSPLEASE/$savelibs/g" ./"$APP"-junest.sh
-	fi
-}
-
-_include_audio_keywords() {
-	read -r -ep "◆ DO YOU WISH TO ADD KEYWORDS IN /usr/lib TO ENABLE THE AUDIO (y,N)?" yn
-	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/^#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh
-	fi
-}
-
-_include_internet_keywords() {
-	read -r -ep "◆ DO YOU WISH TO ADD KEYWORDS IN /use/lib TO USE NETWORK (y,N)? " yn
-	if echo "$yn" | grep -qi "^y"; then
-		sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh
-	fi
-}
-
-_select_libraries() {
-	read -r -ep "◆ DO YOU WISH TO SELECT LIBRARIES TO SAVE (y,N)?" yn
-	if echo "$yn" | grep -qi "^y"; then
-		echo "$DIVIDING_LINE"
-		_keywords_to_save_in_usr_lib
-		echo "$DIVIDING_LINE"
-		_include_audio_keywords
-		echo "$DIVIDING_LINE"
-		_include_internet_keywords
-	fi
-}
-
 ################################################################################
 #				USAGE
 ################################################################################
@@ -305,15 +240,11 @@ case "$1" in
 			[ -f "$AMDATADIR"/archimage-betatester ] && printf "Developer Mode%b" "$DIVIDING_LINE" | _fit | sed -- 's/^ -/-/g'
 			echo "$GETTING_STARTED_MSG" | _fit
 			APP="$2"
-			wget -q "$ARCHIMAGE_REPO/NEW-junest.sh" -O "$APP"-junest.sh
+			wget -q "$ARCHIMAGE_REPO/NEW-junest-anylinux.sh" -O "$APP"-junest.sh
 			sed -i "s#APP=SAMPLE#APP=$APP#g" "$APP"-junest.sh
 			_usr_bin_executable_name
 			echo "$DIVIDING_LINE"
 			_add_dependencies
-			echo "$DIVIDING_LINE"
-    			_extraction_level
-			echo "$DIVIDING_LINE"
-			_include_all_dependencies
 			echo "$DIVIDING_LINE"
 			if curl --output /dev/null --silent --fail -r 0-0 https://aur.archlinux.org/packages/"$APP" 2> /dev/null; then
 				sed -i 's/#BASICSTUFF/BASICSTUFF/g' ./"$APP"-junest.sh # INSTALL BINUTILS AND GZIP
@@ -323,34 +254,10 @@ case "$1" in
 				echo "$DIVIDING_LINE"
 			fi
 			_enable_multilib
-			echo "$DIVIDING_LINE"
-			_enable_nvidia
-			echo "$DIVIDING_LINE"
-			echo "$STANDARD_CONFIGURATION_MSG" | _fit | sed "s/^/ /g; s/  ◆/◆/g"
-			read -r -ep "  DO YOU WISH TO USE A STANDARD CONFIGURATION (y,N)? " yn
-    			if echo "$yn" | grep -qi "^y"; then
-				sed -i 's/#lib_audio_keywords/lib_audio_keywords/g' ./"$APP"-junest.sh # SAVE KEYWORDS RELATED TO AUDIO
-				sed -i 's/^#lib_browser_launcher/lib_browser_launcher/g' ./"$APP"-junest.sh # ALLOW THE PROGRAM TO OPEN THE SYSTEM BROWSER
-			else
-				grep -q "^#BASICSTUFF" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_basicstuff
-				grep -q "^#COMPILERS" ./"$APP"-junest.sh && echo "$DIVIDING_LINE" && _enable_compilers
-				echo "$DIVIDING_LINE"
-				_keywords_to_save_in_usr_bin
-				echo "$DIVIDING_LINE"
-				_keywords_to_save_in_usr_share
-				echo "$DIVIDING_LINE"
-				_select_libraries
-			fi
 		fi
 		echo "$DIVIDING_LINE"
 		chmod a+x ./"$APP"-junest.sh
 		echo " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE!"
-		echo ""
-		echo " SUGGESTIONS:"
-		echo ""
-		echo "◆ you can manually complete the function named \"_remove_more_bloatwares\" with a list of items to be deleted to avoid an excess in the size of the final AppImage" | _fit
-		echo "◆ in the footer of the script you can manually add TAG and REPO in case you want to host an updatable AppImage on github.com" | _fit
-		echo "◆ about the \"\$extraction_count\" variable, you can also set its value externally, for example, by running \"export extraction_count=2\"" | _fit
 		echo ""
 		exit 0
 		done
