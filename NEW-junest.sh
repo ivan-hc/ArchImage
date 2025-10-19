@@ -198,23 +198,8 @@ cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
 # Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
 if test -f "$APP".AppDir/*.desktop; then
 	echo "◆ The .desktop file is available in $APP.AppDir/"
-elif test -f archlinux/.junest/usr/bin/"$BIN"; then
- 	echo "◆ No .desktop file available for $APP, creating a new one"
- 	cat <<-HEREDOC >> "$APP".AppDir/"$APP".desktop
-	[Desktop Entry]
-	Version=1.0
-	Type=Application
-	Name=$(echo "$APP" | tr '[:lower:]' '[:upper:]')
-	Comment=
-	Exec=$BIN
-	Icon=tux
-	Categories=Utility;
-	Terminal=true
-	StartupNotify=true
-	HEREDOC
-	curl -Lo "$APP".AppDir/tux.png https://raw.githubusercontent.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/main/favicon.ico 2>/dev/null
-else
-	echo "No binary in path... aborting all the processes."
+elif ! test -f archlinux/.junest/usr/bin/"$BIN"; then
+ 	echo "No binary in path... aborting all the processes."
 	exit 0
 fi
 
@@ -251,7 +236,6 @@ rm -f "$APP".AppDir/AppRun
 cat <<-'HEREDOC' >> "$APP".AppDir/AppRun
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
-export UNION_PRELOAD="$HERE"
 export JUNEST_HOME="$HERE"/.junest
 
 if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
