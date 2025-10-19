@@ -127,18 +127,18 @@ LAUNCHER=$(grep -iRl "$BIN" .junest/usr/share/applications/* | grep ".desktop" |
 cp -r "$LAUNCHER" AppDir/
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 [ -z "$ICON" ] && ICON="$BIN"
-cp -r .junest/usr/share/icons/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/pixmaps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
 
 # Version
 export VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}')"
