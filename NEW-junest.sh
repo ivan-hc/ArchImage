@@ -444,7 +444,7 @@ _savelibs() {
 
 	echo "◆ Saving JuNest core libraries"
 	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* ./"$APP".AppDir/.junest/usr/lib/
-	lib_preset="$APP $BIN gconv libdw libelf libresolv.so libtinfo.so $libs4bin"
+	lib_preset="$APP $BIN gconv libdw libelf libresolv.so libtinfo.so profile.d $libs4bin"
 	LIBSAVED="$lib_preset $LIBSAVED $SHARESAVED"
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
