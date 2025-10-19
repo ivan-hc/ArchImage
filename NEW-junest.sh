@@ -369,7 +369,7 @@ _extract_package() {
 			tar fx "$pkg_full_path" -C ./deps/ --warning=no-unknown-keyword
 			echo "$pkgname" >> ./packages
 		fi
-		[ -n "$lib_browser_launcher" ] && [[ "$arg" =~ ($FORCE_PACKAGES) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
+		[[ "$arg" =~ ($FORCE_PACKAGES) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
 	fi
 }
 
@@ -390,7 +390,7 @@ _extract_deps() {
 	done
 }
 
-_extract_all_dependences() {
+_extract_all_dependencies() {
 	rm -f ./depdeps
 
 	OPTDEPS=$(cat ./base/.PKGINFO 2>/dev/null | grep "^optdepend = " | sed 's/optdepend = //g' | sed 's/=.*//' | sed 's/:.*//')
@@ -417,7 +417,7 @@ _extract_all_dependences() {
 }
 
 _extract_main_package
-_extract_all_dependences
+_extract_all_dependencies
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
@@ -516,14 +516,14 @@ _rsync_main_package() {
 	rsync -av ./base/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
 }
 
-_rsync_dependences() {
+_rsync_dependencies() {
 	rm -Rf ./deps/.*
 	chmod -R 777 ./deps/*
 	#rsync -av ./deps/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependencies, please wait"
 }
 
 _rsync_main_package
-_rsync_dependences
+_rsync_dependencies
 
 ##########################################################################################################################################################
 #	REMOVE BLOATWARES, ENABLE MOUNTPOINTS
