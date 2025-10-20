@@ -35,10 +35,10 @@ FORCE_PACKAGES="hicolor-icon-theme|xapp"
 # Set the items you want to manually REMOVE in /etc, /usr/bin, /usr/lib and /usr/share respectively.
 # The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
 # Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
-etc_remove="makepkg.conf pacman"
-bin_remove="gcc"
-lib_remove="gcc python*/__pycache__/"
-share_remove="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
+ETC_REMOVED="makepkg.conf pacman"
+BIN_REMOVED="gcc"
+LIB_REMOVED="gcc python*/__pycache__/"
+SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
 
 ##########################################################################################################################################################
 #	SETUP THE ENVIRONMENT
@@ -177,7 +177,7 @@ rm -f archlinux/.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
 
 # Add launcher and icon
-rm -f ./*.desktop
+rm -f "$APP".AppDir/*.desktop
 LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" "$APP".AppDir/
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
@@ -440,7 +440,7 @@ _savelibs() {
 
 	echo "◆ Saving JuNest core libraries"
 	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* ./"$APP".AppDir/.junest/usr/lib/
-	lib_preset="$APP $BIN gconv libdw libelf libresolv.so libtinfo.so profile.d $libs4bin"
+	lib_preset="$APP $BIN gconv libcurl libdw libelf libresolv.so libtinfo.so profile.d $libs4bin"
 	LIBSAVED="$lib_preset $LIBSAVED $SHARESAVED"
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
@@ -526,10 +526,10 @@ _rsync_dependencies
 ##########################################################################################################################################################
 
 _remove_more_bloatwares() {
-	for r in $etc_remove; do rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*; done
-	for r in $bin_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*; done
-	for r in $lib_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*; done
-	for r in $share_remove; do rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*; done
+	for r in $ETC_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*; done
+	for r in $BIN_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*; done
+	for r in $LIB_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*; done
+	for r in $SHARE_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*; done
 	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
 	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
@@ -554,11 +554,6 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	[ ! -f ./"$APP".AppDir/.junest/etc/asound.conf ] && touch ./"$APP".AppDir/.junest/etc/asound.conf
 	[ ! -e ./"$APP".AppDir/.junest/usr/share/X11/xkb ] && rm -f ./"$APP".AppDir/.junest/usr/share/X11/xkb && mkdir -p ./"$APP".AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' ./"$APP".AppDir/AppRun
 }
-
-# Fix libcurl
-if test -f ./"$APP".AppDir/.junest/usr/lib/libcurl*; then
-	rm -f ./"$APP".AppDir/.junest/usr/lib/libcurl* && cp -r ./archlinux/.junest/usr/lib/libcurl* ./"$APP".AppDir/.junest/usr/lib/
-fi
 
 _remove_more_bloatwares
 find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
