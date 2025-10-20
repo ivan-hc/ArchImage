@@ -45,7 +45,7 @@ SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
 ##########################################################################################################################################################
 
 # Create and enter the AppDir
-mkdir -p "$APP".AppDir archlinux && cd archlinux || exit 1
+mkdir -p AppDir archlinux && cd archlinux || exit 1
 
 _JUNEST_CMD() {
 	./.local/share/junest/bin/junest "$@"
@@ -162,63 +162,63 @@ rm -f archlinux/.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
 
 # Add launcher and icon
-rm -f "$APP".AppDir/*.desktop
+rm -f AppDir/*.desktop
 LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
-cp -r "$LAUNCHER" "$APP".AppDir/
+cp -r "$LAUNCHER" AppDir/
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 [ -z "$ICON" ] && ICON="$BIN"
-cp -r archlinux/.junest/usr/share/icons/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
 
 # Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
-if test -f "$APP".AppDir/*.desktop; then
+if test -f AppDir/*.desktop; then
 	echo "◆ The .desktop file is available in $APP.AppDir/"
 elif ! test -f archlinux/.junest/usr/bin/"$BIN"; then
  	echo "No binary in path... aborting all the processes."
 	exit 0
 fi
 
-if [ ! -d "$APP".AppDir/.local ]; then
-	mkdir -p "$APP".AppDir/.local
-	rsync -av archlinux/.local/ "$APP".AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
+if [ ! -d AppDir/.local ]; then
+	mkdir -p AppDir/.local
+	rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
 	# Made JuNest a portable app and remove "read-only file system" errors
-	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' "$APP".AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' "$APP".AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/ln/#ln/g' "$APP".AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/rm -f "$file"/test -f "$file"/g' "$APP".AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' "$APP".AppDir/.local/share/junest/lib/core/namespace.sh
+	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' AppDir/.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' AppDir/.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/ln/#ln/g' AppDir/.local/share/junest/lib/core/wrappers.sh
+	sed -i 's/rm -f "$file"/test -f "$file"/g' AppDir/.local/share/junest/lib/core/wrappers.sh
+	sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' AppDir/.local/share/junest/lib/core/namespace.sh
 fi
 
 echo "◆ Rsync .junest directories structure to the AppDir"
-rm -Rf "$APP".AppDir/.junest/*
+rm -Rf AppDir/.junest/*
 archdirs=$(find archlinux/.junest -type d | sed 's/^archlinux\///g')
 for d in $archdirs; do
-	mkdir -p "$APP".AppDir/"$d"
+	mkdir -p AppDir/"$d"
 done
 symlink_dirs=" bin sbin lib lib64 usr/sbin usr/lib64"
 for l in $symlink_dirs; do
-	cp -r archlinux/.junest/"$l" "$APP".AppDir/.junest/"$l"
+	cp -r archlinux/.junest/"$l" AppDir/.junest/"$l"
 done
 
-rsync -av archlinux/.junest/usr/bin_wrappers/ "$APP".AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
-rsync -av archlinux/.junest/etc/* "$APP".AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+rsync -av archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
+rsync -av archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
 
 ##########################################################################################################################################################
 #	APPRUN
 ##########################################################################################################################################################
 
-rm -f "$APP".AppDir/AppRun
-cat <<-'HEREDOC' >> "$APP".AppDir/AppRun
+rm -f AppDir/AppRun
+cat <<-'HEREDOC' >> AppDir/AppRun
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
 export JUNEST_HOME="$HERE"/.junest
@@ -295,7 +295,7 @@ fi
 _JUNEST_CMD -- $EXEC "$@"
 
 HEREDOC
-chmod a+x "$APP".AppDir/AppRun
+chmod a+x AppDir/AppRun
 
 ##########################################################################################################################################################
 #	EXTRACT PACKAGES
@@ -405,36 +405,36 @@ printf -- "\n-------------------------------------------------------------------
 # Save files in /usr/bin
 _savebins() {
 	echo "◆ Saving files in /usr/bin"
-	cp -r ./archlinux/.junest/usr/bin/bwrap ./"$APP".AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/proot* ./"$APP".AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/*$BIN* ./"$APP".AppDir/.junest/usr/bin/
+	cp -r ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/
+	cp -r ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/
+	cp -r ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/
 	coreutils="[ basename cat chmod chown cp cut dir dirname du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
 	utils_bin="awk bash $coreutils gawk gio grep ld ldd sed sh strings xdg-open"
 	for b in $utils_bin; do
- 		cp -r ./archlinux/.junest/usr/bin/"$b" ./"$APP".AppDir/.junest/usr/bin/
+ 		cp -r ./archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/
    	done
 	for arg in $BINSAVED; do
-		cp -r ./archlinux/.junest/usr/bin/*"$arg"* ./"$APP".AppDir/.junest/usr/bin/
+		cp -r ./archlinux/.junest/usr/bin/*"$arg"* AppDir/.junest/usr/bin/
 	done
 }
 
 # Save files in /usr/lib
 _savelibs() {
 	echo "◆ Detect libraries related to /usr/bin files"
-	libs4bin=$(readelf -d ./"$APP".AppDir/.junest/usr/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so")
+	libs4bin=$(readelf -d AppDir/.junest/usr/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so")
 
 	echo "◆ Saving JuNest core libraries"
-	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* ./"$APP".AppDir/.junest/usr/lib/
+	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* AppDir/.junest/usr/lib/
 	lib_preset="$APP $BIN gconv libcurl libdw libelf libresolv.so libtinfo.so profile.d $libs4bin"
 	LIBSAVED="$lib_preset $LIBSAVED $SHARESAVED"
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
 	done
 	for arg in $LIBPATHS; do
-		[ ! -d "$APP".AppDir/"$arg" ] && cp -r ./archlinux/"$arg" "$APP".AppDir/"$arg" &
+		[ ! -d AppDir/"$arg" ] && cp -r ./archlinux/"$arg" AppDir/"$arg" &
 	done
 	wait
-	core_libs=$(find ./"$APP".AppDir -type f)
+	core_libs=$(find AppDir -type f)
 	lib_core=$(for c in $core_libs; do readelf -d "$c" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 
 	echo "◆ Detect libraries of the main package"
@@ -468,11 +468,11 @@ _savelibs() {
 	lib_base_libs="$lib_core $lib_base_0 $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9 $lib_deps"
 	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
 	for l in $lib_base_libs; do
-		rsync -av ./archlinux/.junest/usr/lib/"$l"* ./"$APP".AppDir/.junest/usr/lib/ &
+		rsync -av ./archlinux/.junest/usr/lib/"$l"* AppDir/.junest/usr/lib/ &
 	done
 	wait
 	for l in $lib_base_libs; do
-		rsync -av ./deps/usr/lib/"$l"* ./"$APP".AppDir/.junest/usr/lib/ &
+		rsync -av ./deps/usr/lib/"$l"* AppDir/.junest/usr/lib/ &
 	done
 	wait
 }
@@ -482,7 +482,7 @@ _saveshare() {
 	echo "◆ Saving directories in /usr/share"
 	SHARESAVED="$SHARESAVED $APP $BIN fontconfig glib- locale mime wayland X11"
 	for arg in $SHARESAVED; do
-		cp -r ./archlinux/.junest/usr/share/*"$arg"* ./"$APP".AppDir/.junest/usr/share/
+		cp -r ./archlinux/.junest/usr/share/*"$arg"* AppDir/.junest/usr/share/
  	done
 }
 
@@ -494,13 +494,13 @@ printf -- "\n-------------------------------------------------------------------
 
 _rsync_main_package() {
 	rm -Rf ./base/.*
-	rsync -av ./base/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
+	rsync -av ./base/ AppDir/.junest/ | echo "◆ Rsync the content of the \"$APP\" package"
 }
 
 _rsync_dependencies() {
 	rm -Rf ./deps/.*
 	chmod -R 777 ./deps/*
-	#rsync -av ./deps/ ./"$APP".AppDir/.junest/ | echo "◆ Rsync all dependencies, please wait"
+	#rsync -av ./deps/ AppDir/.junest/ | echo "◆ Rsync all dependencies, please wait"
 }
 
 _rsync_main_package
@@ -511,40 +511,40 @@ _rsync_dependencies
 ##########################################################################################################################################################
 
 _remove_more_bloatwares() {
-	for r in $ETC_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*; done
-	for r in $BIN_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*; done
-	for r in $LIB_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*; done
-	for r in $SHARE_REMOVED; do rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*; done
-	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
-	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
-	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
-	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgallium*
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgo.so*
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
-	rm -Rf ./"$APP".AppDir/.junest/var/* # remove all packages downloaded with the package manager
+	for r in $ETC_REMOVED; do rm -Rf AppDir/.junest/etc/"$r"*; done
+	for r in $BIN_REMOVED; do rm -Rf AppDir/.junest/usr/bin/"$r"*; done
+	for r in $LIB_REMOVED; do rm -Rf AppDir/.junest/usr/lib/"$r"*; done
+	for r in $SHARE_REMOVED; do rm -Rf AppDir/.junest/usr/share/"$r"*; done
+	echo Y | rm -Rf AppDir/.cache/yay/*
+	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+	rm -Rf AppDir/.junest/home # remove the inbuilt home
+	rm -Rf AppDir/.junest/usr/include # files related to the compiler
+	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
+	#rm -Rf AppDir/.junest/usr/lib/libgallium*
+	#rm -Rf AppDir/.junest/usr/lib/libgo.so*
+	#rm -Rf AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
+	rm -Rf AppDir/.junest/var/* # remove all packages downloaded with the package manager
 }
 
 _enable_mountpoints_for_the_inbuilt_bubblewrap() {
-	mkdir -p ./"$APP".AppDir/.junest/home
-	mkdir -p ./"$APP".AppDir/.junest/media
-	mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
+	mkdir -p AppDir/.junest/home
+	mkdir -p AppDir/.junest/media
+	mkdir -p AppDir/.junest/usr/lib/locale
 	share_dirs="egl fonts glvnd nvidia themes vulkan"
-	for d in $share_dirs; do mkdir -p ./"$APP".AppDir/.junest/usr/share/"$d"; done
-	mkdir -p ./"$APP".AppDir/.junest/run/media
-	mkdir -p ./"$APP".AppDir/.junest/run/user
-	rm -f ./"$APP".AppDir/.junest/etc/localtime && touch ./"$APP".AppDir/.junest/etc/localtime
-	[ ! -f ./"$APP".AppDir/.junest/etc/asound.conf ] && touch ./"$APP".AppDir/.junest/etc/asound.conf
-	[ ! -e ./"$APP".AppDir/.junest/usr/share/X11/xkb ] && rm -f ./"$APP".AppDir/.junest/usr/share/X11/xkb && mkdir -p ./"$APP".AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' ./"$APP".AppDir/AppRun
+	for d in $share_dirs; do mkdir -p AppDir/.junest/usr/share/"$d"; done
+	mkdir -p AppDir/.junest/run/media
+	mkdir -p AppDir/.junest/run/user
+	rm -f AppDir/.junest/etc/localtime && touch AppDir/.junest/etc/localtime
+	[ ! -f AppDir/.junest/etc/asound.conf ] && touch AppDir/.junest/etc/asound.conf
+	[ ! -e AppDir/.junest/usr/share/X11/xkb ] && rm -f AppDir/.junest/usr/share/X11/xkb && mkdir -p AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
 }
 
 _remove_more_bloatwares
-find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
-find ./"$APP".AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
-find ./"$APP".AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
-find ./"$APP".AppDir/.junest/usr -type d -empty -delete
+find AppDir/.junest/usr/lib AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
+find AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
+find AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
+find AppDir/.junest/usr -type d -empty -delete
 _enable_mountpoints_for_the_inbuilt_bubblewrap
 
 ##########################################################################################################################################################
@@ -553,7 +553,7 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap
 
 if test -f ./*.AppImage; then rm -Rf ./*archimage*.AppImage; fi
 
-APPNAME=$(cat ./"$APP".AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
+APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
 REPO="$APPNAME-appimage"
 TAG="continuous"
 VERSION="$VERSION"
@@ -571,4 +571,4 @@ _appimagetool() {
 }
 
 ARCH=x86_64 _appimagetool -u "$UPINFO" \
-	./"$APP".AppDir "$APPNAME"_"$VERSION"-archimage4.3.1-x86_64.AppImage
+	AppDir "$APPNAME"_"$VERSION"-archimage4.3.1-x86_64.AppImage
