@@ -93,9 +93,10 @@ _install_junest() {
 	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/fsquillace/junest\n-----------------------------------------------------------------------------\n"
 	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
 	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+	if [ ! -f ./junest-x86_64.tar.gz ]; then
+		curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz || exit 1
+	fi
 	_JUNEST_CMD setup -i junest-x86_64.tar.gz
-	rm -f junest-x86_64.tar.gz
 	echo " Apply patches to PacMan..."
 	#_enable_multilib
 	#_enable_chaoticaur
@@ -135,33 +136,17 @@ if [ -n "$APP" ]; then
 	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 xapp
 	_JUNEST_CMD -- yay --noconfirm -S "$APP"
 	# Use debloated gdk-pixbuf2
-	if [ -f ./.junest/usr/lib/libgdk_pixbuf-2.0.so ]; then
-		if [ ! -f ./gdk-pixbuf2-2.x-x86_64.pkg.tar.zst ]; then
-			curl -#Lo gdk-pixbuf2-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/gdk-pixbuf2-mini-x86_64.pkg.tar.zst || exit 1
+	debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
+	extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
+	extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
+	for p in $extra_packages; do
+		if _JUNEST_CMD -- yay -Qs "$p"; then
+			if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
+				curl -#Lo "$p"-2.x-x86_64.pkg.tar.zst "$debloated_soueces/$p-mini-x86_64.pkg.tar.zst" || exit 1
+			fi
+			_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
 		fi
-		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/gdk-pixbuf2-2.x-x86_64.pkg.tar.zst
-	fi
-	# Use debloated llvm-libs
-	if [ -f ./.junest/usr/lib/libLLVM.so ]; then
-		if [ ! -f ./llvm-libs-2.x-x86_64.pkg.tar.zst ]; then
-			curl -#Lo llvm-libs-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/llvm-libs-nano-x86_64.pkg.tar.zst || exit 1
-		fi
-		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/llvm-libs-2.x-x86_64.pkg.tar.zst
-	fi
-	# Use debloated mesa
-	if [ -f ./.junest/usr/lib/libEGL_mesa.so ] || [ -f ./junest/usr/lib/libGLX_mesa.so ]; then	
-		if [ ! -f ./mesa-2.x-x86_64.pkg.tar.zst ]; then
-			curl -#Lo mesa-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/mesa-nano-x86_64.pkg.tar.zst || exit 1
-		fi
-		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/mesa-2.x-x86_64.pkg.tar.zst
-	fi
-	# Use debloated qt6-base
-	if [ -d ./.junest/usr/lib/qt6 ]; then
-		if [ ! -f ./qt6-base-2.x-x86_64.pkg.tar.zst ]; then
-			curl -#Lo qt6-base-2.x-x86_64.pkg.tar.zst https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous/qt6-base-mini-x86_64.pkg.tar.zst || exit 1
-		fi
-		_JUNEST_CMD -- yay --noconfirm -U "$HOME"/qt6-base-2.x-x86_64.pkg.tar.zst
-	fi
+	done
 	# Try to compile schema files
 	_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
