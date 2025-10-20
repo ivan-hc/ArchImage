@@ -27,7 +27,7 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 # - extraction_count=3 means that also the dependencies of the dependencies of the dependencies will be included
 #
 # ...and so on, until the whole Arch Linux system will be included into a gigantic AppImage package.
-[ -z "$extraction_count" ] && extraction_count=1
+extraction_count=1
 
 # Set packages to be treated as if they were the main base package, syntax: "package1|package2|package3"
 FORCE_PACKAGES="hicolor-icon-theme|xapp"
