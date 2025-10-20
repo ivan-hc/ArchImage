@@ -123,22 +123,22 @@ mkdir -p AppDir
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
-LAUNCHER=$(grep -iRl "$BIN" .junest/usr/share/applications/* | grep ".desktop" | head -1)
+LAUNCHER=$(grep -iRl "^Exec.*$BIN" .junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" AppDir/
 ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 [ -z "$ICON" ] && ICON="$BIN"
-cp -r .junest/usr/share/icons/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
-cp -r .junest/usr/share/pixmaps/*"$ICON"* "$APP".AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r .junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
 
 # Version
 export VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}')"
@@ -149,13 +149,12 @@ ARCH="x86_64"
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-export ADD_HOOKS="self-updater.bg.hook"
-export APPNAME=$(cat AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
+export APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
 export REPO="$APPNAME-appimage"
 export TAG="latest"
 export UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
 
-export OUTNAME="$APPNAME"-"$VERSION"-anylinux+archimage5-"$ARCH".AppImage
+export OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 
 # Deploy dependencies
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
