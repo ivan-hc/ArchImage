@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-##########################################################################################################################################################
-#	USER'S SETTINGS
-##########################################################################################################################################################
-
-# Set the main package name for Arch Linux (APP), the binary name (BIN) and the dependencies (DEPENDENCES).
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
@@ -24,7 +19,7 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 # Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
 ETC_REMOVED="makepkg.conf pacman"
 BIN_REMOVED="gcc"
-LIB_REMOVED="gcc python*/__pycache__/"
+LIB_REMOVED="gcc"
 SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
 
 ##########################################################################################################################################################
@@ -402,9 +397,7 @@ _remove_more_bloatwares() {
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	#rm -Rf AppDir/.junest/usr/lib/libgallium*
-	#rm -Rf AppDir/.junest/usr/lib/libgo.so*
-	#rm -Rf AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
+	rm -Rf AppDir/.junest/usr/lib/python*/__pycache__/*
 	rm -Rf AppDir/.junest/var/* # remove all packages downloaded with the package manager
 }
 
@@ -452,4 +445,4 @@ _appimagetool() {
 }
 
 ARCH=x86_64 _appimagetool -u "$UPINFO" \
-	AppDir "$APPNAME"_"$VERSION"-archimage5-x86_64.AppImage
+	AppDir "$APPNAME"_"$VERSION"-archimage5.0-x86_64.AppImage
