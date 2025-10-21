@@ -9,10 +9,8 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 # Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED)
 BINSAVED="SAVEBINSPLEASE"
 SHARESAVED="SAVESHAREPLEASE"
-#lib_audio_keywords="alsa jack pipewire pulse"
-#lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
-LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
-[ -n "$lib_browser_launcher" ] && DEPENDENCES="$DEPENDENCES xapp hicolor-icon-theme"
+lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
+LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
 
 # Set the items you want to manually REMOVE in /etc, /usr/bin, /usr/lib and /usr/share respectively.
 # The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
@@ -20,7 +18,7 @@ LIBSAVED="SAVELIBSPLEASE $lib_audio_keywords $lib_browser_launcher"
 ETC_REMOVED="makepkg.conf pacman"
 BIN_REMOVED="gcc"
 LIB_REMOVED="gcc"
-SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/"
+SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 
 ##########################################################################################################################################################
 #	SETUP THE ENVIRONMENT
@@ -115,7 +113,7 @@ if [ -n "$DEPENDENCES" ]; then
 	_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
 fi
 if [ -n "$APP" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 xapp
+	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
 	_JUNEST_CMD -- yay --noconfirm -S "$APP"
 	VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}')"
 	# Use debloated packages
@@ -284,23 +282,23 @@ chmod a+x AppDir/AppRun
 #	DEPLOY DEPENDENCIES
 ##########################################################################################################################################################
 
-if [ ! -d archlinux/AppDir ]; then
-	printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
-	cd archlinux || exit 1
-	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
-	if [ ! -f ./quick-sharun ]; then
-		wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
-		chmod +x ./quick-sharun
-	fi
-	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
+printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
-	cd .. || exit 1
+cd archlinux || exit 1
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-	rsync -av archlinux/AppDir/etc AppDir/.junest/etc/
-	rsync -av archlinux/AppDir/bin AppDir/.junest/usr/bin/
-	rsync -av archlinux/AppDir/lib AppDir/.junest/usr/lib/
-	rsync -av archlinux/AppDir/share AppDir/.junest/usr/share/
+if [ ! -f ./quick-sharun ]; then
+	wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
+	chmod +x ./quick-sharun
 fi
+
+_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
+
+cd .. || exit 1
+rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/
+rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/
+rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/
+rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
@@ -310,8 +308,10 @@ _savebins() {
 	cp -r ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/
 	cp -r ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/
 	cp -r ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/
+	cp -r ./archlinux/.junest/usr/bin/gio* AppDir/.junest/usr/bin/
+	cp -r ./archlinux/.junest/usr/bin/xdg-* AppDir/.junest/usr/bin/
 	coreutils="[ basename cat chmod chown cp cut dir dirname du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
-	utils_bin="awk bash $coreutils gawk gio grep ld ldd sed sh strings xdg-open"
+	utils_bin="awk bash $coreutils gawk gio grep ld ldd sed sh strings"
 	for b in $utils_bin; do
  		cp -r ./archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/
    	done
@@ -327,8 +327,6 @@ _savelibs() {
 
 	echo "◆ Saving JuNest core libraries"
 	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* AppDir/.junest/usr/lib/
-	lib_preset="$APP $BIN gconv libcurl libdw libelf libresolv.so libtinfo.so profile.d $libs4bin"
-	LIBSAVED="$lib_preset $LIBSAVED $SHARESAVED"
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
 	done
