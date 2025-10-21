@@ -22,8 +22,8 @@ SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 
 # Post-installation processes (add whatever you want)
 _post_installation_processes() {
-	printf "\n User's processes: \n\n"
-	echo "- None"
+	printf "\n◆ User's processes: \n\n"
+	echo " - None"
 	# Add here your code
 }
 
@@ -143,7 +143,7 @@ fi
 
 cd ..
 
-printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n"
+printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
 
 # Set locale
 rm -f archlinux/.junest/etc/locale.conf
@@ -289,7 +289,7 @@ chmod a+x AppDir/AppRun
 #	DEPLOY DEPENDENCIES
 ##########################################################################################################################################################
 
-printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
+printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
 
 _run_quick_sharun() {
 	cd archlinux || exit 1
@@ -305,6 +305,7 @@ _run_quick_sharun() {
 	cd .. || exit 1
 	echo "$DEPENDENCES" > ./deps
 	[ ! -f ./deps ] && touch ./deps
+	printf "\n-----------------------------------------------------------------------------\n"
 }
 
 if [ ! -f ./deps ]; then
@@ -317,12 +318,12 @@ elif [ -f ./deps ]; then
 	fi
 fi
 
-rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc\n" 
-rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin\n"
-rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib\n"
+rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
+rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
+rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
 rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
 
-printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
+printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
 
 # Save files in /usr/bin
 _savebins() {
@@ -438,7 +439,7 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	[ ! -e AppDir/.junest/usr/share/X11/xkb ] && rm -f AppDir/.junest/usr/share/X11/xkb && mkdir -p AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
 }
 
-printf "\nTrying to reduce size:\n\n"
+printf "\n◆ Trying to reduce size:\n\n"
 
 _remove_more_bloatwares
 find AppDir/.junest/usr/lib AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
