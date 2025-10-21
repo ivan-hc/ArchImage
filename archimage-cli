@@ -279,8 +279,8 @@ case "$1" in
 		fi
 		echo "$DIVIDING_LINE"
 		chmod a+x ./"$SCRIPT"
-		echo " THE SCRIPT IS READY, RUN IT TO CREATE AN APPIMAGE!"
-		echo ""
+		echo " THE SCRIPT IS READY, RUN IT INTO AN EMPTY DIRECTORY TO CREATE AN APPIMAGE!"
+		echo "$DIVIDING_LINE"
 		exit 0
 		done
 		;;
