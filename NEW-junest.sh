@@ -78,8 +78,8 @@ _bypass_signature_check_level() {
 }
 
 _install_junest() {
-	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/fsquillace/junest\n-----------------------------------------------------------------------------\n"
-	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
+	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
+	git clone https://github.com/ivan-hc/junest.git ./.local/share/junest
 	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
 	if [ ! -f ./junest-x86_64.tar.gz ]; then
 		curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz || exit 1
@@ -181,11 +181,8 @@ if [ ! -d AppDir/.local ]; then
 	mkdir -p AppDir/.local
 	rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
 	# Made JuNest a portable app and remove "read-only file system" errors
-	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/ln/#ln/g' AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's/rm -f "$file"/test -f "$file"/g' AppDir/.local/share/junest/lib/core/wrappers.sh
-	sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' AppDir/.local/share/junest/lib/core/namespace.sh
+	cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
+	cat AppDir/.local/share/junest/lib/core/namespace.sh > AppDir/.local/share/junest/lib/core/namespace.sh
 fi
 
 echo "◆ Rsync .junest directories structure to the AppDir"
