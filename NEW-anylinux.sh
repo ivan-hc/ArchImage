@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-##########################################################################################################################################################
-#	USER'S SETTINGS
-##########################################################################################################################################################
-
-# Set the main package name for Arch Linux (APP), the binary name (BIN) and the dependencies (DEPENDENCES).
 APP=SAMPLE
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
@@ -61,12 +56,13 @@ _bypass_signature_check_level() {
 }
 
 _install_junest() {
-	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/fsquillace/junest\n-----------------------------------------------------------------------------\n"
-	git clone https://github.com/fsquillace/junest.git ./.local/share/junest
+	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
+	git clone https://github.com/ivan-hc/junest.git ./.local/share/junest
 	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+	if [ ! -f ./junest-x86_64.tar.gz ]; then
+		curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz || exit 1
+	fi
 	_JUNEST_CMD setup -i junest-x86_64.tar.gz
-	rm -f junest-x86_64.tar.gz
 	echo " Apply patches to PacMan..."
 	#_enable_multilib
 	#_enable_chaoticaur
@@ -103,7 +99,7 @@ if [ -n "$DEPENDENCES" ]; then
 	_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
 fi
 if [ -n "$APP" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S xorg-server-xvfb zsync
+	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb zsync
 	_JUNEST_CMD -- yay --noconfirm -S "$APP"
 	EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 	wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
