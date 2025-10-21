@@ -182,7 +182,7 @@ if [ ! -d AppDir/.local ]; then
 	rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
 	# Made JuNest a portable app and remove "read-only file system" errors
 	cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
-	cat AppDir/.local/share/junest/lib/core/namespace.sh > AppDir/.local/share/junest/lib/core/namespace.sh
+	cat AppDir/.local/share/junest/lib/core/namespace.patch > AppDir/.local/share/junest/lib/core/namespace.sh
 fi
 
 echo "◆ Rsync .junest directories structure to the AppDir"
