@@ -4,7 +4,7 @@ This allows you to use the latest programs from Arch Linux and AUR on every dist
 
 Being this a container into an AppImage, it has its own "bubblewrap" or "proot" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
 
-**From version 5.0, the CLI also supports scripts for [SHARUN-based Anylinux AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)
+**From version 5.0, the CLI also supports scripts for [SHARUN-based Anylinux AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)**
 
 If you have already installed `archimage-cli`, please run
 ```
