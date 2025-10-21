@@ -135,6 +135,10 @@ Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example]
 ### Step by step guide
 Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
+Also, THIS GUIDE APPLIES TO **ARCHIMAGE 5.0 OR HIGHER**!
+
+Archimage 4.3 or lower are considered OBSOLETE and UNSUPPORTED.
+
 ### 1. Create the script
 Use the option `-b` or `--build`, example with "obs-studio"
 ```
@@ -208,7 +212,7 @@ If this requirement is not met, no AppImage will be created.
 
 -----------------------------------------------------------
 ## Archimage structure
-An Archimage is a Type3 AppImage, i.e. one that does not require libfuse2 to function.
+An Archimage does not require libfuse2 to function.
 
 Unlike many other AppImages, its structure, [other than the requirements above](#requirements-of-an-appimage), resembles a $HOME directory:
 ```
@@ -218,16 +222,15 @@ App.AppDir/
   |
   |_/app.png
   |
-  |_/.cache/
-  |
   |_/.local/share/junest/
   |
   |_/.junest/
 ```
 Hidden directories are those used in a normal Junest installation:
 - ".junest" contains the Arch Linux system;
-- ".local/share/junest" contains the JuNest files to start Arch Linux in a container;
-- ".cache" is usually empty and used by YAY during the temporary JuNest session.
+- ".local/share/junest" contains the JuNest files to start Arch Linux in a container.
+
+<img width="897" height="732" alt="Istantanea_2025-10-22_01-46-25" src="https://github.com/user-attachments/assets/c1bae221-d838-4594-8d1e-4b2a5334947c" />
 
 The Archimage is first built, and then reassembled with only the essential files indicated in the script you created.
 
