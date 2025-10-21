@@ -20,6 +20,13 @@ BIN_REMOVED="gcc"
 LIB_REMOVED="gcc"
 SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 
+# Post-installation processes (add whatever you want)
+_post_installation_processes() {
+	printf "\n User's processes: \n\n"
+	echo "- None"
+	# Add here your code
+}
+
 ##########################################################################################################################################################
 #	SETUP THE ENVIRONMENT
 ##########################################################################################################################################################
@@ -284,21 +291,36 @@ chmod a+x AppDir/AppRun
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
-cd archlinux || exit 1
-SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+_run_quick_sharun() {
+	cd archlinux || exit 1
+	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-if [ ! -f ./quick-sharun ]; then
-	wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
-	chmod +x ./quick-sharun
+	if [ ! -f ./quick-sharun ]; then
+		wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
+		chmod +x ./quick-sharun
+	fi
+
+	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
+
+	cd .. || exit 1
+	echo "$DEPENDENCES" > ./deps
+	[ ! -f ./deps ] && touch ./deps
+}
+
+if [ ! -f ./deps ]; then
+	_run_quick_sharun
+	echo "$DEPENDENCES" > ./deps
+elif [ -f ./deps ]; then
+	DEPENDENCES0=$(cat ./deps)
+	if [ "$DEPENDENCES0" != "$DEPENDENCES" ]; then
+		_run_quick_sharun
+	fi
 fi
 
-_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
-
-cd .. || exit 1
-rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/
-rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/
-rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/
-rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/
+rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc\n" 
+rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin\n"
+rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib\n"
+rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING NECESSARY LIBRARIES (MAY TAKE SEVERAL MINUTES)\n-----------------------------------------------------------------------------\n"
 
@@ -382,6 +404,8 @@ _saveshare 2>/dev/null
 
 printf -- "\n-----------------------------------------------------------------------------\n ASSEMBLING THE APPIMAGE\n-----------------------------------------------------------------------------\n"
 
+_post_installation_processes
+
 ##########################################################################################################################################################
 #	REMOVE BLOATWARES, ENABLE MOUNTPOINTS
 ##########################################################################################################################################################
@@ -413,6 +437,8 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	[ ! -f AppDir/.junest/etc/asound.conf ] && touch AppDir/.junest/etc/asound.conf
 	[ ! -e AppDir/.junest/usr/share/X11/xkb ] && rm -f AppDir/.junest/usr/share/X11/xkb && mkdir -p AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
 }
+
+printf "\nTrying to reduce size:\n\n"
 
 _remove_more_bloatwares
 find AppDir/.junest/usr/lib AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
