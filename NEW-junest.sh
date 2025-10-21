@@ -18,6 +18,7 @@ LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
 ETC_REMOVED="makepkg.conf pacman"
 BIN_REMOVED="gcc"
 LIB_REMOVED="gcc"
+PYTHON_REMOVED="__pycache__/"
 SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 
 # Post-installation processes (add whatever you want)
@@ -415,6 +416,7 @@ _remove_more_bloatwares() {
 	for r in $ETC_REMOVED; do rm -Rf AppDir/.junest/etc/"$r"*; done
 	for r in $BIN_REMOVED; do rm -Rf AppDir/.junest/usr/bin/"$r"*; done
 	for r in $LIB_REMOVED; do rm -Rf AppDir/.junest/usr/lib/"$r"*; done
+	for r in $PYTHON_REMOVED; do rm -Rf AppDir/.junest/usr/lib/python*/"$r"*; done
 	for r in $SHARE_REMOVED; do rm -Rf AppDir/.junest/usr/share/"$r"*; done
 	echo Y | rm -Rf AppDir/.cache/yay/*
 	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
@@ -422,7 +424,6 @@ _remove_more_bloatwares() {
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	rm -Rf AppDir/.junest/usr/lib/python*/__pycache__/*
 	rm -Rf AppDir/.junest/var/* # remove all packages downloaded with the package manager
 }
 
