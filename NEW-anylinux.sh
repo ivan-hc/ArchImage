@@ -152,6 +152,8 @@ elif [ -f ./deps ]; then
 	DEPENDENCES0=$(cat ./deps)
 	[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
 fi
+echo "$DEPENDENCES" > ./deps
+[ ! -f ./deps ] && touch ./deps
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
