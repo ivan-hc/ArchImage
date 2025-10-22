@@ -452,6 +452,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 - the AppImage can be bloated if you don't set a list of removable items manually
+- being a container, it must contain its own set of programs (for example `coreutils`, `awk` and `sed`) as it cannot use the ones on the host
 
 ------------------------------------------------------------------------
 
