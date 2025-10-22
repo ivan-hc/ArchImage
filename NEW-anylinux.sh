@@ -146,6 +146,7 @@ fi
 
 # AppDir setup
 mkdir -p AppDir
+rm -Rf AppDir/*
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
@@ -167,7 +168,7 @@ cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/nul
 cp -r .junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
 
 # Version
-export VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}')"
+export VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 echo "$VERSION" > ~/version
 
 # Anylinux variables
