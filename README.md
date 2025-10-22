@@ -177,7 +177,7 @@ The script will ask you to add a list of additional packages you want to include
 leave blank if no dependency is needed. In our example, I add `python`, also if it is not necessary anymore. You can add many more packages, according to your needs.
 
 ### 3,5. AUR, want to use ChaoticAUR instead? The hidden question
-Between question 3 (include all dependencies) and 4 (enable multilib) exists another hidden question
+Between question 3 (add dependencies) and 4 (enable multilib) exists another hidden question
 
 <img width="709" height="74" alt="402320114-ab650430-a2da-4663-ae9d-c4d97d3f4103" src="https://github.com/user-attachments/assets/408134a1-bef6-468c-9798-006b2f6b0ec5" />
 
