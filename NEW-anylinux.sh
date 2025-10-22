@@ -189,9 +189,9 @@ _JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
 
 # Extract the main package in the AppDir
 _extract_base_to_AppDir() {
-	rsync -av base/etc/* AppDir/etc/ 2>/dev/null
-	rsync -av base/usr/bin/* AppDir/bin/ 2>/dev/null
-	rsync -av base/usr/lib/* AppDir/lib/ 2>/dev/null
+	#rsync -av base/etc/* AppDir/etc/ 2>/dev/null
+	#rsync -av base/usr/bin/* AppDir/bin/ 2>/dev/null
+	#rsync -av base/usr/lib/* AppDir/lib/ 2>/dev/null
 	rsync -av base/usr/share/* AppDir/share/ 2>/dev/null
 }
 
