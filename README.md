@@ -328,7 +328,7 @@ LIB_REMOVED="gcc"
 PYTHON_REMOVED="__pycache__/"
 SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 ```
-Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usrlib/python*/ and /usr/share/ respectively.
+Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usr/lib/python*/ and /usr/share/ respectively.
 
 For example, suppose that we have a directory `some/dir` under /usr/lib:
 - to remove its content, write `some/dir/`
