@@ -254,7 +254,7 @@ LD_DEBUG=files ./Sample-1.2.3-x86_64.AppImage
 To learn more about `LD_DEBUG` usage, see https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
 ### Dotfiles tip
-To not flood your $HOME and yout ~/.config directories with dotfiles, I recommend creating a .home and a .config directory with the same name as the AppImage:
+To not flood your $HOME and ~/.config directories with dotfiles, I recommend creating a .home and a .config directory with the same name as the AppImage:
 ```
 mkdir -p Sample-1.2.3-x86_64.AppImage.home Sample-1.2.3-x86_64.AppImage.config
 ./Sample-1.2.3-x86_64.AppImage
