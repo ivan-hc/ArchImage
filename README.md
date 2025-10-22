@@ -199,7 +199,7 @@ At the end of the wizard you will have a message that will remembe4r you to run 
 
 Again, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
-Also, see the **[tutorial](#tutorial)** to debug and improve your AppImage.
+Also, see the **[Test the AppImage](#test-the-appimage)** section to debug and improve your AppImage.
 
 -----------------------------------------------------------
 ## Requirements of an AppImage
