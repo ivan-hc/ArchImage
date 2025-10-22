@@ -146,7 +146,12 @@ fi
 
 # AppDir setup
 mkdir -p AppDir
-rm -Rf AppDir/*
+if [ ! -f ./deps ]; then
+	rm -Rf AppDir/*
+elif [ -f ./deps ]; then
+	DEPENDENCES0=$(cat ./deps)
+	[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
+fi
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
