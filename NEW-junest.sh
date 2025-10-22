@@ -12,7 +12,7 @@ SHARESAVED="SAVESHAREPLEASE"
 lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
 LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
 
-# Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usrlib/python*/ and /usr/share/ respectively.
+# Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usr/lib/python*/ and /usr/share/ respectively.
 # The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
 # Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
 ETC_REMOVED="makepkg.conf pacman"
