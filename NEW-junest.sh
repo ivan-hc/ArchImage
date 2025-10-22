@@ -307,10 +307,10 @@ rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Sav
 
 # Extract the main package in the AppDir
 _extract_base_to_AppDir() {
-	rsync -av base/etc/* AppDir/etc/ 2>/dev/null
-	rsync -av base/usr/bin/* AppDir/bin/ 2>/dev/null
-	rsync -av base/usr/lib/* AppDir/lib/ 2>/dev/null
-	rsync -av base/usr/share/* AppDir/share/ 2>/dev/null
+	rsync -av base/etc/* AppDir/.junest/etc/ 2>/dev/null
+	rsync -av base/usr/bin/* AppDir/.junest/usr/bin/ 2>/dev/null
+	rsync -av base/usr/lib/* AppDir/.junest/usr/lib/ 2>/dev/null
+	rsync -av base/usr/share/* AppDir/.junest/usr/share/ 2>/dev/null
 }
 
 _extract_main_package() {
