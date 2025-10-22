@@ -295,7 +295,7 @@ Here are the more common scenarios in which you may need to edit the three main 
 - "`Cannot load libcapocchia.so: file not found`" or "`Cannot find libcapocchia.so: No such file or directory`", add `libcapocchia` or just `capocchia` to LIBSAVED
 - "`Cannot read /usr/share/some/program/capocchia.svg`", add `some` to SHARESAVED
 
-Once you have done so, [repeat the build](#Repeat the build).
+Once you have done so, [repeat the build](#repeat-the-build).
 
 NOTE, if the same error about the same file persists, this may mean that such file was not installed in JuNest during the build. In this case, use your favourite search engine (I use [startpage.com](https://www.startpage.com)) and search
 ```
@@ -309,7 +309,7 @@ DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPEND
 ```
 DEPENDENCES="capocchia" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 ```
-...then [repeat the build](#Repeat the build).
+...then [repeat the build](#repeat-the-build).
 
 Since you have already added the `capocchia` keyword to LIBSAVED, this time the error should disappear.
 
@@ -338,6 +338,8 @@ For example, suppose that we have a directory `some/dir` under /usr/lib:
 
 The "`rm`" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
 Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
+
+[Repeat the build](#repeat-the-build) to see your AppImge even smaller. Pay attention to not remove too many things or the AppImage may not work anymore. If this happens, revert your changes and [repeat the build](#repeat-the-build),
 
 ------------------------------------------------------------------------
 # Customize your script
