@@ -20,7 +20,7 @@ In this video, how to create an Archimage 5.0 of Abiword.
 
 https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
 
-*Video sped up due to GitHub limitations for media uploads. Real-time 30 minutes and 30 seconds.*
+*Video sped up due to GitHub limitations for media uploads. Real-time 3 minutes and 30 seconds.*
 
 ------------------------------------------------------------------------
 ### Index
