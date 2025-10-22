@@ -14,6 +14,14 @@ archimage-cli -s
 
 Archimage combines the flexibility of JuNest with the portability of an AppImage, offering the ability to package all the software available in the official Arch Linux repositories, the AUR and ChaoticAUR.
 
+## SEE IT IN ACTION
+
+In this video, how to create an Archimage 5.0 of Abiword.
+
+https://github.com/user-attachments/assets/4f7cc08f-1c08-468a-b654-44bab268ad94
+
+*Video sped up due to GitHub limitations for media uploads. Real-time 30 minutes and 30 seconds.*
+
 ------------------------------------------------------------------------
 ### Index
 ------------------------------------------------------------------------
