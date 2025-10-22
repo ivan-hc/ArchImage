@@ -300,6 +300,11 @@ elif [ -f ./deps ]; then
 	fi
 fi
 
+rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
+rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
+rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
+rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
+
 # Extract the main package in the AppDir
 _extract_base_to_AppDir() {
 	rsync -av base/etc/* AppDir/etc/ 2>/dev/null
@@ -311,9 +316,9 @@ _extract_base_to_AppDir() {
 _extract_main_package() {
 	mkdir -p base
 	rm -Rf ./base/*
-	pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
+	pkg_full_path=$(find ./archlinux/.junest -type f -name "$APP-*zst")
 	if [ "$(echo "$pkg_full_path" | wc -l)" = 1 ]; then
-		pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
+		pkg_full_path=$(find ./archlinux/.junest -type f -name "$APP-*zst")
 	else
 		for p in $pkg_full_path; do
 			if tar fx "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
@@ -327,11 +332,6 @@ _extract_main_package() {
 }
 
 _extract_main_package
-
-rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
-rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
-rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
-rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
 
