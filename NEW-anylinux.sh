@@ -187,6 +187,34 @@ wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
 _JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
 
+# Extract the main package in the AppDir
+_extract_base_to_AppDir() {
+	rsync -av base/etc/* AppDir/etc/ 2>/dev/null
+	rsync -av base/usr/bin/* AppDir/bin/ 2>/dev/null
+	rsync -av base/usr/lib/* AppDir/lib/ 2>/dev/null
+	rsync -av base/usr/share/* AppDir/share/ 2>/dev/null
+}
+
+_extract_main_package() {
+	mkdir -p base
+	rm -Rf ./base/*
+	pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
+	if [ "$(echo "$pkg_full_path" | wc -l)" = 1 ]; then
+		pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
+	else
+		for p in $pkg_full_path; do
+			if tar fx "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
+				pkg_full_path="$p"
+			fi
+		done
+	fi
+	[ -z "$pkg_full_path" ] && echo "💀 ERROR: no package found for \"$APP\", operation aborted!" && exit 0
+	tar fx "$pkg_full_path" -C ./base/
+	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
+}
+
+_extract_main_package
+
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
 
 # Save files in /usr/bin
