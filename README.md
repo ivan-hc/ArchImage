@@ -122,7 +122,7 @@ Here's what absolutely NOT to do when running a script you created:
 - DO NOT RUN THE CREATED SCRIPT IN ANY OTHER DIRECTORIES! Create an empty one and dedicate that to the script. Again, [just follow points 2, 3 and 4 above](#what-to-do).
 - DO NOT USE THE SAME DIRECTORY FOR TWO DIFFERENT APPLICATIONS! Create a new one for each new script created.
 
-Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#example)" above.
+Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#see-it-in-action)" above.
 
 ##### Referenced issues https://github.com/ivan-hc/ArchImage/issues/19 and https://github.com/ivan-hc/ArchImage/issues/23
 
