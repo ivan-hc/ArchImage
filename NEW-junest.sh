@@ -146,7 +146,12 @@ cd ..
 
 printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
 
-rm -Rf AppDir/*
+if [ ! -f ./deps ]; then
+	rm -Rf AppDir/*
+elif [ -f ./deps ]; then
+	DEPENDENCES0=$(cat ./deps)
+	[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
+fi
 
 # Set locale
 rm -f archlinux/.junest/etc/locale.conf
