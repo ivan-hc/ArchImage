@@ -29,10 +29,10 @@ https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
 [Installation](#installation)
 
 [Usage](#usage)
+
 - [Options](#options)
 
 - [What to do](#what-to-do)
-  - [Archimage versions](#archimage-versions)
 
 - [What NOT to do](#what-not-to-do)
 
@@ -43,20 +43,18 @@ https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
 - [Archimage structure](#archimage-structure)
 
 - [Test the AppImage](#test-the-appimage)
+
+  - [How to add missing libraries manually](#how-to-add-missing-libraries-manually)
   - [Dotfiles tip](#dotfiles-tip)
   - [Repeat the build](#repeat-the-build)
-
-[Tutorial](#tutorial)
+  - [How to debloat an Archimage (and made it smaller)](#how-to-debloat-an-archimage)
+  - [Customize your script](#customize-your-script)
 
 [Hardware Acceleration](#hardware-acceleration)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
 - [Disadvantages](#disadvantages)
-
-[How to debloat an Archimage (and made it smaller)](#how-to-debloat-an-archimage)
-
-[Customize your script](#customize-your-script)
 
 [Credits](#credits)
 
@@ -100,7 +98,6 @@ To prevent problems of any kind, dedicate a single directory to the created scri
 4. open a terminal in the directory created in step 2;
 5. run the script inside the directory, like this: `./sample-junest.sh`
 
-### Archimage versions
 NOTE, older versions are significantly slower to build.
 
 Pay attention to the file extension, it must contain the version of Archimage used, for example
@@ -280,6 +277,73 @@ On-screen messages will tell you what's happening.
 Wait until the end and try the AppImage again.
 
 Run the tests until you get the desired result.
+
+## How to add missing libraries manually
+On top of the script (under APP, DEPENDENCES, etcetera...) you can see the following variables:
+```
+BINSAVED="SAVEBINSPLEASE"
+SHARESAVED="SAVESHAREPLEASE"
+lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
+LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
+```
+Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED).
+
+The "$lib_browser_launcher" set of keyword is intended to allow the links inside an AppImage (for example in the Info dialog) to be clicked to launch the host's browser. They come up after a long search using Firefox. Any improvement is wellcome.
+
+Here are the more common scenarios in which you may need to edit the three main variables. If while launching the AppImage from the command line, it prompts (for example)...
+- "`capocchia: command not foud`", add `capocchia` to BINSAVED
+- "`Cannot load libcapocchia.so: file not found`" or "`Cannot find libcapocchia.so: No such file or directory`", add `libcapocchia` or just `capocchia` to LIBSAVED
+- "`Cannot read /usr/share/some/program/capocchia.svg`", add `some` to SHARESAVED
+
+Once you have done so, [repeat the build](#Repeat the build).
+
+NOTE, if the same error about the same file persists, this may mean that such file was not installed in JuNest during the build. In this case, use your favourite search engine (I use [startpage.com](https://www.startpage.com)) and search
+```
+libcapocchia.so archlinux
+```
+And see the results, then try to find the exact package required. In our example, you have found that such library is in the package `capocchia`, so add this to DEPENDENCES
+```
+DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+```
+...so change the above to
+```
+DEPENDENCES="capocchia" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+```
+...then [repeat the build](#Repeat the build).
+
+Since you have already added the `capocchia` keyword to LIBSAVED, this time the error should disappear.
+
+Maybe another error about another missing ligrary and not included may come up. If so, repeat the steps you have done for the `capocchia` package and the `libcapocchia.so` library of our example.
+
+*PS: as far as I know, there is not (yet) a package or a library with that kind of name... but if I am wrong, I suppose it would be a tool that does random things. It would be an idea for someone.*
+
+*PPS: I'm obviously kidding. Please don't hate me.*
+
+## How to debloat an Archimage
+From version 5, you can find all configurable variables on top of the script, and among them, you can see the following ones
+```
+ETC_REMOVED="makepkg.conf pacman"
+BIN_REMOVED="gcc"
+LIB_REMOVED="gcc"
+PYTHON_REMOVED="__pycache__/"
+SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
+```
+Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usrlib/python*/ and /usr/share/ respectively.
+
+For example, suppose that we have a directory `some/dir` under /usr/lib:
+- to remove its content, write `some/dir/`
+- to remove only "dir", use `some/dir`
+- to remove the content of "some", write `some/`
+- to remove "some", write only `some` (note, all files and directories starting with "some" in /usr/lib will be removed)
+
+The "`rm`" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
+Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
+
+------------------------------------------------------------------------
+# Customize your script
+Once you created the script, it is yours and only yours. You can add/remove functions as you like.
+
+Of course, **DO IT ON YOUR OWN RISK!**
 
 ------------------------------------------------------------------------
 
@@ -461,34 +525,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 ### Disadvantages
 - the AppImage can be bloated if you don't set a list of removable items manually
-
-------------------------------------------------------------------------
-
-# How to debloat an Archimage
-From version 5, you can find all configurable variables on top of the script, and among them, you can see the following ones
-```
-ETC_REMOVED="makepkg.conf pacman"
-BIN_REMOVED="gcc"
-LIB_REMOVED="gcc"
-PYTHON_REMOVED="__pycache__/"
-SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
-```
-Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usrlib/python*/ and /usr/share/ respectively.
-
-For example, suppose that we have a directory `some/dir` under /usr/lib:
-- to remove its content, write `some/dir/`
-- to remove only "dir", use `some/dir`
-- to remove the content of "some", write `some/`
-- to remove "some", write only `some` (note, all files and directories starting with "some" in /usr/lib will be removed)
-
-The "`rm`" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
-Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
-
-------------------------------------------------------------------------
-# Customize your script
-Once you created the script, it is yours and only yours. You can add/remove functions as you like.
-
-Of course, **DO IT ON YOUR OWN RISK!**
 
 ------------------------------------------------------------------------
 
