@@ -146,6 +146,8 @@ cd ..
 
 printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
 
+rm -Rf AppDir/*
+
 # Set locale
 rm -f archlinux/.junest/etc/locale.conf
 sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
