@@ -318,6 +318,10 @@ _extract_base_to_AppDir() {
 	rsync -av base/usr/bin/* AppDir/.junest/usr/bin/ 2>/dev/null
 	rsync -av base/usr/lib/* AppDir/.junest/usr/lib/ 2>/dev/null
 	rsync -av base/usr/share/* AppDir/.junest/usr/share/ 2>/dev/null
+	if [ -d archlinux/.junest/usr/lib32 ]; then
+		mkdir -p AppDir/.junest/usr/lib32
+		rsync -av archlinux/.junest/usr/lib32/* AppDir/.junest/usr/lib32/ 2>/dev/null
+	fi
 }
 
 _extract_main_package() {
@@ -338,7 +342,22 @@ _extract_main_package() {
 	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
 }
 
+_extract_core_dependencies() {
+	if [ -n "$DEPENDENCES" ]; then
+		for d in $DEPENDENCES; do
+			if test -f ./archlinux/"$d"-*; then
+				tar fx ./archlinux/"$d"-* -C ./base/ | printf "\n◆ Force \"$d\""
+			else
+				pkg_full_path=$(find ./archlinux -type f -name "$d-[0-9]*zst")
+				tar fx "$pkg_full_path" -C ./base/ | printf "\n◆ Force \"$d\""
+			fi
+		done
+		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
+	fi
+}
+
 _extract_main_package
+_extract_core_dependencies
 
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
 
