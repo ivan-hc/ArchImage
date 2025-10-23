@@ -225,7 +225,7 @@ else
    export PATH="$PATH":"$HERE"/.local/share/junest/bin
 fi
 
-[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
 if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
    nvidia_driver_version="$(cat /sys/module/nvidia/version)"
    JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
