@@ -240,6 +240,15 @@ _enable_multilib() {
 	fi
 }
 
+# Allow Nvidia check in the final AppImage
+_enable_nvidia() {
+	echo "$DIVIDING_LINE"
+	read -r -ep "◆ DO YOU WANT TO ENABLE HARDWARE ACCELERATION FOR NVIDIA USERS? (y,N) " yn
+    	if echo "$yn" | grep -qi "^y"; then
+    		sed -i 's/NVIDIA_ON=0/NVIDIA_ON=1/g' ./"$SCRIPT"
+	fi
+}
+
 ################################################################################
 #				USAGE
 ################################################################################
@@ -276,6 +285,9 @@ case "$1" in
 				_enable_chaoticaur
 			fi
 			_enable_multilib
+			if grep -q "NVIDIA_ON" ./"$SCRIPT"; then
+				_enable_nvidia
+			fi
 		fi
 		echo "$DIVIDING_LINE"
 		chmod a+x ./"$SCRIPT"
