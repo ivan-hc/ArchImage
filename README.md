@@ -194,6 +194,15 @@ Want to enable the "multilib" repo? It is usally needed for 32bit libraries, use
 
 in our case, we can leave blank or press "N". We don't need 32 bits libraries at all in this case.
 
+### 5. Enable hardware acceleration for Nvidia users (only Archimage)
+Do you want to allow hardware acceleration? The variable NVIDIA_ON is set to "0" by default. Press "y" to set it to "1".
+
+This will enable Nvidia users to use your application where hardware acceleration is needed.
+
+<img width="685" height="73" alt="Istantanea_2025-10-23_18-34-52" src="https://github.com/user-attachments/assets/5f57cc38-e865-4844-8ac8-d40918b43b77" />
+
+To learn more on how hardware acceleration works with Archimages, see "[Hardware Acceleration](#hardware-acceleration)".
+
 ### Ending message
 At the end of the wizard you will have a message that will remembe4r you to run the script into an empty directory.
 
@@ -361,7 +370,7 @@ The check is enabled by default and can be disabled by exporting the `NVIDIA_ON`
 This is the logic in the AppRun
 ```
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
 if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
    nvidia_driver_version="$(cat /sys/module/nvidia/version)"
    JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
