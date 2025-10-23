@@ -365,7 +365,7 @@ Of course, **DO IT ON YOUR OWN RISK!**
 # Hardware Acceleration
 From version 5.0, Archimage handles a copy of the system's Nvidia drivers into a temporary "$HOME/.cache/junest_shared" directory, shared with other Archimages 5.0 or higher.
 
-The check is enabled by default and can be disabled by exporting the `NVIDIA_ON` variable with a value not equalt to 1.
+To enable the check, set the `NVIDIA_ON` variable 1.
 
 This is the logic in the AppRun
 ```
