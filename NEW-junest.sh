@@ -123,7 +123,7 @@ fi
 if [ -n "$APP" ]; then
 	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
 	_JUNEST_CMD -- yay --noconfirm -S "$APP"
-	VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}')"
+	VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 	# Use debloated packages
 	debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
 	extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
