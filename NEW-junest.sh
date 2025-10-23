@@ -359,6 +359,8 @@ _extract_core_dependencies() {
 _extract_main_package
 _extract_core_dependencies
 
+tar fx "$(find ./archlinux -type f -name "hicolor-icon-theme-[0-9]*zst")" -C ./base/ 2>/dev/null
+
 printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
 
 # Save files in /usr/bin
