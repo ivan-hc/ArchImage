@@ -303,6 +303,7 @@ if [ ! -f ./deps ]; then
 elif [ -f ./deps ]; then
 	DEPENDENCES0=$(cat ./deps)
 	if [ "$DEPENDENCES0" != "$DEPENDENCES" ]; then
+		rm -Rf archlinux/AppDir/*
 		_run_quick_sharun
 	fi
 fi
