@@ -467,11 +467,8 @@ _remove_more_bloatwares() {
 
 _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	mkdir -p AppDir/.junest/home
-	mkdir -p AppDir/.junest/media
-	mkdir -p AppDir/.junest/usr/lib/locale
-	share_dirs="egl fonts glvnd nvidia themes vulkan"
-	for d in $share_dirs; do mkdir -p AppDir/.junest/usr/share/"$d"; done
-	mkdir -p AppDir/.junest/run/media
+	bind_dirs=$(grep "_dirs=" AppDir/AppRun | tr '" ' '\n' | grep "/" | sort | xargs)
+	for d in $bind_dirs; do mkdir -p AppDir/.junest"$d"; done
 	mkdir -p AppDir/.junest/run/user
 	rm -f AppDir/.junest/etc/localtime && touch AppDir/.junest/etc/localtime
 	[ ! -f AppDir/.junest/etc/asound.conf ] && touch AppDir/.junest/etc/asound.conf
