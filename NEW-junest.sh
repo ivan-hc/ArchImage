@@ -298,6 +298,7 @@ _run_quick_sharun() {
 }
 
 if [ ! -f ./deps ]; then
+	rm -Rf archlinux/AppDir/*
 	_run_quick_sharun
 	echo "$DEPENDENCES" > ./deps
 elif [ -f ./deps ]; then
