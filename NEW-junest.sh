@@ -282,6 +282,7 @@ printf -- "\n-------------------------------------------------------------------
 
 _run_quick_sharun() {
 	cd archlinux || exit 1
+	rm -Rf AppDir/*
 	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
 	if [ ! -f ./quick-sharun ]; then
@@ -298,13 +299,11 @@ _run_quick_sharun() {
 }
 
 if [ ! -f ./deps ]; then
-	rm -Rf archlinux/AppDir/*
 	_run_quick_sharun
 	echo "$DEPENDENCES" > ./deps
 elif [ -f ./deps ]; then
 	DEPENDENCES0=$(cat ./deps)
 	if [ "$DEPENDENCES0" != "$DEPENDENCES" ]; then
-		rm -Rf archlinux/AppDir/*
 		_run_quick_sharun
 	fi
 fi
