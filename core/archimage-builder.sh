@@ -296,6 +296,7 @@ _remove_more_bloatwares() {
 	echo Y | rm -Rf AppDir/.cache/yay/*
 	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+	rsync -av base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n\n"
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
