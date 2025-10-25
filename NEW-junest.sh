@@ -21,6 +21,13 @@ LIB_REMOVED="gcc"
 PYTHON_REMOVED="__pycache__/"
 SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
 
+# Set mountpoints, they are ment to be set into the AppRun.
+# Default mounted files are /etc/resolv.conf, /etc/hosts, /etc/nsswitch.conf, /etc/passwd, /etc/group, /etc/machine-id, /etc/asound.conf and /etc/localtime
+# Default mounted directories are /media, /mnt, /opt, /run/media, /usr/lib/locale, /usr/share/fonts, /usr/share/themes, /var, and Nvidia-related directories
+# Do not touch this if you are not sure.
+mountpoint_files=""
+mountpoint_dirs=""
+
 # Post-installation processes (add whatever you want)
 _post_installation_processes() {
 	printf "\n◆ User's processes: \n\n"
@@ -217,60 +224,14 @@ rsync -av archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
 ##########################################################################################################################################################
 
 rm -f AppDir/AppRun
+
+# Set to "1" if you want to add Nvidia drivers manager in the AppRun
+export NVIDIA_ON=0
+
+source ./archimage-builder.sh apprun "$@"
+
+# AppRun footer, here you can add options and change the way the AppImage interacts with its internal structure
 cat <<-'HEREDOC' >> AppDir/AppRun
-#!/bin/sh
-HERE="$(dirname "$(readlink -f "$0")")"
-export JUNEST_HOME="$HERE"/.junest
-
-CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-mkdir -p "$CACHEDIR" || exit 1
-
-if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
-   PROOT_ON=1 && export PATH="$HERE"/.local/share/junest/bin/:"$PATH"
-else
-   export PATH="$PATH":"$HERE"/.local/share/junest/bin
-fi
-
-[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
-if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
-   nvidia_driver_version="$(cat /sys/module/nvidia/version)"
-   JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
-   mkdir -p "${JUNEST_LIBS}" "${JUNEST_NVIDIA_DATA}" || exit 1
-   [ ! -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
-   [ -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && nvidia_driver_conty=$(cat "${JUNEST_NVIDIA_DATA}"/current-nvidia-version)
-   if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
-      rm -f "${JUNEST_LIBS}"/*; echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
-   fi
-   HOST_LIBS=$(/sbin/ldconfig -p)
-   libnvidia_libs=$(echo "$HOST_LIBS" | grep -i "nvidia\|libcuda" | cut -d ">" -f 2)
-   libvdpau_nvidia=$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)
-   libnv_paths=$(echo "$HOST_LIBS" | grep "libnv" | cut -d ">" -f 2)
-   for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && libnv_libs="$libnv_libs ${f}"; done
-   host_nvidia_libs=$(echo "$libnv_libs $libnvidia_libs $libvdpau_nvidia" | sed 's/ /\n/g' | sort | grep .)
-   for n in $host_nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${JUNEST_LIBS}"/"$libname" ] && cp "$n" "${JUNEST_LIBS}"/; done
-   libvdpau="${JUNEST_LIBS}/libvdpau_nvidia.so"
-   [ -f "${libvdpau}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau}" ] && ln -s "${libvdpau}"."${nvidia_driver_version}" "${libvdpau}"
-   export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${JUNEST_LIBS}":"${LD_LIBRARY_PATH}"
-fi
-
-bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
-bind_nvidia_data_dirs="/usr/share/egl /usr/share/glvnd /usr/share/nvidia /usr/share/vulkan"
-bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var $bind_nvidia_data_dirs"
-if [ "$PROOT_ON" = 1 ]; then
-   for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --bind=$f"; done
-   for d in $bind_dirs; do [ -d "$d" ] && BINDINGS=" $BINDINGS --bind=$d"; done
-   junest_options="proot -n -b"
-   junest_bindings=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $BINDINGS --bind=/home --bind=/home/$USER "
-else
-   for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --ro-bind-try $f $f"; done
-   for d in $bind_dirs; do [ -d "$d" ] && BINDINGS=" $BINDINGS --bind-try $d $d"; done
-   junest_options="-n -b"
-   junest_bindings=" --dev-bind /dev /dev --ro-bind /sys /sys --bind-try /tmp /tmp --proc /proc $BINDINGS --cap-add CAP_SYS_ADMIN "
-fi
-
-_JUNEST_CMD() {
-   "$HERE"/.local/share/junest/bin/junest $junest_options "$junest_bindings" "$@"
-}
 
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 if ! echo "$EXEC" | grep -q "/usr/bin"; then EXEC="/usr/bin/$EXEC"; fi
@@ -284,7 +245,7 @@ chmod a+x AppDir/AppRun
 #	COMPILE
 ##########################################################################################################################################################
 
-source ./archimage-builder.sh compile
+source ./archimage-builder.sh compile "$@"
 
 ##########################################################################################################################################################
 #	CREATE THE APPIMAGE
