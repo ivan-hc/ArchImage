@@ -88,7 +88,7 @@ _apprun_nvidia() {
 	if [ "$NVIDIA_ON" = 1 ]; then
 		cat <<-'HEREDOC' >> AppDir/AppRun
 
-		[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
+		[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
 		if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
 		   nvidia_driver_version="$(cat /sys/module/nvidia/version)"
 		   JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
