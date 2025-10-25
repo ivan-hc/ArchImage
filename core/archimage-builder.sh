@@ -312,8 +312,8 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	rm -f AppDir/.junest/etc/localtime && touch AppDir/.junest/etc/localtime
 	[ ! -f AppDir/.junest/etc/asound.conf ] && touch AppDir/.junest/etc/asound.conf
 	[ ! -e AppDir/.junest/usr/share/X11/xkb ] && rm -f AppDir/.junest/usr/share/X11/xkb && mkdir -p AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
-	if [ -n "$mountpoint_dirs" ]; then
-		for f in $mountpoint_dirs; do
+	if [ -n "$mountpoint_files" ]; then
+		for f in $mountpoint_files; do
 			[ ! -f AppDir/.junest"$f" ] && touch AppDir/.junest"$f"
 			[ ! -e AppDir/.junest"$f" ] && rm -f AppDir/.junest"$f" && touch AppDir/.junest"$f"
 		done
