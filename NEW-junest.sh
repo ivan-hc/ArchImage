@@ -32,6 +32,12 @@ _post_installation_processes() {
 #	SETUP THE ENVIRONMENT
 ##########################################################################################################################################################
 
+# Download archimage-builder.sh
+if [ ! -f ./archimage-builder.sh ]; then
+	ARCHIMAGE_BUILDER="https://raw.githubusercontent.com/ivan-hc/ArchImage/refs/heads/main/core/archimage-builder.sh"
+	wget --retry-connrefused --tries=30 "$ARCHIMAGE_BUILDER" -O ./archimage-builder.sh || exit 0
+fi
+
 # Create and enter the AppDir
 mkdir -p AppDir archlinux && cd archlinux || exit 1
 
@@ -277,11 +283,6 @@ chmod a+x AppDir/AppRun
 ##########################################################################################################################################################
 #	COMPILE
 ##########################################################################################################################################################
-
-if [ ! -f ./archimage-builder.sh ]; then
-	ARCHIMAGE_BUILDER="https://raw.githubusercontent.com/ivan-hc/ArchImage/refs/heads/main/core/archimage-builder.sh"
-	wget --retry-connrefused --tries=30 "$ARCHIMAGE_BUILDER" -O ./archimage-builder.sh || exit 0
-fi
 
 source ./archimage-builder.sh compile
 
