@@ -123,37 +123,8 @@ fi
 
 _JUNEST_CMD -- yay -Syy
 #_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-if [ -n "$BASICSTUFF" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
-fi
-if [ -n "$COMPILERS" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
-	_JUNEST_CMD -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
-fi
-if [ -n "$DEPENDENCES" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
-fi
-if [ -n "$APP" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
-	_JUNEST_CMD -- yay --noconfirm -S "$APP"
-	VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
-	# Use debloated packages
-	debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
-	extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
-	extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
-	for p in $extra_packages; do
-		if _JUNEST_CMD -- yay -Qs "$p"; then
-			if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
-				curl -#Lo "$p"-2.x-x86_64.pkg.tar.zst "$debloated_soueces/$p-mini-x86_64.pkg.tar.zst" || exit 1
-			fi
-			_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
-		fi
-	done
-	# Try to compile schema files
-	_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
-else
-	echo "No app found, exiting"; exit 1
-fi
+
+[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh install "$@" || exit 0
 
 cd ..
 
