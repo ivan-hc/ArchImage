@@ -127,7 +127,7 @@ if [ -n "$APP" ]; then
 	# Use debloated packages
 	debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
 	extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
-	extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
+	extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
 	for p in $extra_packages; do
 		if _JUNEST_CMD -- yay -Qs "$p"; then
 			if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
