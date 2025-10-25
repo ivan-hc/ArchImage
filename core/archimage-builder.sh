@@ -22,7 +22,7 @@ _root_appdir() {
 	rm -f AppDir/*.desktop
 	LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 	cp -r "$LAUNCHER" AppDir/
-	ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+	[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 	[ -z "$ICON" ] && ICON="$BIN"
 	cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
 	hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
