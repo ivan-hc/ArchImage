@@ -124,7 +124,7 @@ fi
 _JUNEST_CMD -- yay -Syy
 #_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
 
-[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh install "$@" || exit 0
+[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh install "$@"
 
 cd ..
 
@@ -132,7 +132,7 @@ cd ..
 #	APPDIR
 ##########################################################################################################################################################
 
-[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh appdir "$@" || exit 0
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh appdir "$@"
 
 ##########################################################################################################################################################
 #	APPRUN
@@ -143,7 +143,7 @@ rm -f AppDir/AppRun
 # Set to "1" if you want to add Nvidia drivers manager in the AppRun
 export NVIDIA_ON=0
 
-[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh apprun "$@" || exit 0
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh apprun "$@"
 
 # AppRun footer, here you can add options and change the way the AppImage interacts with its internal structure
 cat <<-'HEREDOC' >> AppDir/AppRun
@@ -160,7 +160,7 @@ chmod a+x AppDir/AppRun
 #	COMPILE
 ##########################################################################################################################################################
 
-[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh compile "$@" || exit 0
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh compile "$@"
 
 ##########################################################################################################################################################
 #	CREATE THE APPIMAGE
