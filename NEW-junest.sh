@@ -157,67 +157,11 @@ fi
 
 cd ..
 
-printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
+##########################################################################################################################################################
+#	APPDIR
+##########################################################################################################################################################
 
-if [ ! -f ./deps ]; then
-	rm -Rf AppDir/*
-elif [ -f ./deps ]; then
-	DEPENDENCES0=$(cat ./deps)
-	[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
-fi
-
-# Set locale
-rm -f archlinux/.junest/etc/locale.conf
-sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
-
-# Add launcher and icon
-rm -f AppDir/*.desktop
-LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
-cp -r "$LAUNCHER" AppDir/
-ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
-[ -z "$ICON" ] && ICON="$BIN"
-cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
-
-# Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
-if test -f AppDir/*.desktop; then
-	echo "◆ The .desktop file is available in $APP.AppDir/"
-elif ! test -f archlinux/.junest/usr/bin/"$BIN"; then
- 	echo "No binary in path... aborting all the processes."
-	exit 0
-fi
-
-if [ ! -d AppDir/.local ]; then
-	mkdir -p AppDir/.local
-	rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
-	# Made JuNest a portable app and remove "read-only file system" errors
-	cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
-	cat AppDir/.local/share/junest/lib/core/namespace.patch > AppDir/.local/share/junest/lib/core/namespace.sh
-fi
-
-echo "◆ Rsync .junest directories structure to the AppDir"
-rm -Rf AppDir/.junest/*
-archdirs=$(find archlinux/.junest -type d | sed 's/^archlinux\///g')
-for d in $archdirs; do
-	mkdir -p AppDir/"$d"
-done
-symlink_dirs=" bin sbin lib lib64 usr/sbin usr/lib64"
-for l in $symlink_dirs; do
-	cp -r archlinux/.junest/"$l" AppDir/.junest/"$l"
-done
-
-rsync -av archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
-rsync -av archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh appdir "$@" || exit 0
 
 ##########################################################################################################################################################
 #	APPRUN
@@ -228,7 +172,7 @@ rm -f AppDir/AppRun
 # Set to "1" if you want to add Nvidia drivers manager in the AppRun
 export NVIDIA_ON=0
 
-source ./archimage-builder.sh apprun "$@"
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh apprun "$@" || exit 0
 
 # AppRun footer, here you can add options and change the way the AppImage interacts with its internal structure
 cat <<-'HEREDOC' >> AppDir/AppRun
@@ -245,7 +189,7 @@ chmod a+x AppDir/AppRun
 #	COMPILE
 ##########################################################################################################################################################
 
-source ./archimage-builder.sh compile "$@"
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh compile "$@" || exit 0
 
 ##########################################################################################################################################################
 #	CREATE THE APPIMAGE
