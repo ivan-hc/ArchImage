@@ -1,6 +1,68 @@
 #!/usr/bin/env bash
 
 ##########################################################################################################################################################
+#	APPDIR
+##########################################################################################################################################################
+
+_root_appdir() {
+	printf -- "\n-----------------------------------------------------------------------------\n CREATING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
+
+	if [ ! -f ./deps ]; then
+		rm -Rf AppDir/*
+	elif [ -f ./deps ]; then
+		DEPENDENCES0=$(cat ./deps)
+		[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
+	fi
+
+	# Set locale
+	rm -f archlinux/.junest/etc/locale.conf
+	sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
+
+	# Add launcher and icon
+	rm -f AppDir/*.desktop
+	LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
+	cp -r "$LAUNCHER" AppDir/
+	ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+	[ -z "$ICON" ] && ICON="$BIN"
+	cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+	hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
+	for i in $hicolor_dirs; do
+		cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/apps/*"$ICON"* AppDir/ 2>/dev/null || cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/mimetypes/*"$ICON"* AppDir/ 2>/dev/null
+	done
+	cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
+
+	# Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
+	if test -f AppDir/*.desktop; then
+		echo "◆ The .desktop file is available in $APP.AppDir/"
+	elif ! test -f archlinux/.junest/usr/bin/"$BIN"; then
+	 	echo "No binary in path... aborting all the processes."
+		exit 0
+	fi
+
+	if [ ! -d AppDir/.local ]; then
+		mkdir -p AppDir/.local
+		rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
+		# Made JuNest a portable app and remove "read-only file system" errors
+		cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
+		cat AppDir/.local/share/junest/lib/core/namespace.patch > AppDir/.local/share/junest/lib/core/namespace.sh
+	fi
+
+	echo "◆ Rsync .junest directories structure to the AppDir"
+	rm -Rf AppDir/.junest/*
+	archdirs=$(find archlinux/.junest -type d | sed 's/^archlinux\///g')
+	for d in $archdirs; do
+		mkdir -p AppDir/"$d"
+	done
+	symlink_dirs=" bin sbin lib lib64 usr/sbin usr/lib64"
+	for l in $symlink_dirs; do
+		cp -r archlinux/.junest/"$l" AppDir/.junest/"$l"
+	done
+
+	rsync -av archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
+	rsync -av archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+}
+
+##########################################################################################################################################################
 #	APPRUN
 ##########################################################################################################################################################
 
@@ -81,7 +143,7 @@ _apprun_binds() {
 }
 
 ##########################################################################################################################################################
-#	DEPLOY DEPENDENCIES
+#	COMPILE
 ##########################################################################################################################################################
 
 # Deploy core libraries of the app
@@ -255,6 +317,10 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 ##########################################################################################################################################################
 
 case "$1" in
+	"appdir")
+		_root_appdir
+		;;
+
 	"apprun")
 		_apprun_header
 		_apprun_nvidia
