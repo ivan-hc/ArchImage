@@ -138,8 +138,8 @@ _apprun_binds() {
 	}
 
 	HEREDOC
-	[ -n "$mountpoint_files" ] && sed -i "s/bind_files=\"/bind_files=\"$mountpoint_files /g" AppDir/AppRun
-	[ -n "$mountpoint_dirs" ] && sed -i "s/bind_dirs=\"/bind_dirs=\"$mountpoint_files /g" AppDir/AppRun
+	[ -n "$mountpoint_files" ] && sed -i "s#bind_files=\"#bind_files=\"$mountpoint_files #g" AppDir/AppRun
+	[ -n "$mountpoint_dirs" ] && sed -i "s#bind_dirs=\"#bind_dirs=\"$mountpoint_dirs #g" AppDir/AppRun
 }
 
 ##########################################################################################################################################################
