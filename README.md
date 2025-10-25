@@ -1,16 +1,10 @@
-ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest). Hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty) instead.
+ArchImage is the bundling of Arch Linux packages into an AppImage using [JuNest](https://github.com/fsquillace/junest).
 
 This allows you to use the latest programs from Arch Linux and AUR on every distribution, old or newer.
 
 Being this a container into an AppImage, it has its own "bubblewrap" or "proot" to work using its inbuilt resources, including GLIBC, so it can run also on 10+ years old GNU/Linux distributions.
 
-**From version 4.2 is available a NEW template that creates AppImages that can work on both systems with or without Namespaces restrictions:**
-
-- **[NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/NEW-junest.sh)**
-
-It is the mix of the two previous templates used until version 4.1:
-- [sample-next-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/legacy/sample-next-junest.sh) uses bubblewrap and namespaces, so it is more flexible
-- [sample-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/legacy/sample-junest.sh) uses proot to be more portable but less integrated with the host system
+**From version 5.0, the CLI also supports scripts for [SHARUN-based Anylinux AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)**
 
 If you have already installed `archimage-cli`, please run
 ```
@@ -18,7 +12,15 @@ archimage-cli -s
 ```
 ...to use the latest version.
 
-Archimage combines the flexibility of JuNest with the power of Conty, the two portable Arch Linux containers that run on any other GNU/Linux distribution, offering the ability to package all the software available in the official Arch Linux repositories, the AUR and ChaoticAUR.
+Archimage combines the flexibility of JuNest with the portability of an AppImage, offering the ability to package all the software available in the official Arch Linux repositories, the AUR and ChaoticAUR.
+
+## SEE IT IN ACTION
+
+In this video, how to create an Archimage 5.0 of Abiword.
+
+https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
+
+*Video sped up due to GitHub limitations for media uploads. Real-time 3 minutes and 30 seconds.*
 
 ------------------------------------------------------------------------
 ### Index
@@ -27,32 +29,32 @@ Archimage combines the flexibility of JuNest with the power of Conty, the two po
 [Installation](#installation)
 
 [Usage](#usage)
+
 - [Options](#options)
+
 - [What to do](#what-to-do)
+
 - [What NOT to do](#what-not-to-do)
+
 - [Step by step guide](#step-by-step-guide)
+
 - [Requirements of an AppImage](#requirements-of-an-appimage)
+
 - [Archimage structure](#archimage-structure)
+
 - [Test the AppImage](#test-the-appimage)
+
+  - [How to add missing libraries manually](#how-to-add-missing-libraries-manually)
   - [Dotfiles tip](#dotfiles-tip)
   - [Repeat the build](#repeat-the-build)
-  - [Extraction levels](#extraction-levels)
-
-[Tutorial](#tutorial)
+  - [How to debloat an Archimage (and made it smaller)](#how-to-debloat-an-archimage)
+  - [Customize your script](#customize-your-script)
 
 [Hardware Acceleration](#hardware-acceleration)
 
 [Compared to classic AppImage construction](#compared-to-classic-appimage-construction)
 - [Advantages](#advantages)
 - [Disadvantages](#disadvantages)
-
-[Files removed by default](#files-removed-by-default)
-
-[Customize your script](#customize-your-script)
-
-[Drafts](#drafts)
-
-[Troubleshooting](#troubleshooting)
 
 [Credits](#credits)
 
@@ -96,19 +98,11 @@ To prevent problems of any kind, dedicate a single directory to the created scri
 4. open a terminal in the directory created in step 2;
 5. run the script inside the directory, like this: `./sample-junest.sh`
 
-#### EXAMPLE
-
-The Archimage release used in this two-parts videos is 4.3
-
-| Create the script and the JuNest environment (part 1) | Create the AppImage (part 2) |
-| - | - |
-| <video src="https://github.com/user-attachments/assets/2c1165f7-879c-4120-a3b8-92c8253af7f1"> | <video src="https://github.com/user-attachments/assets/a32645e1-4cf8-4280-8dd5-d98404c919e3"> |
-
 NOTE, older versions are significantly slower to build.
 
 Pay attention to the file extension, it must contain the version of Archimage used, for example
 ```
-Appname-$VERSION-archimage4.3-x86_64.AppImage
+Appname-$VERSION-archimage5.0-x86_64.AppImage
 ```
 
 Always try to get the latest version to build your Appimages:
@@ -116,6 +110,7 @@ Always try to get the latest version to build your Appimages:
 - since version 4 hardware acceleration is available
 - since version 4.2 the AppImages created use PROOT as a fallback in case the host system has Namespaces restrictions (see Ubuntu), also the Appimages created are updatable
 - since version 4.3 the scripts are faster and more selective for libraries, automating much of the process
+- since version 5.0 librariesw are collected via SHARUN, to check and import as much as possible only the needed libraries to made the app run
 
 Please refer to the [releases](https://github.com/ivan-hc/ArchImage/releases) page to see the developments and new features introduced in this project so far.
 
@@ -127,7 +122,7 @@ Here's what absolutely NOT to do when running a script you created:
 - DO NOT RUN THE CREATED SCRIPT IN ANY OTHER DIRECTORIES! Create an empty one and dedicate that to the script. Again, [just follow points 2, 3 and 4 above](#what-to-do).
 - DO NOT USE THE SAME DIRECTORY FOR TWO DIFFERENT APPLICATIONS! Create a new one for each new script created.
 
-Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#example)" above.
+Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example](#see-it-in-action)" above.
 
 ##### Referenced issues https://github.com/ivan-hc/ArchImage/issues/19 and https://github.com/ivan-hc/ArchImage/issues/23
 
@@ -140,52 +135,51 @@ Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example]
 ### Step by step guide
 Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
+Also, THIS GUIDE APPLIES TO **ARCHIMAGE 5.0 OR HIGHER**!
+
+Archimage 4.3 or lower are considered OBSOLETE and UNSUPPORTED.
+
 ### 1. Create the script
 Use the option `-b` or `--build`, example with "obs-studio"
 ```
 ./archimage-cli -b obs-studio
 ```
+<img width="747" height="798" alt="Istantanea_2025-10-22_00-57-36" src="https://github.com/user-attachments/assets/0b18343b-e480-4f71-a474-0016bfe3a79b" />
 
-![1](https://github.com/user-attachments/assets/d9c7b29b-2ccc-4cf0-b3ff-5de10cf13e5b)
+The first question is about creating an Archimage script (1, default), a SHARUN-based Anylinux script (2) or press any other key to abort.
 
-this will download and rename the script [NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/dev/NEW-junest.sh) on your desktop.
+The two scripts are not much different:
+- this is the Junest-based Archimage [NEW-junest.sh](https://github.com/ivan-hc/ArchImage/blob/main/NEW-junest.sh)
+- this is the SHARUN-based AppImagee [NEW-anylinux.sh](https://github.com/ivan-hc/ArchImage/blob/main/NEW-anylinux.sh)
+
+The JuNest-based script supports more configurable variables and an editable AppRun and body in general. The SHARUN-based is efficient, but lacks of configurations. Also the AppRun come from a preset.
+
+The JuNest-based Appimage (Archimage) is a portable container, so it relies on its own resources, while mounts few other files and directories using BubbleWrap or Proot (depending on system's restrictions), so it is not much integrated with the host system. On the contrary, SHARUN-based AppImages are more independent and work in harmony with other applications.
+
+**To learn more about Anylinux AppImages, visit https://github.com/pkgforge-dev/Anylinux-AppImages**
+
+Choose the script you prefer.
+
+**NOTE, both the scripts use JuNest in Bubblewrap mode (requires unrestricted Namespaces) in the build process.** See [here](https://github.com/ivan-hc/AM/blob/main/docs/troubleshooting.md#ubuntu-mess) for more context.
 
 ### 2. Add binary name
-The script will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. In most cases we can leave blank, but for some applications, like OBS Studio, the executable name is different, in our case it is `obs`
+The CLI will ask you if you want to specify the name of the binary or leave blank if the name is the same of [PROGRAM]. In most cases we can leave blank, but for some applications, like OBS Studio, the executable name is different, in our case it is `obs`
 
-![2](https://github.com/user-attachments/assets/961d03ec-9c6a-4faa-a9ab-fa7dbb557b14)
+<img width="701" height="78" alt="Istantanea_2025-10-22_01-25-18" src="https://github.com/user-attachments/assets/90aceb33-30a8-4eb2-a76f-587c0940ef87" />
 
-If you're not sure about thename of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
+If you're not sure about the name of the main executable, use https://archlinux.org/packages/ or read the PKGBUILD if the app is hosted on the AUR. By default, the script will use "yay" to install all the programs in JuNest.
 
 ### 3. Add extra dependencies
 The script will ask you to add a list of additional packages you want to include into the AppImage (with the syntax `app1 app2 app3...`)
 
-![3](https://github.com/user-attachments/assets/2d6a3a5a-9fab-4c32-9081-d5bf5f51fe28)
+<img width="697" height="75" alt="Istantanea_2025-10-22_01-26-21" src="https://github.com/user-attachments/assets/73271046-be23-4bfc-b432-00deef4b6ee8" />
 
-leave blank if no dependency is needed. In our example, we are using Archimage version 4.2, so we don't need add dependencies for `obs-studio`. Previous versions were less automatic and to build `obs-studio` we needed to add `python`. You can add many more packages, according to your needs.
+Leave blank if no dependency is needed. In our example, I add `python`, also if it is not necessary anymore. You can add many more packages, according to your needs.
 
-### 4. Extract dependencies and subdependencies by level
-Assign a number to the variable "`$extraction_count`". The higher the number, the more dependencies will be downloaded separately, the longer the process will be, the bigger the final AppImage package will be... but at the same time the easier our AppImage will work.
+### 3,5. AUR, want to use ChaoticAUR instead? The hidden question
+Between question 3 (add dependencies) and 4 (enable multilib) exists another hidden question
 
-![4](https://github.com/user-attachments/assets/7e46e63a-8a60-426f-91c3-6eca36effb15)
-
-By default the level is 1, so only the dependencies of the direct dependencies of the application we want to package are extracted. For OBS Studio I set a level of 2, and this is enough to have an AppImage that works out of the box, but only if you include all dependencies and set the "**standard  configuration**". Keep read.
-
-### 5. Include all dependencies?
-Do you want to include all dependencies? Press "y", or leave blank if you want to keep customize (recommended)
-
-![5](https://github.com/user-attachments/assets/d50dd4bc-9bd4-43d9-82d7-6819d7c86d74)
-
-In my workflows I usually include all dependencies, to remove the extra files after I confirm that the application works.
-
-If you press "N" or leave blank, only the main package will be included, near the libraries and files imported when the script is running.
-
-Please, see the [tutorial](#tutorial) to learn more on how to investigate on app's malfunctions.
-
-### 5,5. AUR, whant tu use ChaoticAUR instead? The hidden question
-Between question 5 (include all dependencies) and 6 (enable multilib) exists another hidden question
-
-![Istantanea_2025-01-12_07-20-18](https://github.com/user-attachments/assets/ab650430-a2da-4663-ae9d-c4d97d3f4103)
+<img width="709" height="74" alt="402320114-ab650430-a2da-4663-ae9d-c4d97d3f4103" src="https://github.com/user-attachments/assets/408134a1-bef6-468c-9798-006b2f6b0ec5" />
 
 this question come up only if the program is not hosted on the official repositories, so it come from AUR.
 
@@ -193,59 +187,28 @@ In this case `binutils`, `gzip` and `base-devel` are enabled by default. You can
 
 Of course, this question will not come up with `obs-studio`, since it is on the official Arch Linux repositories.
 
-### 6. Enable multilib
+### 4. Enable multilib
 Want to enable the "multilib" repo? It is usally needed for 32bit libraries, used in programs like WINE and frontends like Bottles
 
-![Istantanea_2025-01-12_06-53-42](https://github.com/user-attachments/assets/2e036728-49d5-4362-a042-f6b44efff393)
+<img width="659" height="69" alt="Istantanea_2025-10-22_01-32-26" src="https://github.com/user-attachments/assets/56eef331-c247-45f3-923f-6dce3d5b5eb2" />
 
 in our case, we can leave blank or press "N". We don't need 32 bits libraries at all in this case.
 
-### 7. Enable hardware acceleration for Nvidia users
-Do you want to allow hardware acceleration? This will enable Nvidia users to use your application where hardware acceleration is needed
+### 5. Enable hardware acceleration for Nvidia users (only Archimage)
+Do you want to allow hardware acceleration? The variable NVIDIA_ON is set to "0" by default. Press "y" to set it to "1".
 
-![Istantanea_2025-01-12_06-55-57](https://github.com/user-attachments/assets/2bd7483d-c521-4827-b7b8-20bb6301f704)
+This will enable Nvidia users to use your application where hardware acceleration is needed.
 
-to learn more on how hardware acceleration works with Archimages, see "[Hardware Acceleration](#hardware-acceleration)".
+<img width="685" height="73" alt="Istantanea_2025-10-23_18-34-52" src="https://github.com/user-attachments/assets/5f57cc38-e865-4844-8ac8-d40918b43b77" />
 
-### 8. Standard configuration
-Standard configuration only enables keywords for Networking and Audio. If you have choosen to include all dependencies at point 5, press "y". This will exit the wizard
-
-![8](https://github.com/user-attachments/assets/c0f55b4f-b28f-4153-8735-14cf23ea8b92)
-
-if you press N or leave blank, you can keep customize the script.
-
-### 9. `binutils` and `gzip`
-Junest is a very minimal system, you can choose to include `gzip` and `binutils` if you know that none of the previous packages will install them as dependencies.
-
-### 10. `base-devel` for AUR
-If you need to build something from AUR, enable `base-devel` with all its related compilers
-
-This is how questions 9 and 10 appear
-
-![9-10](https://github.com/user-attachments/assets/0595778d-1687-4546-b3b4-3a26cffb095e)
-
-### 11. `BINSAVED`, `LIBSAVED` and `SHARESAVED`
-Questions about keywords for binaries in /usr/bin, directories in /usr/share and various files and directories (mostly libraries) in /usr/lib are up to you. For example, if you want to include all Qt related files and directories, write `Qt` for the question related to the interested path. In my case I included `libgallium.so`, the search will be done using `find` and `grep`
-
-![Istantanea_2025-01-12_21-18-09](https://github.com/user-attachments/assets/71b2584e-7209-4a59-98a1-145b0e4257f5)
-
-### 12. Preset of Audio and Networking keywords
-Next two questions are related to a preset of keywords used to check files and libraries for networking and audio, the same that can be enabled in one go at point 8
-
-![Istantanea_2025-01-12_07-12-50](https://github.com/user-attachments/assets/adc17a3b-36b9-4d27-8d8b-7d5f1f32df94)
-
-Personally I never go further than point 8, and press "y", because the script is simple enough to understand, if you have the patience to read what is written. So i prefer to edit manually my scripts when they are ready.
+To learn more on how hardware acceleration works with Archimages, see "[Hardware Acceleration](#hardware-acceleration)".
 
 ### Ending message
-At the end of the wizard you will have a series of suggestions like this
-
-![Istantanea_2025-01-12_07-19-02](https://github.com/user-attachments/assets/139698b4-c2aa-4675-9840-4c7c93e73c39)
-
-now you can finally run the script in an empty and dedicated directory.
+At the end of the wizard you will have a message that will remembe4r you to run the script into an empty directory.
 
 Again, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
-Also, see the **[tutorial](#tutorial)** to debug and improve your AppImage.
+Also, see the **[Test the AppImage](#test-the-appimage)** section to debug and improve your AppImage.
 
 -----------------------------------------------------------
 ## Requirements of an AppImage
@@ -258,7 +221,7 @@ If this requirement is not met, no AppImage will be created.
 
 -----------------------------------------------------------
 ## Archimage structure
-An Archimage is a Type3 AppImage, i.e. one that does not require libfuse2 to function.
+An Archimage does not require libfuse2 to function.
 
 Unlike many other AppImages, its structure, [other than the requirements above](#requirements-of-an-appimage), resembles a $HOME directory:
 ```
@@ -268,16 +231,15 @@ App.AppDir/
   |
   |_/app.png
   |
-  |_/.cache/
-  |
   |_/.local/share/junest/
   |
   |_/.junest/
 ```
 Hidden directories are those used in a normal Junest installation:
 - ".junest" contains the Arch Linux system;
-- ".local/share/junest" contains the JuNest files to start Arch Linux in a container;
-- ".cache" is usually empty and used by YAY during the temporary JuNest session.
+- ".local/share/junest" contains the JuNest files to start Arch Linux in a container.
+
+<img width="897" height="732" alt="Istantanea_2025-10-22_01-46-25" src="https://github.com/user-attachments/assets/c1bae221-d838-4594-8d1e-4b2a5334947c" />
 
 The Archimage is first built, and then reassembled with only the essential files indicated in the script you created.
 
@@ -287,25 +249,30 @@ Once the script has finished and the AppImage has been created, run the AppImage
 ```
 ./Sample-1.2.3-x86_64.AppImage
 ```
-For more verbose output, use `LD_DEBUG`, like this:
+For more verbose output, use `LD_DEBUG`.
+
+To see the missing libraries, run
 ```
 LD_DEBUG=libs ./Sample-1.2.3-x86_64.AppImage
 ```
-to see the missing libraries, or
+to see the missing files, run
 ```
 LD_DEBUG=files ./Sample-1.2.3-x86_64.AppImage
 ```
-to see the missing files.
 
-I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
+To learn more about `LD_DEBUG` usage, see https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
 ### Dotfiles tip
-To not flood your $HOME with dotfiles, I recommend creating a .home directory with the same name as the AppImage:
+To not flood your $HOME and ~/.config directories with dotfiles, I recommend creating a .home and a .config directory with the same name as the AppImage:
 ```
-mkdir Sample-1.2.3-x86_64.AppImage.home
+mkdir -p Sample-1.2.3-x86_64.AppImage.home Sample-1.2.3-x86_64.AppImage.config
 ./Sample-1.2.3-x86_64.AppImage
 ```
-I suggest you empty it or remove/recreate it at the end of each test, in order to rewrite the dotfiles using a clean configuration.
+If your file manager supports custom actions (for example Thunar in XFCE4), you can right-click on an AppImage using this command
+```
+grep -Eaoq -m 1 'github.com/AppImage/AppImageKit/wiki/FUSE' %f && chmod a+x %f && mkdir -p %f.home %f.config
+```
+I suggest you empty/remove/recreate these direcftories at the end of each test, in order to rewrite the dotfiles using a clean configuration.
 
 ### Repeat the build
 If you encounter any problems after testing, manually edit the script by adding dependencies or keywords in the respective listed variables, then run the script again to build the AppImage.
@@ -320,242 +287,68 @@ Wait until the end and try the AppImage again.
 
 Run the tests until you get the desired result.
 
-### Extraction levels
-Since version 4.2 you can set extraction levels by assigning the variable "$extraction_count" (in the middle of the script) a number from zero and up. The default value is 1. Here's what the number means:
-- level 0 extracts only the dependencies, the "optdepends" and the dependencies you specify in the variable "DEPENDENCES"
-- level 1 is the default, it extracts the dependencies of dependencies of the main package (not the "optdepends") and the dependencies of packages in "DEPENDENCES"
-- level 2 extracts the dependencies of the packages extracted at point 1
-- level 3 extracts the dependencies of the packages at point 2
-
-...and so on.
-
-If you decide to include all the dependencies, the package will be much larger, and at the same time you will have a better chance of running the program you are building.
-
-If you decide NOT to include the dependencies, you will still have all the files to check to include only the libraries shared between the dependencies.
-
-However, there is no guarantee that the AppImage will work immediately. Please refer to the "[tutorial](#tutorial)" to perform your own tests.
-
-------------------------------------------------------------------------
-
-| [Back to "Index"](#index) |
-| - |
-
-------------------------------------------------------------------------
-# Tutorial
-This is a step-by-step tutorial on how to create an Archimage correctly. To write this one I tried to help a user into a comment, so I decided to publish it here too, with the same videos in real time.
-
-In this example I'll build "Signal", available in Arch Linux as "[signal-desktop](https://archlinux.org/packages/extra/x86_64/signal-desktop/)", in "extra" (not an AUR package).
-
-To create the basic script I'll use a standard configuration:
-1. name: signal-desktop
-2. name binary: leave blank, its the same
-3. dependences: none
-4. extraction level: 1, default... leave blank. Whit only one level, the app will be smaller, but will not easily run at first go (for the sake of this tutorial)
-5. include all dependences: y
-6. multilib: nope, leave blank
-7. hardware acceleration: nope, leave blank
-8. use defaults: y
-
-like this:
-
-https://github.com/user-attachments/assets/0e373cbd-f473-4214-bf3c-8530867762dd
-
-Once I created the script, I create a "tmp" directory (you can name it the way you want) and I put the script into it.
-
-I run the script and after 2 minutes I got the AppImage.
-
-The AppImage is 296 MB. Here is what happens when I run it:
-
-https://github.com/user-attachments/assets/b0d6474c-c7bc-4df0-bc91-bcde8d764176
-
-as expected, it does not work at first attempt. To fix it you can start to read the logs and see what files are missing, like this
-
-https://github.com/user-attachments/assets/fed38d05-bf11-4804-9846-93e55e14e6b0
-
-it is looking for a missing module named "xapp-gtk3-module", contained into a package to search on Google (or in my case via "Startpage"), in this case the package is "xapp". You can enter the page of the package and read the content, under "Package content".
-
-All you need to do is to take note of the missing package and then add to dependences, like this:
-
-https://github.com/user-attachments/assets/bbe35505-d8f9-489c-9e31-ef5713a7cc3c
-
-and as you can see, "xapp" is downloaded and then it wil be extracted with all the other packages listed during this process in the "deps" directory.
-
-Now the AppImage is increased of 0,1 MB, let we see if it works...
-
-https://github.com/user-attachments/assets/5c832f45-e3fa-4a10-8b16-69f381492685
-
-also this time it is not working, but I've found that there is a missing library "libgnomekbdui", contained in the "libgnomekbd" package... so I'll do the same as I did with xapp.
-
-Now the package is 296,2 MB... let we see if it runs...
-
-https://github.com/user-attachments/assets/bad4d6cc-a16c-498b-a9fa-528894c3cb8f
-
-this time it is missing the library "libudev.so", I'll add the keyword "libudev" to $LIBSAVED, to fetch all files under /usr/lib containing this keyword, for this will be added all depending libraries and it too will be bundled in the AppImage.
-
-In case it is not saved, search the package containing that library as I did with "xapp" and "libgnomekbd".
-
-Now the package is 296,3 MB... let se again:
-
-https://github.com/user-attachments/assets/bf6ff485-80b7-4c33-a753-19e8c2a08d74
-
-Magic!
-
-If the app works, you are good with it. Anyway it is still suggested to find missing libraries t mede it work as better as you can.
-
-If you feel that the package is too big, use a tool like Baobab or "du" to find the big files or the ones that you think are unneeded.
-
-You can also disable/comment the `rsync` command referencing to the content of the "deps" directory, not to include them all, and add only the keyworkd of missing libraries you will see usind LD_DEBUG, one by one.
-
-To test the debloating, sun theAppRun script into the AppDir directory, it will run the program as it were the AppImage. Try to move elsewhere all files you think are unneeded, run the AppRun and see if it works. It the app still works without the files and directories you moved, take note of what you can remove and add the commands in the script, maybe under the "_remove_more_bloatwares" function.
-
-If you do all this correctly, the package will be even smaller.
-
-------------------------------------------------------------------------
-
-| [Back to "Index"](#index) |
-| - |
-
-------------------------------------------------------------------------
-# Hardware Acceleration
-If you are an Nvidia user, hardware accelleration is provided by [Conty](https://github.com/Kron4ek/Conty). At first start it will copy Nvidia libraries locally to allow the builtin Arch Linux container the use of hardware accelleration.
-
-According to the Conty project, the drivers will be placed in a "Conty" directory located in $HOME/.local/share. If you already use a Conty container or run other Archimages v4 or higher, you will be able to use the same drivers.
-
-The check is enabled in the AppRun, the script inside the AppImage, using the variable `NVIDIA_ON` with a value equal to `1`. To disable it, simply assign a different value to this variable, for example `0`. The creators of the AppImage will be able to decide whether to enable it during the creation of the script, via `archimage-cli`, from version 4 onwards, or they can enable it manually.
-
-- Archimage v4 was able to download a script that used a mini `conty.sh` to compile the Nvidia drivers using the official online installer, and it took a few minutes to complete the process
-- Archimage v4.1 instead is able to intercept the drivers installed on the system and copy them locally, taking less than a second
-
-**It is recommended to keep your Archimages up to date with the portion of the code available in new releases.**
-
-<details>
-  <summary>Click here to see the part of the AppRun that handles Nvidia drivers</summary>
-
+## How to add missing libraries manually
+On top of the script (under APP, DEPENDENCES, etcetera...) you can see the following variables:
 ```
-[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
-if [ "$NVIDIA_ON" = 1 ]; then
-   DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
-   CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
-   [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
-   if [ -n "$nvidia_driver_version" ]; then
-      mkdir -p "${CONTY_DIR}"/nvidia "${CONTY_DIR}"/up/usr/lib "${CONTY_DIR}"/up/usr/share
-      nvidia_data_dirs="egl glvnd nvidia vulkan"
-      for d in $nvidia_data_dirs; do [ ! -d "${CONTY_DIR}"/up/usr/share/"$d" ] && ln -s /usr/share/"$d" "${CONTY_DIR}"/up/usr/share/ 2>/dev/null; done
-      [ ! -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
-      [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty=$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)
-      if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
-         rm -f "${CONTY_DIR}"/up/usr/lib/*; echo "${nvidia_driver_version}" > "${CONTY_DIR}"/nvidia/current-nvidia-version
-      fi
-      /sbin/ldconfig -p > "${CONTY_DIR}"/nvidia/host_libs
-      grep -i "nvidia\|libcuda" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2 > "${CONTY_DIR}"/nvidia/host_nvidia_libs
-      libnv_paths=$(grep "libnv" "${CONTY_DIR}"/nvidia/host_libs | cut -d ">" -f 2)
-      for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && echo "${f}" >> "${CONTY_DIR}"/nvidia/host_nvidia_libs; done
-      nvidia_libs=$(cat "${CONTY_DIR}"/nvidia/host_nvidia_libs)
-      for n in $nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${CONTY_DIR}"/up/usr/lib/"$libname" ] && cp "$n" "${CONTY_DIR}"/up/usr/lib/; done
-      libvdpau_nvidia="${CONTY_DIR}/up/usr/lib/libvdpau_nvidia.so"
-      if ! test -f "${libvdpau_nvidia}*"; then cp "$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)" "${CONTY_DIR}"/up/usr/lib/; fi
-      [ -f "${libvdpau_nvidia}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau_nvidia}" ] && ln -s "${libvdpau_nvidia}"."${nvidia_driver_version}" "${libvdpau_nvidia}"
-      [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
-      [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
-   fi
-fi
+BINSAVED="SAVEBINSPLEASE"
+SHARESAVED="SAVESHAREPLEASE"
+lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
+LIBSAVED="SAVELIBSPLEASE $lib_browser_launcher"
 ```
+Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED).
 
-For the existing Archimages, its enough to add this part to the AppRun.
+The "$lib_browser_launcher" set of keyword is intended to allow the links inside an AppImage (for example in the Info dialog) to be clicked to launch the host's browser. They come up after a long search using Firefox. Any improvement is wellcome.
 
-</details>
+Here are the more common scenarios in which you may need to edit the three main variables. If while launching the AppImage from the command line, it prompts (for example)...
+- "`capocchia: command not foud`", add `capocchia` to BINSAVED
+- "`Cannot load libcapocchia.so: file not found`" or "`Cannot find libcapocchia.so: No such file or directory`", add `libcapocchia` or just `capocchia` to LIBSAVED
+- "`Cannot read /usr/share/some/program/capocchia.svg`", add `some` to SHARESAVED
 
-By default the value inside the templates and AppRuns is set to "`0`"
+Once you have done so, [repeat the build](#repeat-the-build).
+
+NOTE, if the same error about the same file persists, this may mean that such file was not installed in JuNest during the build. In this case, use your favourite search engine (I use [startpage.com](https://www.startpage.com)) and search
 ```
-NVIDIA_ON=0
+libcapocchia.so archlinux
 ```
-
-NOTE, make sure your release has Archimage version 4.1 or higher in the file name.
-
-------------------------------------------------------------------------
-
-| [Back to "Index"](#index) |
-| - |
-
-------------------------------------------------------------------------
-# Compared to classic AppImage construction
-In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
-
-For example, an OBS Studio ArchImage equals 650MB in total, I managed to get it to 260MB by removing what wasn't necessary, while now (since Archimage2.x was released) is about 180MB.
-
-This is a list of the AppImages I've built until I wrote this brief guide:
-- Abiword https://github.com/ivan-hc/Abiword-appimage
-- GIMP Stable & Deveveloper Edition https://github.com/ivan-hc/GIMP-appimage
-- Gnumeric https://github.com/ivan-hc/Gnumeric-appimage
-- Handbrake https://github.com/ivan-hc/Handbrake-appimage
-- MPV https://github.com/ivan-hc/MPV-appimage
-- OBS Studio https://github.com/ivan-hc/OBS-Studio-appimage
-- VLC https://github.com/ivan-hc/VLC-appimage
-
-### Advantages
-- compatibility with all versions of Linux starting from kernel 2.6, therefore also older distributions than those normally indicated by the classic AppImage developers;
-- easy and immediate compilation;
-- AppRun script very minimal and easy to configure;
-- all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
-
-### Disadvantages
-- the AppImage can be bloated if you don't set a list of removable items manually
-
-------------------------------------------------------------------------
-
-# Drafts
-You can download some experimental scripts made with this tool and to which I have not dedicated a repository (also because I have too many) at the following link:
-
-https://github.com/ivan-hc/ArchImage/tree/main/drafts
-
-in my experiments, if I uploaded them here, it means that they work quite well or at least start the graphical interface. I have not looked into their operation. If you want, you can download them and modify them to your liking, or even open a dedicated repository.
-
-------------------------------------------------------------------------
-
-# Files removed by default
-The following function is responsible of removals of unneeded files and directories, you can find it to the end of the script
+And see the results, then try to find the exact package required. In our example, you have found that such library is in the package `capocchia`, so add this to DEPENDENCES
 ```
-_remove_more_bloatwares() {
-	etc_remove="makepkg.conf pacman"
-	for r in $etc_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/etc/"$r"*
-	done
-	bin_remove="gcc"
-	for r in $bin_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/bin/"$r"*
-	done
-	lib_remove="gcc"
-	for r in $lib_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/lib/"$r"*
-	done
-	share_remove="gcc"
-	for r in $share_remove; do
-		rm -Rf ./"$APP".AppDir/.junest/usr/share/"$r"*
-	done
-	echo Y | rm -Rf ./"$APP".AppDir/.cache/yay/*
-	find ./"$APP".AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-	find ./"$APP".AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rm -Rf ./"$APP".AppDir/.junest/home # remove the inbuilt home
-	rm -Rf ./"$APP".AppDir/.junest/usr/include # files related to the compiler
-	rm -Rf ./"$APP".AppDir/.junest/usr/share/man # AppImages are not ment to have man command
-	rm -Rf ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgallium*
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libgo.so*
-	#rm -Rf ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
-	rm -Rf ./"$APP".AppDir/.junest/var/* # remove all packages downloaded with the package manager
-}
+DEPENDENCES="" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 ```
-it contains 4 variables:
-- `etc_remove` to remove files in /etc
-- `bin_remove` to remove files in /usr/bin
-- `lib_remove` to remove files and directories in /usr/lib
-- `share_remove` to remove files and directories in /usr/share
+...so change the above to
+```
+DEPENDENCES="capocchia" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+```
+...then [repeat the build](#repeat-the-build).
 
-it is enough to add the name or the first keywords of the names you want to remove. For example if you add `z` in `share_remove`, all directories starting with "z" will be removed. If you add `icons/Adwaita/cursors/` in `share_remove`, all files under /usr/share/icons/Adwaita/cursors/ will be removed.
+Since you have already added the `capocchia` keyword to LIBSAVED, this time the error should disappear.
 
-A known list of big ligraries is also commented in this function (`libgallium`, `libgo.so` and `libLLVM`), uncomment if the app works without them.
+Maybe another error about another missing ligrary and not included may come up. If so, repeat the steps you have done for the `capocchia` package and the `libcapocchia.so` library of our example.
 
-The `find` commands of the abofe function will remove languages and documentation not related to "`$BIN`" (the binary name of the app, in most cases the value is `BIN="$APP"`, but it may change, depending on the script you have created.
+*PS: as far as I know, there is not (yet) a package or a library with that kind of name... but if I am wrong, I suppose it would be a tool that does random things. It would be an idea for someone.*
+
+*PPS: I'm obviously kidding. Please don't hate me.*
+
+## How to debloat an Archimage
+From version 5, you can find all configurable variables on top of the script, and among them, you can see the following ones
+```
+ETC_REMOVED="makepkg.conf pacman"
+BIN_REMOVED="gcc"
+LIB_REMOVED="gcc"
+PYTHON_REMOVED="__pycache__/"
+SHARE_REMOVED="gcc icons/AdwaitaLegacy icons/Adwaita/cursors/ terminfo"
+```
+Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usr/lib/python*/ and /usr/share/ respectively.
+
+For example, suppose that we have a directory `some/dir` under /usr/lib:
+- to remove its content, write `some/dir/`
+- to remove only "dir", use `some/dir`
+- to remove the content of "some", write `some/`
+- to remove "some", write only `some` (note, all files and directories starting with "some" in /usr/lib will be removed)
+
+The "`rm`" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
+Some keywords and paths are already set. Remove them if you consider them necessary for the AppImage to function properly.
+
+[Repeat the build](#repeat-the-build) to see your AppImge even smaller. Pay attention to not remove too many things or the AppImage may not work anymore. If this happens, revert your changes and [repeat the build](#repeat-the-build),
 
 ------------------------------------------------------------------------
 # Customize your script
@@ -569,35 +362,106 @@ Of course, **DO IT ON YOUR OWN RISK!**
 | - |
 
 ------------------------------------------------------------------------
-# Troubleshooting
-1. If the AppImage is already bundled, extract the AppImage using `./*.AppImage --appimage-extract`
-2. Execute the AppRun file:
-```
-./AppRun
-```
-In case you wont to parse dotfiles in your $HOME directory, use the AppDir itself as a custom $HOME, like this:
-```
-cd ./*.AppDir
-HOME="$(dirname "$(readlink -f $0)")"
-./AppRun
-```
-It is now possible to read errors related to the application.
+# Hardware Acceleration
+From version 5.0, Archimage handles a copy of the system's Nvidia drivers into a temporary "$HOME/.cache/junest_shared" directory, shared with other Archimages 5.0 or higher.
 
-For more verbose output, use `LD_DEBUG`, like this (for example, to know what are the missing libraries):
+To enable the check, set the `NVIDIA_ON` variable 1.
+
+This is the logic in the AppRun
 ```
-LD_DEBUG=libs ./AppRun
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
+if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
+   nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+   JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
+   mkdir -p "${JUNEST_LIBS}" "${JUNEST_NVIDIA_DATA}" || exit 1
+   [ ! -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
+   [ -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && nvidia_driver_conty=$(cat "${JUNEST_NVIDIA_DATA}"/current-nvidia-version)
+   if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+      rm -f "${JUNEST_LIBS}"/*; echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
+   fi
+   HOST_LIBS=$(/sbin/ldconfig -p)
+   libnvidia_libs=$(echo "$HOST_LIBS" | grep -i "nvidia\|libcuda" | cut -d ">" -f 2)
+   libvdpau_nvidia=$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)
+   libnv_paths=$(echo "$HOST_LIBS" | grep "libnv" | cut -d ">" -f 2)
+   for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && libnv_libs="$libnv_libs ${f}"; done
+   host_nvidia_libs=$(echo "$libnv_libs $libnvidia_libs $libvdpau_nvidia" | sed 's/ /\n/g' | sort | grep .)
+   for n in $host_nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${JUNEST_LIBS}"/"$libname" ] && cp "$n" "${JUNEST_LIBS}"/; done
+   libvdpau="${JUNEST_LIBS}/libvdpau_nvidia.so"
+   [ -f "${libvdpau}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau}" ] && ln -s "${libvdpau}"."${nvidia_driver_version}" "${libvdpau}"
+   export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${JUNEST_LIBS}":"${LD_LIBRARY_PATH}"
+fi
 ```
-I redirect you to the guide on the usage of `LD_DEBUG`, at https://www.bnikolic.co.uk/blog/linux-ld-debug.html
 
-See also
+For the old Archimage 4.x series, hardware accelleration was provided by [Conty](https://github.com/Kron4ek/Conty). The drivers were placed in a "$HOME/.local/share/Conty" directory. If you already use a Conty container or run 4.x Archimages (see the name of the AppImage), you will be able to use the same Conty directory.
 
-- [Archimage structure](#archimage-structure)
-- [Test the AppImage](#test-the-appimage)
-- [Dotfiles tip](#dotfiles-tip)
-- [Repeat the build](#repeat-the-build)
+------------------------------------------------------------------------
 
-If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchImage/issues) or search for a solution among the existing ones ([here](https://github.com/ivan-hc/ArchImage/issues?q=)).
+| [Back to "Index"](#index) |
+| - |
 
+------------------------------------------------------------------------
+# Compared to classic AppImage construction
+In the past AppImages were built using .deb packages or guessing instructions to make them work. With the "ArchImage" method all you have to do is the reverse, i.e. "delete" what is no longer needed.
+
+This is a list of the AppImages I've built until I wrote this brief guide:
+
+| Application | Stars |
+| -- | -- |
+| [*Abiword*](https://github.com/ivan-hc/Abiword-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Abiword-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Aisleriot*](https://github.com/ivan-hc/Aisleriot-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Aisleriot-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Amarok*](https://github.com/ivan-hc/Amarok-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Amarok-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Avidemux*](https://github.com/ivan-hc/Avidemux-unofficial-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Avidemux-unofficial-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Bottles*](https://github.com/ivan-hc/Bottles-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Bottles-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Celestia "Enanched"*](https://github.com/ivan-hc/Celestia-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Celestia-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Emacs*](https://github.com/ivan-hc/Emacs-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Emacs-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Evince*](https://github.com/ivan-hc/Evince-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Evince-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Gedit*](https://github.com/ivan-hc/Gedit-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Gedit-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*GIMP Stable/Git/Hybrid*](https://github.com/ivan-hc/GIMP-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/GIMP-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*GNOME Boxes*](https://github.com/ivan-hc/Boxes-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Boxes-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Gnome-calculator*](https://github.com/ivan-hc/Gnome-calculator-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Gnome-calculator-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Gnumeric*](https://github.com/ivan-hc/Gnumeric-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Gnumeric-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Handbrake*](https://github.com/ivan-hc/Handbrake-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Handbrake-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Hypnotix*](https://github.com/ivan-hc/Hypnotix-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Hypnotix-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Inkscape*](https://github.com/ivan-hc/Inkscape-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Inkscape-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*KDE-games*](https://github.com/ivan-hc/KDE-games-suite-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/KDE-games-suite-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*KDE-utils*](https://github.com/ivan-hc/KDE-utils-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/KDE-utils-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*LibreOffice Still/Fresh*](https://github.com/ivan-hc/LibreOffice-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/LibreOffice-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*MPV*](https://github.com/ivan-hc/MPV-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/MPV-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*OBS-Studio*](https://github.com/ivan-hc/OBS-Studio-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/OBS-Studio-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*ocenaudio*](https://github.com/ivan-hc/ocenaudio-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/ocenaudio-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Rhythmbox*](https://github.com/ivan-hc/Rhythmbox-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Rhythmbox-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*SpaceCadet Pinball (AUR)*](https://github.com/ivan-hc/Spacecadetpinball-git-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Spacecadetpinball-git-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Torcs*](https://github.com/ivan-hc/Torcs-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Torcs-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Transmission-gtk*](https://github.com/ivan-hc/Transmission-gtk-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Transmission-gtk-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*VirtualBox KVM*](https://github.com/ivan-hc/VirtualBox-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/VirtualBox-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*VLC Stable/Git*](https://github.com/ivan-hc/VLC-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/VLC-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Database of pkg2appimaged packages**](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages) (*Various sources*) | ![](https://img.shields.io/github/stars/ivan-hc/Database-of-pkg2appimaged-packages?label=%E2%AD%90&style=for-the-badge)
+
+**NOTE, the last one in the table above is a database containing small random apps and games that you may need. The Archimages contained in this repository are:*
+
+| Application |
+| -- |
+| [*Asunder*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/asunder) |
+| [*Audacious*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/audacious) |
+| [*Chromium BSU*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/chromium-bsu) |
+| [*Falkon*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/falkon) |
+| [*FileZilla*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/filezilla) |
+| [*kwave*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/kwave) |
+| [*Poedit*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/poedit) |
+| [*Sunvox*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/sunvox) |
+| [*Webcamoid*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/webcamoid) |
+
+
+### Advantages
+- compatibility with all versions of Linux starting from kernel 2.6, therefore also older distributions than those normally indicated by the classic AppImage developers;
+- easy and immediate compilation;
+- AppRun script very minimal and easy to configure;
+- all programs for Arch Linux within AppImage's reach, therefore one of the most extensive software parks in the GNU/Linux panorama.
+
+### Disadvantages
+- the AppImage can be bloated if you don't set a list of removable items manually
+- being a container, it must contain its own set of programs (for example `coreutils`, `awk` and `sed`) as it cannot use the ones on the host
 
 ------------------------------------------------------------------------
 
@@ -607,14 +471,15 @@ If you have any doubts you can [open an issue](https://github.com/ivan-hc/ArchIm
 ------------------------------------------------------------------------
 # Credits
 This project wont be possible without:
-- Conty https://github.com/Kron4ek/Conty
-- JuNest https://github.com/fsquillace/junest
-- Arch Linux https://archlinux.org
+- **Anylinux** at https://github.com/pkgforge-dev/Anylinux-AppImages for library deploy method (Archimage 5.x and higher) and the debloated packages
+- **Conty** at https://github.com/Kron4ek/Conty for the idea and the implementation of Nvidia hardware acceleration support (Archimage 4.x and higher) 
+- **JuNest** at https://github.com/fsquillace/junest for the whole base of this project
+- **Arch Linux** https://archlinux.org for keep providing brand new software in its repositories
 
 -----------------------------------------------------------
 # Related projects
-- "AM", the package manager for AppImage an portable apps for GNU/Linux https://github.com/ivan-hc/AM
-- "AppImagen", build AppImage packages using .deb packages from Debian and Ubuntu https://github.com/ivan-hc/AppImaGen
+- **"AM"** at https://github.com/ivan-hc/AM, the package manager for AppImage an portable apps for GNU/Linux
+- **AppImagen** at https://github.com/ivan-hc/AppImaGen, build AppImage packages using .deb packages from Debian and Ubuntu
 
 ------------------------------------------------------------------------
 
