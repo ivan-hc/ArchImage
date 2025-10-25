@@ -1,6 +1,86 @@
 #!/usr/bin/env bash
 
 ##########################################################################################################################################################
+#	APPRUN
+##########################################################################################################################################################
+
+_apprun_header() {
+	cat <<-'HEREDOC' >> AppDir/AppRun
+	#!/bin/sh
+	HERE="$(dirname "$(readlink -f "$0")")"
+	export JUNEST_HOME="$HERE"/.junest
+
+	CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+	mkdir -p "$CACHEDIR" || exit 1
+
+	if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
+	   PROOT_ON=1 && export PATH="$HERE"/.local/share/junest/bin/:"$PATH"
+	else
+	   export PATH="$PATH":"$HERE"/.local/share/junest/bin
+	fi
+
+	HEREDOC
+}
+
+_apprun_nvidia() {
+	if [ "$NVIDIA_ON" = 1 ]; then
+		cat <<-'HEREDOC' >> AppDir/AppRun
+
+		[ -z "$NVIDIA_ON" ] && NVIDIA_ON=0
+		if [ -f /sys/module/nvidia/version ] && [ "$NVIDIA_ON" = 1 ]; then
+		   nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+		   JUNEST_DIRS="${CACHEDIR}/junest_shared/usr" JUNEST_LIBS="${JUNEST_DIRS}/lib" JUNEST_NVIDIA_DATA="${JUNEST_DIRS}/share/nvidia"
+		   mkdir -p "${JUNEST_LIBS}" "${JUNEST_NVIDIA_DATA}" || exit 1
+		   [ ! -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
+		   [ -f "${JUNEST_NVIDIA_DATA}"/current-nvidia-version ] && nvidia_driver_conty=$(cat "${JUNEST_NVIDIA_DATA}"/current-nvidia-version)
+		   if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+		      rm -f "${JUNEST_LIBS}"/*; echo "${nvidia_driver_version}" > "${JUNEST_NVIDIA_DATA}"/current-nvidia-version
+		   fi
+		   HOST_LIBS=$(/sbin/ldconfig -p)
+		   libnvidia_libs=$(echo "$HOST_LIBS" | grep -i "nvidia\|libcuda" | cut -d ">" -f 2)
+		   libvdpau_nvidia=$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)
+		   libnv_paths=$(echo "$HOST_LIBS" | grep "libnv" | cut -d ">" -f 2)
+		   for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && libnv_libs="$libnv_libs ${f}"; done
+		   host_nvidia_libs=$(echo "$libnv_libs $libnvidia_libs $libvdpau_nvidia" | sed 's/ /\n/g' | sort | grep .)
+		   for n in $host_nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${JUNEST_LIBS}"/"$libname" ] && cp "$n" "${JUNEST_LIBS}"/; done
+		   libvdpau="${JUNEST_LIBS}/libvdpau_nvidia.so"
+		   [ -f "${libvdpau}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau}" ] && ln -s "${libvdpau}"."${nvidia_driver_version}" "${libvdpau}"
+		   export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${JUNEST_LIBS}":"${LD_LIBRARY_PATH}"
+		fi
+
+		bind_nvidia_data_dirs="/usr/share/egl /usr/share/glvnd /usr/share/nvidia /usr/share/vulkan"
+
+		HEREDOC
+	fi
+}
+
+_apprun_binds() {
+	cat <<-'HEREDOC' >> AppDir/AppRun
+
+	bind_files="/etc/resolv.conf /etc/hosts /etc/nsswitch.conf /etc/passwd /etc/group /etc/machine-id /etc/asound.conf /etc/localtime "
+	bind_dirs=" /media /mnt /opt /run/media /usr/lib/locale /usr/share/fonts /usr/share/themes /var $bind_nvidia_data_dirs"
+	if [ "$PROOT_ON" = 1 ]; then
+	   for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --bind=$f"; done
+	   for d in $bind_dirs; do [ -d "$d" ] && BINDINGS=" $BINDINGS --bind=$d"; done
+	   junest_options="proot -n -b"
+	   junest_bindings=" --bind=/dev --bind=/sys --bind=/tmp --bind=/proc $BINDINGS --bind=/home --bind=/home/$USER "
+	else
+	   for f in $bind_files; do [ -f "$f" ] && BINDINGS=" $BINDINGS --ro-bind-try $f $f"; done
+	   for d in $bind_dirs; do [ -d "$d" ] && BINDINGS=" $BINDINGS --bind-try $d $d"; done
+	   junest_options="-n -b"
+	   junest_bindings=" --dev-bind /dev /dev --ro-bind /sys /sys --bind-try /tmp /tmp --proc /proc $BINDINGS --cap-add CAP_SYS_ADMIN "
+	fi
+
+	_JUNEST_CMD() {
+	   "$HERE"/.local/share/junest/bin/junest $junest_options "$junest_bindings" "$@"
+	}
+
+	HEREDOC
+	[ -n "$mountpoint_files" ] && sed -i "s/bind_files=\"/bind_files=\"$mountpoint_files /g" AppDir/AppRun
+	[ -n "$mountpoint_dirs" ] && sed -i "s/bind_dirs=\"/bind_dirs=\"$mountpoint_files /g" AppDir/AppRun
+}
+
+##########################################################################################################################################################
 #	DEPLOY DEPENDENCIES
 ##########################################################################################################################################################
 
@@ -175,6 +255,12 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 ##########################################################################################################################################################
 
 case "$1" in
+	"apprun")
+		_apprun_header
+		_apprun_nvidia
+		_apprun_binds
+		;;
+
 	"compile")
 		# Deploy libraries
 		printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
