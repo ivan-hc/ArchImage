@@ -181,9 +181,10 @@ _extract_main_package() {
 	mkdir -p base
 	rm -Rf ./base/*
 	pkg_full_path=$(find ./archlinux/.junest -type f -name "$APP-*zst")
-	if [ "$(echo "$pkg_full_path" | wc -l)" = 1 ]; then
-		pkg_full_path=$(find ./archlinux/.junest -type f -name "$APP-*zst")
-	else
+	if [ -z "$pkg_full_path" ]; then
+		pkg_full_path=$(find ./archlinux -type f -name "$APP-*zst")
+	fi
+	if [ "$(echo "$pkg_full_path" | wc -l)" != 1 ]; then
 		for p in $pkg_full_path; do
 			if tar fx "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
 				pkg_full_path="$p"
