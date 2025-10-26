@@ -202,7 +202,13 @@ _extract_core_dependencies() {
 				tar fx ./archlinux/"$d"-* -C ./base/ | printf "\n◆ Force \"$d\""
 			else
 				pkg_full_path=$(find ./archlinux -type f -name "$d-[0-9]*zst")
-				tar fx "$pkg_full_path" -C ./base/ | printf "\n◆ Force \"$d\""
+				if [ -z "$pkg_full_path" ]; then
+					pkg_full_path=$(find ./archlinux -type f -name "$d-*zst")
+				fi
+				for p in $pkg_full_path; do
+					pkgname=$(echo "$pkg_full_path" | sed 's:.*/::')
+					tar fx "$pkg_full_path" -C ./base/ | printf "\n◆ Force \"$pkgname\""
+				done
 			fi
 		done
 		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
