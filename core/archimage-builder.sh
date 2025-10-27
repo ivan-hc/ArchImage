@@ -192,7 +192,7 @@ _extract_main_package() {
 		done
 	fi
 	[ -z "$pkg_full_path" ] && echo "💀 ERROR: no package found for \"$APP\", operation aborted!" && exit 0
-	tar fx "$pkg_full_path" -C ./base/
+	tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword
 	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
 }
 
@@ -200,7 +200,7 @@ _extract_core_dependencies() {
 	if [ -n "$DEPENDENCES" ]; then
 		for d in $DEPENDENCES; do
 			if test -f ./archlinux/"$d"-*; then
-				tar fx ./archlinux/"$d"-* -C ./base/ | printf "\n◆ Force \"$d\""
+				tar fx ./archlinux/"$d"-* -C ./base/ --warning=no-unknown-keyword | printf "\n◆ Force \"$d\""
 			else
 				pkg_full_path=$(find ./archlinux -type f -name "$d-[0-9]*zst")
 				if [ -z "$pkg_full_path" ]; then
@@ -208,7 +208,7 @@ _extract_core_dependencies() {
 				fi
 				for p in $pkg_full_path; do
 					pkgname=$(echo "$pkg_full_path" | sed 's:.*/::')
-					tar fx "$pkg_full_path" -C ./base/ | printf "\n◆ Force \"$pkgname\""
+					tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword | printf "\n◆ Force \"$pkgname\""
 				done
 			fi
 		done
