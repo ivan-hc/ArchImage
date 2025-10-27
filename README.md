@@ -174,7 +174,7 @@ The script will ask you to add a list of additional packages you want to include
 
 <img width="697" height="75" alt="Istantanea_2025-10-22_01-26-21" src="https://github.com/user-attachments/assets/73271046-be23-4bfc-b432-00deef4b6ee8" />
 
-Leave blank if no dependency is needed. In our example, I add `python`, also if it is not necessary anymore. You can add many more packages, according to your needs.
+Leave blank if no dependency is needed. In our example, I add `python`. You can add many more packages, according to your needs.
 
 ### 3,5. AUR, want to use ChaoticAUR instead? The hidden question
 Between question 3 (add dependencies) and 4 (enable multilib) exists another hidden question
