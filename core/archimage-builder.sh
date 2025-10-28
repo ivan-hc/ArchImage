@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-if grep -q "_junest_setup" ../*-junest.sh; then
-	exit 0
-fi
-
 ##########################################################################################################################################################
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
 ##########################################################################################################################################################
@@ -316,7 +312,7 @@ _savelibs() {
 	echo "◆ Detect libraries related to /usr/bin files"
 	libs4bin=$(readelf -d AppDir/.junest/usr/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so")
 
-	echo "◆ Saving JuNest core libraries"
+	echo "◆ Select JuNest core libraries"
 	cp -r ./archlinux/.junest/usr/lib/ld-linux-x86-64.so* AppDir/.junest/usr/lib/
 	lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
 	lib_preset="$APP $BIN libdw libelf libresolv.so libtinfo.so profile.d $libs4bin $lib_browser_launcher"
@@ -324,6 +320,9 @@ _savelibs() {
 	for arg in $LIBSAVED; do
 		LIBPATHS="$LIBPATHS $(find ./archlinux/.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
 	done
+	echo "$LIBPATHS" | tr ' ' '\n' | grep -v "__pycache__" | grep "/usr/lib" | sort -u > libs
+	LIBPATHS=$(sort ./libs)
+	echo "◆ Copy selected libraries to AppDir/"
 	for arg in $LIBPATHS; do
 		[ ! -d AppDir/"$arg" ] && cp -r ./archlinux/"$arg" AppDir/"$arg" &
 	done
@@ -333,24 +332,34 @@ _savelibs() {
 
 	echo "◆ Detect and copy base libs"
 	basebin_libs=$(find ./AppDir -executable -name "*.so*")
+	printf "\n 1\n"
 	lib_base_1=$(for b in $basebin_libs; do readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_1=$(echo "$lib_base_1" | tr ' ' '\n' | sort -u | xargs)
+	echo " 2"
 	lib_base_2=$(for b in $lib_base_1; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_2=$(echo "$lib_base_2" | tr ' ' '\n' | sort -u | xargs)
+	echo " 3"
 	lib_base_3=$(for b in $lib_base_2; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_3=$(echo "$lib_base_3" | tr ' ' '\n' | sort -u | xargs)
+	echo " 4"
 	lib_base_4=$(for b in $lib_base_3; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_4=$(echo "$lib_base_4" | tr ' ' '\n' | sort -u | xargs)
+	echo " 5"
 	lib_base_5=$(for b in $lib_base_4; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_5=$(echo "$lib_base_5" | tr ' ' '\n' | sort -u | xargs)
+	echo " 6"
 	lib_base_6=$(for b in $lib_base_5; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_6=$(echo "$lib_base_6" | tr ' ' '\n' | sort -u | xargs)
+	echo " 7"
 	lib_base_7=$(for b in $lib_base_6; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_7=$(echo "$lib_base_7" | tr ' ' '\n' | sort -u | xargs)
+	echo " 8"
 	lib_base_8=$(for b in $lib_base_7; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_8=$(echo "$lib_base_8" | tr ' ' '\n' | sort -u | xargs)
+	echo " 9"
 	lib_base_9=$(for b in $lib_base_8; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_9=$(echo "$lib_base_9" | tr ' ' '\n' | sort -u | xargs)
+	printf " 10\n\n"
 	lib_base_libs="$lib_core $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9"
 	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
 	for l in $lib_base_libs; do
@@ -432,7 +441,7 @@ case "$1" in
 			# Use debloated packages
 			debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
 			extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
-			extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
+			extra_packages="ffmpeg gdk-pixbuf2 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
 			for p in $extra_packages; do
 				if _JUNEST_CMD -- yay -Qs "$p"; then
 					if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
@@ -441,8 +450,11 @@ case "$1" in
 					_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
 				fi
 			done
-			# Try to compile schema files
+			# Try to compile schema files, update mime database and gdk-pixbuf loaders.cache
 			_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
+			_JUNEST_CMD -- update-mime-database /usr/share/mime
+			_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0
+			_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
 		else
 			echo "No app found, exiting"; exit 1
 		fi
