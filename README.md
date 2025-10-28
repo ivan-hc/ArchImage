@@ -36,6 +36,8 @@ https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
 
 - [What NOT to do](#what-not-to-do)
 
+- [Extensions (and what they mean)](#extensions-and-what-they-mean)
+
 - [Step by step guide](#step-by-step-guide)
 
 - [Requirements of an AppImage](#requirements-of-an-appimage)
@@ -105,14 +107,7 @@ Pay attention to the file extension, it must contain the version of Archimage us
 Appname-$VERSION-archimage5.0-x86_64.AppImage
 ```
 
-Always try to get the latest version to build your Appimages:
-
-- since version 4 hardware acceleration is available
-- since version 4.2 the AppImages created use PROOT as a fallback in case the host system has Namespaces restrictions (see Ubuntu), also the Appimages created are updatable
-- since version 4.3 the scripts are faster and more selective for libraries, automating much of the process
-- since version 5.0 librariesw are collected via SHARUN, to check and import as much as possible only the needed libraries to made the app run
-
-Please refer to the [releases](https://github.com/ivan-hc/ArchImage/releases) page to see the developments and new features introduced in this project so far.
+Always try to get the latest version to build your Appimages (see "*[Extensions (and what they mean)](#extensions-and-what-they-mean)*", below).
 
 ------------------------------------------
 ### What NOT to do
@@ -132,6 +127,35 @@ Follow the steps at "[*What to do*](#what-to-do)" and watch the "[video example]
 | - |
 
 ------------------------------------------------------------------------
+
+### Extensions (and what they mean)
+
+You can recognize an Archimage by the form of its file name.
+```
+$APPNAME_$VERSION-archimage5.0-x86_64.AppImage
+```
+...in the example, you see the term "**archimage5.0**". This term indicates characteristics that differentiate it from other Archimages, whether it's from a specific release or not.
+
+In fact, the script and the CLI don't go hand in hand:
+- The CLI is used to adapt the script based on your primary needs (naming the app, its binary, adding additional repositories, and Nvidia hardware acceleration).
+- The script may change from time to time depending on improvements made to the way AppImages are built.
+
+In this sense, here's what the terms you'll most often see (in my repositories) mean:
+
+- **archimage3.5** - This is an old version, it relies solely on BuubbleWrap, so it won't work on some systems. 
+- **archimage4.0** - Introduces Nvidia hardware acceleration for the first time in this project.
+- **archimage4.2** - Alternates BubbleWrap with PROOT, so it runs on almost any distro. Also, the AppImage supports Delta updates.
+- **archimage4.3** - Faster and less resource-intensive build scripts, with greater automation in processes.
+- **archimage4.8/4.9** - Build only (no release). Moved the local Nvidia driver directory from *~/.local/share/Conty* to *~/.cache/junest_shared*.
+- **archimage5.0** - Moved the common processes of all scripts into a single script in this repository. Library selection via SHARUN. Reduced build scripts for easier reading and, more importantly, customization.
+
+------------------------------------------------------------------------
+
+| [Back to "Index"](#index) |
+| - |
+
+------------------------------------------------------------------------
+
 ### Step by step guide
 Before proceeding, make sure you have understood "[What to do](#what-to-do)" and above all "[**What NOT to do**](#what-not-to-do)"!
 
