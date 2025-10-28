@@ -25,8 +25,17 @@ _junest_setup() {
 
 		# Enable the archlinuxcn third-party repository
 		if [ "$ARCHLINUXCN_ON" = 1 ]; then
-			archcn_mirror="https://repo.archlinuxcn.org"
-			archcn_key_pkg=$(curl -Ls "$archcn_mirror" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
+			archlinuxcn_mirrorlist="https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/refs/heads/master/archlinuxcn-mirrorlist"
+			archcn_mirrors=$(curl -Ls "$archlinuxcn_mirrorlist" | tr ' ' '\n' | grep "^https://" | sed 's#/$arch##g')
+			for m in $archlinuxcn_mirrorlist; do
+				if [ -z "$archcn_mirror" ]; then
+					archcn_key_pkg=$(curl -Ls "$m/x86_64" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
+					if [ -n "$archcn_key_pkg" ]; then
+						archcn_mirror="$m"
+					fi
+				fi
+			done
+			[ -z "$archcn_mirror" ] && exit 0
 			_JUNEST_CMD -- sudo pacman --noconfirm -U "$archcn_mirror"/"$ARCH"/"$archcn_key_pkg"
 			printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = $archcn_mirror/\$arch" >> ./.junest/etc/pacman.conf
 		fi
