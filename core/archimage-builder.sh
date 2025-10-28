@@ -27,7 +27,7 @@ _junest_setup() {
 		if [ "$ARCHLINUXCN_ON" = 1 ]; then
 			archlinuxcn_mirrorlist="https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/refs/heads/master/archlinuxcn-mirrorlist"
 			archcn_mirrors=$(curl -Ls "$archlinuxcn_mirrorlist" | tr ' ' '\n' | grep "^https://" | sed 's#/$arch##g')
-			for m in $archlinuxcn_mirrorlist; do
+			for m in $archcn_mirrors; do
 				if [ -z "$archcn_mirror" ]; then
 					archcn_key_pkg=$(curl -Ls "$m/x86_64" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
 					if [ -n "$archcn_key_pkg" ]; then
