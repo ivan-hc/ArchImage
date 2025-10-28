@@ -36,7 +36,7 @@ _junest_setup() {
 				fi
 			done
 			[ -z "$archcn_mirror" ] && exit 0
-			_JUNEST_CMD -- sudo pacman --noconfirm -U "$archcn_mirror"/"$ARCH"/"$archcn_key_pkg"
+			_JUNEST_CMD -- sudo pacman --noconfirm -U "$archcn_mirror"/x86_64/"$archcn_key_pkg"
 			printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = $archcn_mirror/\$arch" >> ./.junest/etc/pacman.conf
 		fi
 
