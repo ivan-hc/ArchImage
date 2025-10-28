@@ -58,63 +58,15 @@ HOME="$(dirname "$(readlink -f "$0")")"
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
 ##########################################################################################################################################################
 
-_enable_multilib() {
-	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
-}
+_enable_archlinuxcn() {	ARCHLINUXCN_ON="1"; }
+_enable_chaoticaur() { CHAOTICAUR_ON="1"; }
+_enable_multilib() { MULTILIB_ON="1"; }
 
-_enable_chaoticaur() {
-	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
-	_JUNEST_CMD -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-	_JUNEST_CMD -- sudo pacman-key --lsign-key 3056513887B78AEB
-	_JUNEST_CMD -- sudo pacman-key --populate chaotic
-	_JUNEST_CMD -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
-}
+#_enable_archlinuxcn
+#_enable_chaoticaur
+#_enable_multilib
 
-_enable_archlinuxcn() {
-	_JUNEST_CMD -- sudo pacman --noconfirm -U "https://repo.archlinuxcn.org/x86_64/$(curl -Ls https://repo.archlinuxcn.org/x86_64/ | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)"
-	printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = http://repo.archlinuxcn.org/\$arch" >> ./.junest/etc/pacman.conf
-}
-
-_custom_mirrorlist() {
-	COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
-	if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
-		curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS= | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
-	else
-		curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
-	fi
-}
-
-_bypass_signature_check_level() {
-	sed -i 's/#SigLevel/SigLevel/g; s/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
-}
-
-_install_junest() {
-	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	git clone https://github.com/ivan-hc/junest.git ./.local/share/junest
-	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	if [ ! -f ./junest-x86_64.tar.gz ]; then
-		curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz || exit 1
-	fi
-	_JUNEST_CMD setup -i junest-x86_64.tar.gz
-	echo " Apply patches to PacMan..."
-	#_enable_multilib
-	#_enable_chaoticaur
-	#_enable_archlinuxcn
-	_custom_mirrorlist
-	_bypass_signature_check_level
-
-	# Update arch linux in junest
-	_JUNEST_CMD -- sudo pacman -Syy
-	_JUNEST_CMD -- sudo pacman --noconfirm -Syu
-}
-
-if ! test -d "$HOME/.local/share/junest"; then
-	printf -- "-----------------------------------------------------------------------------\n DOWNLOAD, INSTALL AND CONFIGURE JUNEST\n-----------------------------------------------------------------------------\n"
-	_install_junest
-else
-	printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
-fi
+[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh junest-setup "$@"
 
 ##########################################################################################################################################################
 #	INSTALL PROGRAMS USING YAY
