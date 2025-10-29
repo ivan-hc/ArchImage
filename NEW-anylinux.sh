@@ -31,6 +31,12 @@ _post_installation_processes() {
 #	SETUP THE ENVIRONMENT
 ##########################################################################################################################################################
 
+# Download archimage-builder.sh
+if [ ! -f ./archimage-builder.sh ]; then
+	ARCHIMAGE_BUILDER="https://raw.githubusercontent.com/ivan-hc/ArchImage/refs/heads/main/core/archimage-builder.sh"
+	wget --retry-connrefused --tries=30 "$ARCHIMAGE_BUILDER" -O ./archimage-builder.sh || exit 0
+fi
+
 # Create and enter the AppDir
 mkdir -p archlinux && cd archlinux || exit 1
 
@@ -45,63 +51,15 @@ HOME="$(dirname "$(readlink -f "$0")")"
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
 ##########################################################################################################################################################
 
-_enable_multilib() {
-	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
-}
+_enable_archlinuxcn() {	ARCHLINUXCN_ON="1"; }
+_enable_chaoticaur() { CHAOTICAUR_ON="1"; }
+_enable_multilib() { MULTILIB_ON="1"; }
 
-_enable_chaoticaur() {
-	# This function is ment to be used during the installation of JuNest, see "_pacman_patches"
-	_JUNEST_CMD -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-	_JUNEST_CMD -- sudo pacman-key --lsign-key 3056513887B78AEB
-	_JUNEST_CMD -- sudo pacman-key --populate chaotic
-	_JUNEST_CMD -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-	printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
-}
+#_enable_archlinuxcn
+#_enable_chaoticaur
+#_enable_multilib
 
-_enable_archlinuxcn() {
-	_JUNEST_CMD -- sudo pacman --noconfirm -U "https://repo.archlinuxcn.org/x86_64/$(curl -Ls https://repo.archlinuxcn.org/x86_64/ | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)"
-	printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = http://repo.archlinuxcn.org/\$arch" >> ./.junest/etc/pacman.conf
-}
-
-_custom_mirrorlist() {
-	COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
-	if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
-		curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS= | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
-	else
-		curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
-	fi
-}
-
-_bypass_signature_check_level() {
-	sed -i 's/#SigLevel/SigLevel/g; s/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
-}
-
-_install_junest() {
-	printf -- "-----------------------------------------------------------------------------\n◆ Clone JuNest from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	git clone https://github.com/ivan-hc/junest.git ./.local/share/junest
-	printf -- "-----------------------------------------------------------------------------\n◆ Downloading JuNest archive from https://github.com/ivan-hc/junest\n-----------------------------------------------------------------------------\n"
-	if [ ! -f ./junest-x86_64.tar.gz ]; then
-		curl -#Lo junest-x86_64.tar.gz https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz || exit 1
-	fi
-	_JUNEST_CMD setup -i junest-x86_64.tar.gz
-	echo " Apply patches to PacMan..."
-	#_enable_multilib
-	#_enable_chaoticaur
-	#_enable_archlinuxcn
-	_custom_mirrorlist
-	_bypass_signature_check_level
-
-	# Update arch linux in junest
-	_JUNEST_CMD -- sudo pacman -Syy
-	_JUNEST_CMD -- sudo pacman --noconfirm -Syu
-}
-
-if ! test -d "$HOME/.local/share/junest"; then
-	printf -- "-----------------------------------------------------------------------------\n DOWNLOAD, INSTALL AND CONFIGURE JUNEST\n-----------------------------------------------------------------------------\n"
-	_install_junest
-else
-	printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
-fi
+[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh junest-setup "$@"
 
 ##########################################################################################################################################################
 #	INSTALL PROGRAMS USING YAY
@@ -109,39 +67,18 @@ fi
 
 _JUNEST_CMD -- yay -Syy
 #_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-if [ -n "$BASICSTUFF" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
-fi
-if [ -n "$COMPILERS" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
-	_JUNEST_CMD -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
-fi
-if [ -n "$DEPENDENCES" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
-fi
-if [ -n "$APP" ]; then
-	_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb zsync
-	_JUNEST_CMD -- yay --noconfirm -S "$APP"
-	# Use debloated packages
-	debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
-	extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
-	extra_packages="ffmpeg gdk-pixbuf2 gtk3 gtk4 intel-media-driver llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
-	for p in $extra_packages; do
-		if _JUNEST_CMD -- yay -Qs "$p"; then
-			if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
-				curl -#Lo "$p"-2.x-x86_64.pkg.tar.zst "$debloated_soueces/$p-mini-x86_64.pkg.tar.zst" || exit 1
-			fi
-			_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
-		fi
-	done
-	# Try to compile schema files
-	_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
-else
-	echo "No app found, exiting"; exit 1
-fi
+
+[ -f ../archimage-builder.sh ] && source ../archimage-builder.sh install "$@"
+
+anylinux_utils="xorg-server-xvfb zsync"
+for alu in $anylinux_utils; do
+	if ! _JUNEST_CMD -- yay -Qs "$alu"; then
+		_JUNEST_CMD -- yay --noconfirm -S "$alu"
+	fi
+done
 
 ##########################################################################################################################################################
-#	CREATE THE APPIMAGE
+#	APPDIR
 ##########################################################################################################################################################
 
 # AppDir setup
@@ -157,30 +94,39 @@ echo "$DEPENDENCES" > ./deps
 
 # Add launcher and icon
 rm -f AppDir/*.desktop
-LAUNCHER=$(grep -iRl "^Exec.*$BIN" .junest/usr/share/applications/* | grep ".desktop" | head -1)
+if [ "$BIN" = libreoffice ]; then
+	LAUNCHER=$(grep -iRl "^Exec.*$BIN" ./.junest/lib/libreoffice/share/xdg/* | grep "startcenter.*.desktop" | head -1)
+else
+	LAUNCHER=$(grep -iRl "^Exec.*$BIN" ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
+fi
 cp -r "$LAUNCHER" AppDir/
-ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 [ -z "$ICON" ] && ICON="$BIN"
-cp -r .junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* AppDir/ 2>/dev/null
-cp -r .junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
+cp -r ./.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
+for i in $hicolor_dirs; do
+	cp -r ./.junest/usr/share/icons/hicolor/"$i"/apps/*"$ICON"* AppDir/ 2>/dev/null || cp -r ./.junest/usr/share/icons/hicolor/"$i"/mimetypes/*"$ICON"* AppDir/ 2>/dev/null
+done
+cp -r ./.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
+
+# Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
+if test -f AppDir/*.desktop; then
+	echo "◆ The .desktop file is available in AppDir/"
+elif ! test -f ./.junest/usr/bin/"$BIN"; then
+ 	echo "No binary in path... aborting all the processes."
+	exit 0
+fi
 
 # Version
 export VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 echo "$VERSION" > ~/version
 
+##########################################################################################################################################################
+#	COMPILE
+##########################################################################################################################################################
+
 # Anylinux variables
 ARCH="x86_64"
-URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
 export APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
@@ -207,9 +153,10 @@ _extract_main_package() {
 	mkdir -p base
 	rm -Rf ./base/*
 	pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
-	if [ "$(echo "$pkg_full_path" | wc -l)" = 1 ]; then
-		pkg_full_path=$(find ./.junest -type f -name "$APP-*zst")
-	else
+	if [ -z "$pkg_full_path" ]; then
+		pkg_full_path=$(find . -type f -name "$APP-*zst")
+	fi
+	if [ "$(echo "$pkg_full_path" | wc -l)" != 1 ]; then
 		for p in $pkg_full_path; do
 			if tar fx "$p" .PKGINFO -O | grep -q "pkgname = $APP$"; then
 				pkg_full_path="$p"
@@ -217,7 +164,7 @@ _extract_main_package() {
 		done
 	fi
 	[ -z "$pkg_full_path" ] && echo "💀 ERROR: no package found for \"$APP\", operation aborted!" && exit 0
-	tar fx "$pkg_full_path" -C ./base/
+	tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword
 	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
 }
 
@@ -229,52 +176,17 @@ printf -- "\n-------------------------------------------------------------------
 _savebins() {
 	echo "◆ Saving files in /usr/bin"
 	for arg in $BINSAVED; do
-		cp -r ./.junest/usr/bin/*"$arg"* AppDir/bin/
+		rsync -av ./.junest/usr/bin/*"$arg"* AppDir/bin/ 1>/dev/null
 	done
 }
 
 # Save files in /usr/lib
 _savelibs() {
-	echo "◆ Detect libraries related to /usr/bin files"
-	libs4bin=$(readelf -d AppDir/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so")
-
-	LIBSAVED="$libs4bin $LIBSAVED"
+	echo "◆ Saving directories and files in /usr/lib"
+	LIBSAVED="$LIBSAVED $APP $BIN"
 	for arg in $LIBSAVED; do
-		LIBPATHS="$LIBPATHS $(find ./.junest/usr/lib -maxdepth 20 -wholename "*$arg*" | sed 's/\.\/archlinux\///g')"
-	done
-	for arg in $LIBPATHS; do
-		[ ! -d AppDir/"$arg" ] && cp -r ./archlinux/"$arg" AppDir/"$arg" &
-	done
-	wait
-	core_libs=$(find AppDir -type f)
-	lib_core=$(for c in $core_libs; do readelf -d "$c" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-
-	echo "◆ Detect and copy base libs"
-	basebin_libs=$(find ./AppDir -executable -name "*.so*")
-	lib_base_1=$(for b in $basebin_libs; do readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_1=$(echo "$lib_base_1" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_2=$(for b in $lib_base_1; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_2=$(echo "$lib_base_2" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_3=$(for b in $lib_base_2; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_3=$(echo "$lib_base_3" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_4=$(for b in $lib_base_3; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_4=$(echo "$lib_base_4" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_5=$(for b in $lib_base_4; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_5=$(echo "$lib_base_5" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_6=$(for b in $lib_base_5; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_6=$(echo "$lib_base_6" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_7=$(for b in $lib_base_6; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_7=$(echo "$lib_base_7" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_8=$(for b in $lib_base_7; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_8=$(echo "$lib_base_8" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_9=$(for b in $lib_base_8; do readelf -d ./.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
-	lib_base_9=$(echo "$lib_base_9" | tr ' ' '\n' | sort -u | xargs)
-	lib_base_libs="$lib_core $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9"
-	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
-	for l in $lib_base_libs; do
-		rsync -av ./.junest/usr/lib/"$l"* AppDir/lib/ &
-	done
-	wait
+		rsync -av ./.junest/usr/lib/*"$arg"* AppDir/lib/ 1>/dev/null
+ 	done
 }
 
 # Save files in /usr/share
@@ -282,7 +194,7 @@ _saveshare() {
 	echo "◆ Saving directories in /usr/share"
 	SHARESAVED="$SHARESAVED $APP $BIN"
 	for arg in $SHARESAVED; do
-		cp -r ./.junest/usr/share/*"$arg"* AppDir/share/
+		rsync -av ./.junest/usr/share/*"$arg"* AppDir/share/ 1>/dev/null
  	done
 }
 
@@ -298,19 +210,21 @@ _post_installation_processes
 #	REMOVE BLOATWARES
 ##########################################################################################################################################################
 
-_remove_more_bloatwares() {
-	for r in $BIN_REMOVED; do rm -Rf AppDir/bin/"$r"*; done
-	for r in $LIB_REMOVED; do rm -Rf AppDir/lib/"$r"*; done
-	for r in $PYTHON_REMOVED; do rm -Rf AppDir/lib/python*/"$r"*; done
-	for r in $SHARE_REMOVED; do rm -Rf AppDir/share/"$r"*; done
-	find AppDir/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-	find AppDir/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rm -Rf AppDir/share/man # AppImages are not ment to have man command
-}
+# Remove bloatwares
+for r in $BIN_REMOVED; do rm -Rf AppDir/bin/"$r"*; done
+for r in $LIB_REMOVED; do rm -Rf AppDir/lib/"$r"*; done
+for r in $PYTHON_REMOVED; do rm -Rf AppDir/lib/python*/"$r"*; done
+for r in $SHARE_REMOVED; do rm -Rf AppDir/share/"$r"*; done
+find AppDir/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+find AppDir/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+rsync -av base/usr/share/locale/* AppDir/share/locale/ | printf "◆ Save locale from base package\n"
+rm -Rf AppDir/share/man # AppImages are not ment to have man command
 
 ##########################################################################################################################################################
 #	CREATE THE APPIMAGE WITH URUNTIME
 ##########################################################################################################################################################
+
+URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 
 wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
 chmod +x ./uruntime2appimage
