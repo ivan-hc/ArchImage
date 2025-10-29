@@ -128,7 +128,7 @@ _root_appdir() {
 	done
 	symlink_dirs=" bin sbin lib lib64 usr/sbin usr/lib64"
 	for l in $symlink_dirs; do
-		cp -r archlinux/.junest/"$l" AppDir/.junest/"$l"
+		rsync -av archlinux/.junest/"$l" AppDir/.junest/"$l" 1>/dev/null
 	done
 
 	rsync -av archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
@@ -246,7 +246,7 @@ _extract_base_to_AppDir() {
 	rsync -av base/usr/share/* AppDir/.junest/usr/share/ 2>/dev/null
 	if [ -d archlinux/.junest/usr/lib32 ]; then
 		mkdir -p AppDir/.junest/usr/lib32
-		rsync -av archlinux/.junest/usr/lib32/* AppDir/.junest/usr/lib32/ 2>/dev/null
+		rsync -av archlinux/.junest/usr/lib32/* AppDir/.junest/usr/lib32/ 1>/dev/null
 	fi
 }
 
@@ -271,9 +271,11 @@ _extract_main_package() {
 
 _extract_core_dependencies() {
 	if [ -n "$DEPENDENCES" ]; then
+		mkdir -p dependencies
+		rm -Rf ./dependencies/*
 		for d in $DEPENDENCES; do
 			if test -f ./archlinux/"$d"-*; then
-				tar fx ./archlinux/"$d"-* -C ./base/ --warning=no-unknown-keyword | printf "\n◆ Force \"$d\""
+				tar fx ./archlinux/"$d"-* -C ./dependencies/ --warning=no-unknown-keyword | printf "\n◆ Force \"$d\""
 			else
 				pkg_full_path=$(find ./archlinux -type f -name "$d-[0-9]*zst")
 				if [ -z "$pkg_full_path" ]; then
@@ -281,29 +283,31 @@ _extract_core_dependencies() {
 				fi
 				for p in $pkg_full_path; do
 					pkgname=$(echo "$pkg_full_path" | sed 's:.*/::')
-					tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword | printf "\n◆ Force \"$pkgname\""
+					tar fx "$pkg_full_path" -C ./dependencies/ --warning=no-unknown-keyword | printf "\n◆ Force \"$pkgname\""
 				done
 			fi
 		done
 		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
+		rm -Rf dependencies/usr/share/locale dependencies/.*
+		rsync -av dependencies/* AppDir/.junest/ 1>/dev/null
 	fi
 }
 
 # Save files in /usr/bin
 _savebins() {
 	echo "◆ Saving files in /usr/bin"
-	cp -r ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/gio* AppDir/.junest/usr/bin/
-	cp -r ./archlinux/.junest/usr/bin/xdg-* AppDir/.junest/usr/bin/
+	rsync -av ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av ./archlinux/.junest/usr/bin/gio* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av ./archlinux/.junest/usr/bin/xdg-* AppDir/.junest/usr/bin/ 1>/dev/null
 	coreutils="[ basename cat chmod chown cp cut dir dirname du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
 	utils_bin="awk bash $coreutils gawk gio grep ld ldd sed sh strings"
 	for b in $utils_bin; do
- 		cp -r ./archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/
+ 		rsync -av archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/ 1>/dev/null
    	done
 	for arg in $BINSAVED; do
-		cp -r ./archlinux/.junest/usr/bin/*"$arg"* AppDir/.junest/usr/bin/
+		rsync -av archlinux/.junest/usr/bin/*"$arg"* AppDir/.junest/usr/bin/ 1>/dev/null
 	done
 }
 
@@ -322,48 +326,38 @@ _savelibs() {
 	done
 	echo "$LIBPATHS" | tr ' ' '\n' | grep -v "__pycache__" | grep "/usr/lib" | sort -u > libs
 	LIBPATHS=$(sort ./libs)
-	echo "◆ Copy selected libraries to AppDir/"
+	echo "◆ Copy selected libraries to AppDir"
 	for arg in $LIBPATHS; do
-		[ ! -d AppDir/"$arg" ] && cp -r ./archlinux/"$arg" AppDir/"$arg" &
+		[ ! -d AppDir/"$arg" ] && rsync -av archlinux/"$arg" AppDir/"$arg" 1>/dev/null &
 	done
 	wait
 	core_libs=$(find AppDir -type f)
 	lib_core=$(for c in $core_libs; do readelf -d "$c" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 
-	echo "◆ Detect and copy base libs"
+	printf "◆ Detect and copy base libs\n"
 	basebin_libs=$(find ./AppDir -executable -name "*.so*")
-	printf "\n 1\n"
 	lib_base_1=$(for b in $basebin_libs; do readelf -d "$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_1=$(echo "$lib_base_1" | tr ' ' '\n' | sort -u | xargs)
-	echo " 2"
 	lib_base_2=$(for b in $lib_base_1; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_2=$(echo "$lib_base_2" | tr ' ' '\n' | sort -u | xargs)
-	echo " 3"
 	lib_base_3=$(for b in $lib_base_2; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_3=$(echo "$lib_base_3" | tr ' ' '\n' | sort -u | xargs)
-	echo " 4"
 	lib_base_4=$(for b in $lib_base_3; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_4=$(echo "$lib_base_4" | tr ' ' '\n' | sort -u | xargs)
-	echo " 5"
 	lib_base_5=$(for b in $lib_base_4; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_5=$(echo "$lib_base_5" | tr ' ' '\n' | sort -u | xargs)
-	echo " 6"
 	lib_base_6=$(for b in $lib_base_5; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_6=$(echo "$lib_base_6" | tr ' ' '\n' | sort -u | xargs)
-	echo " 7"
 	lib_base_7=$(for b in $lib_base_6; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_7=$(echo "$lib_base_7" | tr ' ' '\n' | sort -u | xargs)
-	echo " 8"
 	lib_base_8=$(for b in $lib_base_7; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_8=$(echo "$lib_base_8" | tr ' ' '\n' | sort -u | xargs)
-	echo " 9"
 	lib_base_9=$(for b in $lib_base_8; do readelf -d ./archlinux/.junest/usr/lib/"$b" 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so"; done)
 	lib_base_9=$(echo "$lib_base_9" | tr ' ' '\n' | sort -u | xargs)
-	printf " 10\n\n"
 	lib_base_libs="$lib_core $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9"
 	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
 	for l in $lib_base_libs; do
-		rsync -av ./archlinux/.junest/usr/lib/"$l"* AppDir/.junest/usr/lib/ &
+		rsync -av ./archlinux/.junest/usr/lib/"$l"* AppDir/.junest/usr/lib/ 1>/dev/null &
 	done
 	wait
 }
@@ -373,7 +367,7 @@ _saveshare() {
 	echo "◆ Saving directories in /usr/share"
 	SHARESAVED="$SHARESAVED $APP $BIN fontconfig glib- locale mime wayland X11"
 	for arg in $SHARESAVED; do
-		cp -r ./archlinux/.junest/usr/share/*"$arg"* AppDir/.junest/usr/share/
+		rsync -av ./archlinux/.junest/usr/share/*"$arg"* AppDir/.junest/usr/share/ 1>/dev/null
  	done
 }
 
@@ -390,7 +384,7 @@ _remove_more_bloatwares() {
 	echo Y | rm -Rf AppDir/.cache/yay/*
 	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rsync -av base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n\n"
+	rsync -av base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
@@ -398,6 +392,7 @@ _remove_more_bloatwares() {
 }
 
 _enable_mountpoints_for_the_inbuilt_bubblewrap() {
+	printf "◆ Create mount points\n\n"
 	mkdir -p AppDir/.junest/home
 	bind_dirs=$(grep "_dirs=" AppDir/AppRun | tr '" ' '\n' | grep "/" | sort | xargs)
 	for d in $bind_dirs; do mkdir -p AppDir/.junest"$d"; done
@@ -506,12 +501,12 @@ case "$1" in
 		_post_installation_processes
 
 		# Remove bloatwares and enable mountpoints
-		printf "\n◆ Trying to reduce size:\n\n"
+		printf "\n◆ Trying to reduce size\n"
 
 		_remove_more_bloatwares
 		find AppDir/.junest/usr/lib AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
-		find AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
-		find AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
+		find AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \; 2>/dev/null
+		find AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \; 2>/dev/null
 		find AppDir/.junest/usr -type d -empty -delete
 
 		_enable_mountpoints_for_the_inbuilt_bubblewrap
