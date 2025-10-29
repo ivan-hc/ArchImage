@@ -136,10 +136,10 @@ _JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
 
 # Extract the main package in the AppDir
 _extract_base_to_AppDir() {
-	#rsync -av base/etc/* AppDir/etc/ 2>/dev/null
-	#rsync -av base/usr/bin/* AppDir/bin/ 2>/dev/null
-	#rsync -av base/usr/lib/* AppDir/lib/ 2>/dev/null
-	rsync -av base/usr/share/* AppDir/share/ 2>/dev/null
+	#rsync -av --inplace --no-whole-file --size-only base/etc/* AppDir/etc/ 2>/dev/null
+	#rsync -av --inplace --no-whole-file --size-only base/usr/bin/* AppDir/bin/ 2>/dev/null
+	#rsync -av --inplace --no-whole-file --size-only base/usr/lib/* AppDir/lib/ 2>/dev/null
+	rsync -av --inplace --no-whole-file --size-only base/usr/share/* AppDir/share/ 2>/dev/null
 }
 
 _extract_main_package() {
@@ -169,7 +169,7 @@ printf -- "\n-------------------------------------------------------------------
 _savebins() {
 	echo "◆ Saving files in /usr/bin"
 	for arg in $BINSAVED; do
-		rsync -av ./.junest/usr/bin/*"$arg"* AppDir/bin/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only ./.junest/usr/bin/*"$arg"* AppDir/bin/ 1>/dev/null
 	done
 }
 
@@ -178,7 +178,7 @@ _savelibs() {
 	echo "◆ Saving directories and files in /usr/lib"
 	LIBSAVED="$LIBSAVED $APP $BIN"
 	for arg in $LIBSAVED; do
-		rsync -av ./.junest/usr/lib/*"$arg"* AppDir/lib/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only ./.junest/usr/lib/*"$arg"* AppDir/lib/ 1>/dev/null
  	done
 }
 
@@ -187,7 +187,7 @@ _saveshare() {
 	echo "◆ Saving directories in /usr/share"
 	SHARESAVED="$SHARESAVED $APP $BIN"
 	for arg in $SHARESAVED; do
-		rsync -av ./.junest/usr/share/*"$arg"* AppDir/share/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only ./.junest/usr/share/*"$arg"* AppDir/share/ 1>/dev/null
  	done
 }
 
@@ -210,7 +210,7 @@ for r in $PYTHON_REMOVED; do rm -Rf AppDir/lib/python*/"$r"*; done
 for r in $SHARE_REMOVED; do rm -Rf AppDir/share/"$r"*; done
 find AppDir/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find AppDir/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-rsync -av base/usr/share/locale/* AppDir/share/locale/ | printf "◆ Save locale from base package\n"
+rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/share/locale/ | printf "◆ Save locale from base package\n"
 rm -Rf AppDir/share/man # AppImages are not ment to have man command
 
 ##########################################################################################################################################################
