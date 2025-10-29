@@ -114,7 +114,7 @@ _root_appdir() {
 
 	if [ ! -d AppDir/.local ]; then
 		mkdir -p AppDir/.local
-		rsync -av archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
+		rsync -av --inplace --no-whole-file --size-only archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
 		# Made JuNest a portable app and remove "read-only file system" errors
 		cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
 		cat AppDir/.local/share/junest/lib/core/namespace.patch > AppDir/.local/share/junest/lib/core/namespace.sh
@@ -128,11 +128,11 @@ _root_appdir() {
 	done
 	symlink_dirs=" bin sbin lib lib64 usr/sbin usr/lib64"
 	for l in $symlink_dirs; do
-		rsync -av archlinux/.junest/"$l" AppDir/.junest/"$l" 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only archlinux/.junest/"$l" AppDir/.junest/"$l" 1>/dev/null
 	done
 
-	rsync -av archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
-	rsync -av archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
+	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
 }
 
 ##########################################################################################################################################################
@@ -240,13 +240,13 @@ _run_quick_sharun() {
 
 # Extract the main package in the AppDir
 _extract_base_to_AppDir() {
-	rsync -av base/etc/* AppDir/.junest/etc/ 2>/dev/null
-	rsync -av base/usr/bin/* AppDir/.junest/usr/bin/ 2>/dev/null
-	rsync -av base/usr/lib/* AppDir/.junest/usr/lib/ 2>/dev/null
-	rsync -av base/usr/share/* AppDir/.junest/usr/share/ 2>/dev/null
+	rsync -av --inplace --no-whole-file --size-only base/etc/* AppDir/.junest/etc/ 2>/dev/null
+	rsync -av --inplace --no-whole-file --size-only base/usr/bin/* AppDir/.junest/usr/bin/ 2>/dev/null
+	rsync -av --inplace --no-whole-file --size-only base/usr/lib/* AppDir/.junest/usr/lib/ 2>/dev/null
+	rsync -av --inplace --no-whole-file --size-only base/usr/share/* AppDir/.junest/usr/share/ 2>/dev/null
 	if [ -d archlinux/.junest/usr/lib32 ]; then
 		mkdir -p AppDir/.junest/usr/lib32
-		rsync -av archlinux/.junest/usr/lib32/* AppDir/.junest/usr/lib32/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/lib32/* AppDir/.junest/usr/lib32/ 1>/dev/null
 	fi
 }
 
@@ -289,25 +289,25 @@ _extract_core_dependencies() {
 		done
 		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
 		rm -Rf dependencies/usr/share/locale dependencies/.*
-		rsync -av dependencies/* AppDir/.junest/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only dependencies/* AppDir/.junest/ 1>/dev/null
 	fi
 }
 
 # Save files in /usr/bin
 _savebins() {
 	echo "◆ Saving files in /usr/bin"
-	rsync -av ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/ 1>/dev/null
-	rsync -av ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/ 1>/dev/null
-	rsync -av ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/ 1>/dev/null
-	rsync -av ./archlinux/.junest/usr/bin/gio* AppDir/.junest/usr/bin/ 1>/dev/null
-	rsync -av ./archlinux/.junest/usr/bin/xdg-* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/bin/bwrap AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/bin/proot* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/bin/*$BIN* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/bin/gio* AppDir/.junest/usr/bin/ 1>/dev/null
+	rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/bin/xdg-* AppDir/.junest/usr/bin/ 1>/dev/null
 	coreutils="[ basename cat chmod chown cp cut dir dirname du echo env expand expr fold head id ln ls mkdir mv readlink realpath rm rmdir seq sleep sort stty sum sync tac tail tee test timeout touch tr true tty uname uniq wc who whoami yes"
 	utils_bin="awk bash $coreutils gawk gio grep ld ldd sed sh strings"
 	for b in $utils_bin; do
- 		rsync -av archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/ 1>/dev/null
+ 		rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/bin/"$b" AppDir/.junest/usr/bin/ 1>/dev/null
    	done
 	for arg in $BINSAVED; do
-		rsync -av archlinux/.junest/usr/bin/*"$arg"* AppDir/.junest/usr/bin/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/bin/*"$arg"* AppDir/.junest/usr/bin/ 1>/dev/null
 	done
 }
 
@@ -328,7 +328,7 @@ _savelibs() {
 	LIBPATHS=$(sort ./libs)
 	echo "◆ Copy selected libraries to AppDir"
 	for arg in $LIBPATHS; do
-		[ ! -d AppDir/"$arg" ] && rsync -av archlinux/"$arg" AppDir/"$arg" 1>/dev/null &
+		[ ! -d AppDir/"$arg" ] && rsync -av --inplace --no-whole-file --size-only archlinux/"$arg" AppDir/"$arg" 1>/dev/null &
 	done
 	wait
 	core_libs=$(find AppDir -type f)
@@ -357,7 +357,7 @@ _savelibs() {
 	lib_base_libs="$lib_core $lib_base_1 $lib_base_2 $lib_base_3 $lib_base_4 $lib_base_5 $lib_base_6 $lib_base_7 $lib_base_8 $lib_base_9"
 	lib_base_libs=$(echo "$lib_base_libs" | tr ' ' '\n' | sort -u | sed 's/.so.*/.so/' | xargs)
 	for l in $lib_base_libs; do
-		rsync -av ./archlinux/.junest/usr/lib/"$l"* AppDir/.junest/usr/lib/ 1>/dev/null &
+		rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/lib/"$l"* AppDir/.junest/usr/lib/ 1>/dev/null &
 	done
 	wait
 }
@@ -367,7 +367,7 @@ _saveshare() {
 	echo "◆ Saving directories in /usr/share"
 	SHARESAVED="$SHARESAVED $APP $BIN fontconfig glib- locale mime wayland X11"
 	for arg in $SHARESAVED; do
-		rsync -av ./archlinux/.junest/usr/share/*"$arg"* AppDir/.junest/usr/share/ 1>/dev/null
+		rsync -av --inplace --no-whole-file --size-only ./archlinux/.junest/usr/share/*"$arg"* AppDir/.junest/usr/share/ 1>/dev/null
  	done
 }
 
@@ -384,7 +384,7 @@ _remove_more_bloatwares() {
 	echo Y | rm -Rf AppDir/.cache/yay/*
 	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rsync -av base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
+	rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
@@ -480,10 +480,10 @@ case "$1" in
 		fi
 
 		# Compile AppDir
-		rsync -av archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
-		rsync -av archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
-		rsync -av archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
-		rsync -av archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
+		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
+		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
+		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
+		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
 
 		_extract_main_package
 		_extract_core_dependencies
