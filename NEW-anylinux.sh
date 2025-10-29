@@ -125,18 +125,11 @@ echo "$VERSION" > ~/version
 #	COMPILE
 ##########################################################################################################################################################
 
-# Anylinux variables
 ARCH="x86_64"
-SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
-
-export APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
-export REPO="$APPNAME-appimage"
-export TAG="latest"
-export UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
-
-export OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 
 # Deploy dependencies
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
 _JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
@@ -225,6 +218,13 @@ rm -Rf AppDir/share/man # AppImages are not ment to have man command
 ##########################################################################################################################################################
 
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
+
+export APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
+export REPO="$APPNAME-appimage"
+export TAG="latest"
+export UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
+
+export OUTNAME="$APPNAME"-"$VERSION"-anylinux-"$ARCH".AppImage
 
 wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
 chmod +x ./uruntime2appimage
