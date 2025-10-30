@@ -138,6 +138,7 @@ _root_appdir() {
 
 	# Add launcher and icon
 	rm -f AppDir/*.desktop
+	DESKTOP_FILES=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop")
 	if [ "$BIN" = libreoffice ]; then
 		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/lib/libreoffice/share/xdg/* | grep "startcenter.*.desktop" | head -1)
 	elif [ -n "$LAUNCHER" ]; then
@@ -146,6 +147,8 @@ _root_appdir() {
 		LAUNCHER="archlinux/.junest/usr/share/applications/$BIN.desktop"
 	elif [ -f archlinux/.junest/usr/share/applications/"$APP".desktop ]; then
 		LAUNCHER="archlinux/.junest/usr/share/applications/$APP.desktop"
+	elif [ "$(echo "$DESKTOP_FILES" | wc -l)" != 1 ]; then
+		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | awk 'length < min || NR==1 {min=length; line=$0} END {print line}')
 	else
 		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 	fi
