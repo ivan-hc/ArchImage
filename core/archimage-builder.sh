@@ -70,6 +70,55 @@ _junest_setup() {
 }
 
 ##########################################################################################################################################################
+#	INSTALL PROGRAMS USING YAY
+##########################################################################################################################################################
+
+_install_packages() {
+	if [ -n "$BASICSTUFF" ]; then
+			_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
+	fi
+	if [ -n "$COMPILERS" ]; then
+		_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
+		_JUNEST_CMD -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
+	fi
+	if [ -n "$DEPENDENCES" ]; then
+		_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
+	fi
+	if [ -n "$APP" ]; then
+		_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
+		_JUNEST_CMD -- yay --noconfirm -S "$APP"
+		VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
+		# Use debloated packages
+		debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
+		extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
+		extra_packages="ffmpeg gdk-pixbuf2 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
+		for p in $extra_packages; do
+			if _JUNEST_CMD -- yay -Qs "$p"; then
+				if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
+					curl -#Lo "$p"-2.x-x86_64.pkg.tar.zst "$debloated_soueces/$p-mini-x86_64.pkg.tar.zst" || exit 1
+				fi
+				_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
+			fi
+		done
+		# Try to compile schema files
+		_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
+		# Update mime database
+		if [ ! -f ./.junest/usr/share/mime/mime.cache ]; then
+			_JUNEST_CMD -- update-mime-database /usr/share/mime
+		fi
+		# Create loaders.cache for gdk-pixbuf
+		if _JUNEST_CMD -- yay -Qs gdk-pixbuf2; then
+			_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+			if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ] && [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
+				_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
+			fi
+		fi
+	else
+		echo "No app found, exiting"; exit 1
+	fi
+}
+
+##########################################################################################################################################################
 #	APPDIR
 ##########################################################################################################################################################
 
@@ -386,11 +435,11 @@ _saveshare() {
 _save_doc_and_locale() {
 	if [ -d AppDir/.junest/usr/share/doc ]; then
 		find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-		[ -d base/usr/share/doc ] && rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / | printf "◆ Save documentation from base package\n"
+		rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / 2>/dev/null | printf "◆ Save documentation from base package\n"
 	fi
 	if [ -d AppDir/.junest/usr/share/locale ]; then
 		find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-		[ -d base/usr/share/locale ] && rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
+		rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ 2>/dev/null | printf "◆ Save locale from base package\n"
 	fi
 }
 
@@ -457,48 +506,7 @@ case "$1" in
 		;;
 
 	"install")
-		if [ -n "$BASICSTUFF" ]; then
-			_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
-		fi
-		if [ -n "$COMPILERS" ]; then
-			_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
-			_JUNEST_CMD -- yay --noconfirm -S python # to force one Python version and prevent modules from being installed in different directories (e.g. "mesonbuild")
-		fi
-		if [ -n "$DEPENDENCES" ]; then
-			_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
-		fi
-		if [ -n "$APP" ]; then
-			_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
-			_JUNEST_CMD -- yay --noconfirm -S "$APP"
-			VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
-			# Use debloated packages
-			debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
-			extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
-			extra_packages="ffmpeg gdk-pixbuf2 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
-			for p in $extra_packages; do
-				if _JUNEST_CMD -- yay -Qs "$p"; then
-					if [ ! -f ./"$p"-2.x-x86_64.pkg.tar.zst ]; then
-						curl -#Lo "$p"-2.x-x86_64.pkg.tar.zst "$debloated_soueces/$p-mini-x86_64.pkg.tar.zst" || exit 1
-					fi
-					_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
-				fi
-			done
-			# Try to compile schema files
-			_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
-			# Update mime database
-			if [ ! -f ./.junest/usr/share/mime/mime.cache ]; then
-				_JUNEST_CMD -- update-mime-database /usr/share/mime
-			fi
-			# Create loaders.cache for gdk-pixbuf
-			if _JUNEST_CMD -- yay -Qs gdk-pixbuf2; then
-				_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
-				if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ] && [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
-					_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
-				fi
-			fi
-		else
-			echo "No app found, exiting"; exit 1
-		fi
+		_install_packages
 		;;
 
 	"appdir")
