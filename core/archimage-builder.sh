@@ -106,7 +106,7 @@ _root_appdir() {
 
 	# Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
 	if test -f AppDir/*.desktop; then
-		echo "◆ The .desktop file is available in AppDir/"
+		echo "◆ Found .desktop file"
 	elif ! test -f archlinux/.junest/usr/bin/"$BIN"; then
 	 	echo "No binary in path... aborting all the processes."
 		exit 0
@@ -114,13 +114,13 @@ _root_appdir() {
 
 	if [ ! -d AppDir/.local ]; then
 		mkdir -p AppDir/.local
-		rsync -av --inplace --no-whole-file --size-only archlinux/.local/ AppDir/.local/ | echo "◆ Rsync .local directory to the AppDir"
+		rsync -av --inplace --no-whole-file --size-only archlinux/.local/ AppDir/.local/ | echo "◆ Include JuNest-related .local directory into AppDir"
 		# Made JuNest a portable app and remove "read-only file system" errors
 		cat AppDir/.local/share/junest/lib/core/wrappers.patch > AppDir/.local/share/junest/lib/core/wrappers.sh
 		cat AppDir/.local/share/junest/lib/core/namespace.patch > AppDir/.local/share/junest/lib/core/namespace.sh
 	fi
 
-	echo "◆ Rsync .junest directories structure to the AppDir"
+	echo "◆ Include .junest directories structure into AppDir"
 	rm -Rf AppDir/.junest/*
 	archdirs=$(find archlinux/.junest -type d | sed 's/^archlinux\///g')
 	for d in $archdirs; do
@@ -131,8 +131,8 @@ _root_appdir() {
 		rsync -av --inplace --no-whole-file --size-only archlinux/.junest/"$l" AppDir/.junest/"$l" 1>/dev/null
 	done
 
-	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Rsync bin_wrappers to the AppDir"
-	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Rsync /etc"
+	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/bin_wrappers/ AppDir/.junest/usr/bin_wrappers/ | echo "◆ Include bin_wrappers (JuNest)"
+	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/etc/* AppDir/.junest/etc/ | echo "◆ Include /etc elements from JuNest"
 }
 
 ##########################################################################################################################################################
@@ -221,6 +221,8 @@ _apprun_binds() {
 
 # Deploy core libraries of the app
 _run_quick_sharun() {
+	printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
+
 	cd archlinux || exit 1
 	rm -Rf AppDir/*
 	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
@@ -375,20 +377,50 @@ _saveshare() {
 #	REMOVE BLOATWARES, ENABLE MOUNTPOINTS
 ##########################################################################################################################################################
 
+_save_doc_and_locale() {
+	if [ -d AppDir/.junest/usr/share/doc ]; then
+		find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+		[ -d base/usr/share/doc ] && rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / | printf "◆ Save documentation from base package\n"
+	fi
+	if [ -d AppDir/.junest/usr/share/locale ]; then
+		find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+		[ -d base/usr/share/locale ] && rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
+	fi
+}
+
 _remove_more_bloatwares() {
 	for r in $ETC_REMOVED; do rm -Rf AppDir/.junest/etc/"$r"*; done
 	for r in $BIN_REMOVED; do rm -Rf AppDir/.junest/usr/bin/"$r"*; done
 	for r in $LIB_REMOVED; do rm -Rf AppDir/.junest/usr/lib/"$r"*; rm -Rf AppDir/.junest/usr/lib32/"$r"*; done
 	for r in $PYTHON_REMOVED; do rm -Rf AppDir/.junest/usr/lib/python*/"$r"*; done
 	for r in $SHARE_REMOVED; do rm -Rf AppDir/.junest/usr/share/"$r"*; done
+
+	# AUR packages
 	echo Y | rm -Rf AppDir/.cache/yay/*
-	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
-	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
-	rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ | printf "◆ Save locale from base package\n"
+
+	# Unneeded directories
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
 	rm -Rf AppDir/.junest/var/* # remove all packages downloaded with the package manager
+
+	# Handle 32 bits libraries
+	if [ -f AppDir/.junest/usr/lib32/ld-linux.so.2 ]; then
+		find AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null | printf "◆ Delete all .a files in /usr/lib32\n"
+		find AppDir/.junest/usr/lib32 -type f -regex '.*\.so.*' -exec strip --strip-debug {} \; 2>/dev/null | printf "◆ Discard symbols and other data from libraries in /usr/lib32\n"
+	else
+		rm -Rf AppDir/.junest/usr/lib32 | printf "◆ Delete /usr/lib32\n"
+	fi
+
+	# Handle 64 bits libraries
+	find AppDir/.junest/usr/lib -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null | printf "◆ Delete all .a files in /usr/lib\n"
+	find AppDir/.junest/usr/lib -type f -regex '.*\.so.*' -exec strip --strip-debug {} \; 2>/dev/null | printf "◆ Discard symbols and other data from libraries in /usr/lib\n"
+
+	# Use "strip" on files in /usr/bin
+	find AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \; 2>/dev/null | printf "◆ Discard symbols and other data from some files in /usr/bin\n"
+
+	# Remove all empty directories
+	find AppDir/.junest/usr -type d -empty -delete | printf "◆ Delete all empty directories\n"
 }
 
 _enable_mountpoints_for_the_inbuilt_bubblewrap() {
@@ -445,11 +477,19 @@ case "$1" in
 					_JUNEST_CMD -- yay --noconfirm -U "$HOME"/"$p"-2.x-x86_64.pkg.tar.zst
 				fi
 			done
-			# Try to compile schema files, update mime database and gdk-pixbuf loaders.cache
+			# Try to compile schema files
 			_JUNEST_CMD -- glib-compile-schemas /usr/share/glib-2.0/schemas/
-			_JUNEST_CMD -- update-mime-database /usr/share/mime
-			_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0
-			_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
+			# Update mime database
+			if [ ! -f ./.junest/usr/share/mime/mime.cache ]; then
+				_JUNEST_CMD -- update-mime-database /usr/share/mime
+			fi
+			# Create loaders.cache for gdk-pixbuf
+			if _JUNEST_CMD -- yay -Qs gdk-pixbuf2; then
+				_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+				if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ] && [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
+					_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
+				fi
+			fi
 		else
 			echo "No app found, exiting"; exit 1
 		fi
@@ -460,6 +500,7 @@ case "$1" in
 		;;
 
 	"apprun")
+		echo "◆ Create AppRun"
 		_apprun_header
 		_apprun_nvidia
 		_apprun_binds
@@ -467,8 +508,6 @@ case "$1" in
 
 	"compile")
 		# Deploy libraries
-		printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
-
 		if [ ! -f ./deps ]; then
 			_run_quick_sharun
 			echo "$DEPENDENCES" > ./deps
@@ -479,37 +518,38 @@ case "$1" in
 			fi
 		fi
 
+		printf -- "\n-----------------------------------------------------------------------------\n IMPORT CORE ELEMENTS INTO APPDIR\n-----------------------------------------------------------------------------\n"
+
 		# Compile AppDir
 		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/etc/* AppDir/.junest/etc/ | printf "\n◆ Saving /etc" 
 		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/bin/* AppDir/.junest/usr/bin/ | printf "\n◆ Saving /usr/bin"
 		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/lib/* AppDir/.junest/usr/lib/ | printf "\n◆ Saving /usr/lib"
 		rsync -av --inplace --no-whole-file --size-only archlinux/AppDir/share/* AppDir/.junest/usr/share/ | printf "\n◆ Saving /usr/share\n"
 
+		printf -- "\n-----------------------------------------------------------------------------\n INCLUDE THE CONTENTS OF THE MAIN PACKAGES\n-----------------------------------------------------------------------------\n"
+
 		_extract_main_package
 		_extract_core_dependencies
 
 		tar fx "$(find ./archlinux -type f -name "hicolor-icon-theme-[0-9]*zst")" -C ./base/ 2>/dev/null
 
-		printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING USER'S SELECTED FILES AND DIRECTORIES\n-----------------------------------------------------------------------------\n\n"
+		printf -- "\n-----------------------------------------------------------------------------\n ASSEMBLING THE APPDIR\n-----------------------------------------------------------------------------\n\n"
 
 		_savebins 2>/dev/null
 		_savelibs 2>/dev/null
 		_saveshare 2>/dev/null
 
-		printf -- "\n-----------------------------------------------------------------------------\n ASSEMBLING THE APPIMAGE\n-----------------------------------------------------------------------------\n"
-
 		_post_installation_processes
 
-		# Remove bloatwares and enable mountpoints
-		printf "\n◆ Trying to reduce size\n"
+		printf -- "\n\n-----------------------------------------------------------------------------\n ATTEMPTS TO REDUCE THE SIZE\n-----------------------------------------------------------------------------\n\n"
+
+		_save_doc_and_locale
 
 		_remove_more_bloatwares
-		find AppDir/.junest/usr/lib AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \; 2>/dev/null
-		find AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \; 2>/dev/null
-		find AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \; 2>/dev/null
-		find AppDir/.junest/usr -type d -empty -delete
 
 		_enable_mountpoints_for_the_inbuilt_bubblewrap
+
+		printf -- "-----------------------------------------------------------------------------\n EXPORT TO APPIMAGE\n-----------------------------------------------------------------------------\n\n"
 		;;
 esac
 
