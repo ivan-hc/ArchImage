@@ -456,8 +456,9 @@ _remove_more_bloatwares() {
 	# AUR packages
 	echo Y | rm -Rf AppDir/.cache/yay/*
 
-	# Unneeded directories
+	# Unneeded files and directories
 	rm -Rf AppDir/.junest/home # remove the inbuilt home
+	rm -Rf AppDir/.junest/usr/bin/qt.conf # created by Sharun, causes troubles in Qt-based Archimages
 	rm -Rf AppDir/.junest/usr/include # files related to the compiler
 	rm -Rf AppDir/.junest/usr/share/man # AppImages are not ment to have man command
 	rm -Rf AppDir/.junest/var/* # remove all packages downloaded with the package manager
