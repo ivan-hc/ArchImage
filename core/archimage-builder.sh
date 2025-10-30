@@ -91,6 +91,12 @@ _root_appdir() {
 	rm -f AppDir/*.desktop
 	if [ "$BIN" = libreoffice ]; then
 		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/lib/libreoffice/share/xdg/* | grep "startcenter.*.desktop" | head -1)
+	elif [ -n "$LAUNCHER" ]; then
+		LAUNCHER="archlinux/.junest/usr/share/applications/$LAUNCHER"
+	elif [ -f archlinux/.junest/usr/share/applications/"$BIN".desktop ]; then
+		LAUNCHER="archlinux/.junest/usr/share/applications/$BIN.desktop"
+	elif [ -f archlinux/.junest/usr/share/applications/"$APP".desktop ]; then
+		LAUNCHER="archlinux/.junest/usr/share/applications/$APP.desktop"
 	else
 		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 	fi
