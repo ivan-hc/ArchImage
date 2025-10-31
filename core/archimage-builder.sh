@@ -140,8 +140,8 @@ _root_appdir() {
 	rm -f AppDir/*.desktop
 
 	# Add .desktop file
-	if [ -f "$APP".desktop ]; then
-		cp -r "$APP".desktop AppDir/ | echo "◆ Add local $APP.desktop to AppDir"
+	if [ -f ./*.desktop ]; then
+		LAUNCHER=$(ls . | grep "\.desktop$" | head -1)
 	else
 		DESKTOP_FILES=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop")
 		if [ "$BIN" = libreoffice ]; then
@@ -157,14 +157,19 @@ _root_appdir() {
 		else
 			LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
 		fi
+	fi
+	if [ -n "$LAUNCHER" ]; then
 		cp -r "$LAUNCHER" AppDir/
+	else
+		echo "✖ ERROR: No .desktop file available. Aborting all the processes."
+		exit 0
 	fi
 
 	# Add icon
-	if [ -f "$APP".png ]; then
-		cp -r "$APP".png AppDir/ | echo "◆ Add local $APP.png to AppDir"
-	elif [ -f "$APP".svg ]; then
-		cp -r "$APP".svg AppDir/ | echo "◆ Add local $APP.svg to AppDir"
+	if [ -f ./*.png ]; then
+		cp -r ./*.png AppDir/ | echo "◆ Add local .png to AppDir"
+	elif [ -f ./*.svg ]; then
+		cp -r ./*.svg AppDir/ | echo "◆ Add local .svg to AppDir"
 	else
 		[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
 		[ -z "$ICON" ] && ICON="$BIN"
