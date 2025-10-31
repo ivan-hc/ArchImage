@@ -136,31 +136,45 @@ _root_appdir() {
 	rm -f archlinux/.junest/etc/locale.conf
 	sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' archlinux/.junest/etc/profile.d/locale.sh
 
-	# Add launcher and icon
+	# Remove existing .desktop files from AppDir
 	rm -f AppDir/*.desktop
-	DESKTOP_FILES=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop")
-	if [ "$BIN" = libreoffice ]; then
-		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/lib/libreoffice/share/xdg/* | grep "startcenter.*.desktop" | head -1)
-	elif [ -n "$LAUNCHER" ]; then
-		LAUNCHER="archlinux/.junest/usr/share/applications/$LAUNCHER"
-	elif [ -f archlinux/.junest/usr/share/applications/"$BIN".desktop ]; then
-		LAUNCHER="archlinux/.junest/usr/share/applications/$BIN.desktop"
-	elif [ -f archlinux/.junest/usr/share/applications/"$APP".desktop ]; then
-		LAUNCHER="archlinux/.junest/usr/share/applications/$APP.desktop"
-	elif [ "$(echo "$DESKTOP_FILES" | wc -l)" != 1 ]; then
-		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | awk 'length < min || NR==1 {min=length; line=$0} END {print line}')
+
+	# Add .desktop file
+	if [ -f "$APP".desktop ]; then
+		cp -r "$APP".desktop AppDir/ | echo "◆ Add local $APP.desktop to AppDir"
 	else
-		LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
+		DESKTOP_FILES=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop")
+		if [ "$BIN" = libreoffice ]; then
+			LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/lib/libreoffice/share/xdg/* | grep "startcenter.*.desktop" | head -1)
+		elif [ -n "$LAUNCHER" ]; then
+			LAUNCHER="archlinux/.junest/usr/share/applications/$LAUNCHER"
+		elif [ -f archlinux/.junest/usr/share/applications/"$BIN".desktop ]; then
+			LAUNCHER="archlinux/.junest/usr/share/applications/$BIN.desktop"
+		elif [ -f archlinux/.junest/usr/share/applications/"$APP".desktop ]; then
+			LAUNCHER="archlinux/.junest/usr/share/applications/$APP.desktop"
+		elif [ "$(echo "$DESKTOP_FILES" | wc -l)" != 1 ]; then
+			LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | awk 'length < min || NR==1 {min=length; line=$0} END {print line}')
+		else
+			LAUNCHER=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop" | head -1)
+		fi
+		cp -r "$LAUNCHER" AppDir/
 	fi
-	cp -r "$LAUNCHER" AppDir/
-	[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
-	[ -z "$ICON" ] && ICON="$BIN"
-	cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
-	hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
-	for i in $hicolor_dirs; do
-		cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/apps/*"$ICON"* AppDir/ 2>/dev/null || cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/mimetypes/*"$ICON"* AppDir/ 2>/dev/null
-	done
-	cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
+
+	# Add icon
+	if [ -f "$APP".png ]; then
+		cp -r "$APP".png AppDir/ | echo "◆ Add local $APP.png to AppDir"
+	elif [ -f "$APP".svg ]; then
+		cp -r "$APP".svg AppDir/ | echo "◆ Add local $APP.svg to AppDir"
+	else
+		[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+		[ -z "$ICON" ] && ICON="$BIN"
+		cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
+		hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
+		for i in $hicolor_dirs; do
+			cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/apps/*"$ICON"* AppDir/ 2>/dev/null || cp -r archlinux/.junest/usr/share/icons/hicolor/"$i"/mimetypes/*"$ICON"* AppDir/ 2>/dev/null
+		done
+		cp -r archlinux/.junest/usr/share/pixmaps/*"$ICON"* AppDir/ 2>/dev/null
+	fi
 
 	# Test if the desktop file and the icon are in the root of the future appimage (./*appdir/*)
 	if test -f AppDir/*.desktop; then
