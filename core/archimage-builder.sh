@@ -141,7 +141,7 @@ _root_appdir() {
 
 	# Add .desktop file
 	if [ -f ./*.desktop ]; then
-		LAUNCHER=$(ls . | grep "\.desktop$" | head -1)
+		LAUNCHER=$(grep -iRl "^Exec.*$BIN" ./* | grep "\.desktop$" | head -1)
 	else
 		DESKTOP_FILES=$(grep -iRl "^Exec.*$BIN" archlinux/.junest/usr/share/applications/* | grep ".desktop")
 		if [ "$BIN" = libreoffice ]; then
