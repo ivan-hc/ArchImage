@@ -51,6 +51,7 @@ https://github.com/user-attachments/assets/231da48c-8b1f-49f1-8f40-8d439f0ccfae
   - [Repeat the build](#repeat-the-build)
   - [How to debloat an Archimage (and made it smaller)](#how-to-debloat-an-archimage)
   - [Customize your script](#customize-your-script)
+  - [Launcher and icon](#launcher-and-icon)
 
 [Hardware Acceleration](#hardware-acceleration)
 
@@ -379,6 +380,10 @@ Some keywords and paths are already set. Remove them if you consider them necess
 Once you created the script, it is yours and only yours. You can add/remove functions as you like.
 
 Of course, **DO IT ON YOUR OWN RISK!**
+
+------------------------------------------------------------------------
+## Launcher and icon
+By default, the builder searches the JuNest container for the launcher and icons. However, you can manually add a .desktop and .png/.svg file next to the script so that it is included instead of what the script would otherwise look for.
 
 ------------------------------------------------------------------------
 
