@@ -171,7 +171,7 @@ _root_appdir() {
 	elif [ -f ./*.svg ]; then
 		cp -r ./*.svg AppDir/ | echo "◆ Add local .svg to AppDir"
 	else
-		[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | cut -c 6-)
+		[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | head -1 | cut -c 6-)
 		[ -z "$ICON" ] && ICON="$BIN"
 		cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
 		hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
