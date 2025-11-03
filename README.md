@@ -439,7 +439,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | -- | -- |
 | [*Abiword*](https://github.com/ivan-hc/Abiword-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Abiword-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Aisleriot*](https://github.com/ivan-hc/Aisleriot-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Aisleriot-appimage?label=%E2%AD%90&style=for-the-badge)
-| [*Amarok*](https://github.com/ivan-hc/Amarok-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Amarok-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Avidemux*](https://github.com/ivan-hc/Avidemux-unofficial-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Avidemux-unofficial-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Bottles*](https://github.com/ivan-hc/Bottles-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Bottles-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Celestia "Enanched"*](https://github.com/ivan-hc/Celestia-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Celestia-appimage?label=%E2%AD%90&style=for-the-badge)
@@ -478,7 +477,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | [*FileZilla*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/filezilla) |
 | [*kwave*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/kwave) |
 | [*Poedit*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/poedit) |
-| [*Sunvox*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/sunvox) |
 | [*Webcamoid*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/webcamoid) |
 
 
