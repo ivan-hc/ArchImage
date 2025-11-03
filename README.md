@@ -470,6 +470,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 
 | Application |
 | -- |
+| [*Anki*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/anki) |
 | [*Asunder*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/asunder) |
 | [*Audacious*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/audacious) |
 | [*Chromium BSU*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/chromium-bsu) |
