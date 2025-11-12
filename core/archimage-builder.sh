@@ -304,12 +304,23 @@ _run_quick_sharun() {
 	rm -Rf AppDir/*
 	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
+	mkdir -p ./.config ./.local
+	export XDG_DATA_HOME="$PWD/.local"
+	export XDG_CONFIG_HOME="$PWD/.config"
+
 	if [ ! -f ./quick-sharun ]; then
 		wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
 		chmod +x ./quick-sharun
 	fi
 
 	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"*
+
+	if [ -n "$extra_bins" ]; then
+		for b in $extra_bins; do
+			export DESKTOP=$(grep -iRl "^Exec.*$b" .junest/usr/share/applications/* | grep ".desktop") && _JUNEST_CMD -- ./quick-sharun /usr/bin/"$b"* &
+		done
+		wait
+	fi
 
 	cd .. || exit 1
 	echo "$DEPENDENCES" > ./deps
@@ -367,7 +378,8 @@ _extract_core_dependencies() {
 			fi
 		done
 		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
-		rm -Rf dependencies/usr/share/locale dependencies/.*
+		[ -z "$extra_bins" ] && rm -Rf dependencies/usr/share/locale
+		rm -f dependencies/.*
 		rsync -av --inplace --no-whole-file --size-only dependencies/* AppDir/.junest/ 1>/dev/null
 	fi
 }
@@ -460,7 +472,7 @@ _save_doc_and_locale() {
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / 2>/dev/null | printf "◆ Save documentation from base package\n"
 	fi
 	if [ -d AppDir/.junest/usr/share/locale ]; then
-		find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+		[ -z "$extra_bins" ] && find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ 2>/dev/null | printf "◆ Save locale from base package\n"
 	fi
 }
