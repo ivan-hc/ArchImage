@@ -130,6 +130,10 @@ ARCH="x86_64"
 # Deploy dependencies
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
+mkdir -p ./.config ./.local
+export XDG_DATA_HOME="$PWD/.local"
+export XDG_CONFIG_HOME="$PWD/.config"
+
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
 _JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"
