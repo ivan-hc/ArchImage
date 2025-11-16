@@ -85,7 +85,7 @@ _install_packages() {
 		_JUNEST_CMD -- yay --noconfirm -S $DEPENDENCES
 	fi
 	if [ -n "$APP" ]; then
-		_JUNEST_CMD -- yay --noconfirm -S alsa-lib gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
+		_JUNEST_CMD -- yay --noconfirm -S alsa-lib binutils gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
 		_JUNEST_CMD -- yay --noconfirm -S "$APP"
 		VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 		# Use debloated packages
