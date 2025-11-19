@@ -449,6 +449,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | [*Emacs*](https://github.com/ivan-hc/Emacs-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Emacs-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Evince*](https://github.com/ivan-hc/Evince-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Evince-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*falkon*](https://github.com/ivan-hc/falkon-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/falkon-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*FileZilla (client)*](https://github.com/ivan-hc/FileZilla-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/FileZilla-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Gedit*](https://github.com/ivan-hc/Gedit-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Gedit-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*GIMP Stable/Git/Hybrid*](https://github.com/ivan-hc/GIMP-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/GIMP-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*GNOME Boxes*](https://github.com/ivan-hc/Boxes-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Boxes-appimage?label=%E2%AD%90&style=for-the-badge)
