@@ -439,6 +439,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | -- | -- |
 | [*Abiword*](https://github.com/ivan-hc/Abiword-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Abiword-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Aisleriot*](https://github.com/ivan-hc/Aisleriot-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Aisleriot-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*anki*](https://github.com/ivan-hc/anki-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/anki-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*asunder*](https://github.com/ivan-hc/asunder-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/asunder-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Audacious*](https://github.com/ivan-hc/Audacious-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Audacious-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Avidemux*](https://github.com/ivan-hc/Avidemux-unofficial-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Avidemux-unofficial-appimage?label=%E2%AD%90&style=for-the-badge)
