@@ -470,16 +470,6 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | [*Transmission-gtk*](https://github.com/ivan-hc/Transmission-gtk-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Transmission-gtk-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*VirtualBox KVM*](https://github.com/ivan-hc/VirtualBox-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/VirtualBox-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*VLC Stable/Git*](https://github.com/ivan-hc/VLC-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/VLC-appimage?label=%E2%AD%90&style=for-the-badge)
-| [*Database of pkg2appimaged packages**](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages) (*Various sources*) | ![](https://img.shields.io/github/stars/ivan-hc/Database-of-pkg2appimaged-packages?label=%E2%AD%90&style=for-the-badge)
-
-**NOTE, the last one in the table above is a database containing small random apps and games that you may need. The Archimages contained in this repository are:*
-
-| Application |
-| -- |
-| [*Anki*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/anki) |
-| [*FileZilla*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/filezilla) |
-| [*Webcamoid*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/webcamoid) |
-
 
 ### Advantages
 - compatibility with all versions of Linux starting from kernel 2.6, therefore also older distributions than those normally indicated by the classic AppImage developers;
