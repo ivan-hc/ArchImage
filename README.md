@@ -439,12 +439,15 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | -- | -- |
 | [*Abiword*](https://github.com/ivan-hc/Abiword-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Abiword-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Aisleriot*](https://github.com/ivan-hc/Aisleriot-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Aisleriot-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*asunder*](https://github.com/ivan-hc/asunder-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/asunder-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Audacious*](https://github.com/ivan-hc/Audacious-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Audacious-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Avidemux*](https://github.com/ivan-hc/Avidemux-unofficial-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Avidemux-unofficial-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Bottles*](https://github.com/ivan-hc/Bottles-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Bottles-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Celestia "Enanched"*](https://github.com/ivan-hc/Celestia-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Celestia-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*chromium-bsu*](https://github.com/ivan-hc/chromium-bsu-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/chromium-bsu-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Emacs*](https://github.com/ivan-hc/Emacs-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Emacs-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Evince*](https://github.com/ivan-hc/Evince-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Evince-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*falkon*](https://github.com/ivan-hc/falkon-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/falkon-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Gedit*](https://github.com/ivan-hc/Gedit-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Gedit-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*GIMP Stable/Git/Hybrid*](https://github.com/ivan-hc/GIMP-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/GIMP-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*GNOME Boxes*](https://github.com/ivan-hc/Boxes-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Boxes-appimage?label=%E2%AD%90&style=for-the-badge)
@@ -455,6 +458,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | [*Inkscape*](https://github.com/ivan-hc/Inkscape-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Inkscape-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*KDE-games*](https://github.com/ivan-hc/KDE-games-suite-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/KDE-games-suite-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*KDE-utils*](https://github.com/ivan-hc/KDE-utils-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/KDE-utils-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*kwave*](https://github.com/ivan-hc/kwave-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/kwave-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*LibreOffice Still/Fresh*](https://github.com/ivan-hc/LibreOffice-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/LibreOffice-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*MPV*](https://github.com/ivan-hc/MPV-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/MPV-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*OBS-Studio*](https://github.com/ivan-hc/OBS-Studio-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/OBS-Studio-appimage?label=%E2%AD%90&style=for-the-badge)
@@ -473,11 +477,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | Application |
 | -- |
 | [*Anki*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/anki) |
-| [*Asunder*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/asunder) |
-| [*Chromium BSU*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/chromium-bsu) |
-| [*Falkon*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/falkon) |
 | [*FileZilla*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/filezilla) |
-| [*kwave*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/kwave) |
 | [*Webcamoid*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/webcamoid) |
 
 
