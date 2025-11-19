@@ -439,6 +439,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | -- | -- |
 | [*Abiword*](https://github.com/ivan-hc/Abiword-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Abiword-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Aisleriot*](https://github.com/ivan-hc/Aisleriot-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Aisleriot-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Audacious*](https://github.com/ivan-hc/Audacious-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Audacious-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Avidemux*](https://github.com/ivan-hc/Avidemux-unofficial-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Avidemux-unofficial-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Bottles*](https://github.com/ivan-hc/Bottles-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Bottles-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Celestia "Enanched"*](https://github.com/ivan-hc/Celestia-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Celestia-appimage?label=%E2%AD%90&style=for-the-badge)
@@ -458,6 +459,7 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | [*MPV*](https://github.com/ivan-hc/MPV-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/MPV-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*OBS-Studio*](https://github.com/ivan-hc/OBS-Studio-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/OBS-Studio-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*ocenaudio*](https://github.com/ivan-hc/ocenaudio-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/ocenaudio-appimage?label=%E2%AD%90&style=for-the-badge)
+| [*Poedit*](https://github.com/ivan-hc/Poedit-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Poedit-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Rhythmbox*](https://github.com/ivan-hc/Rhythmbox-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Rhythmbox-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*SpaceCadet Pinball (AUR)*](https://github.com/ivan-hc/Spacecadetpinball-git-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Spacecadetpinball-git-appimage?label=%E2%AD%90&style=for-the-badge)
 | [*Torcs*](https://github.com/ivan-hc/Torcs-appimage) | ![](https://img.shields.io/github/stars/ivan-hc/Torcs-appimage?label=%E2%AD%90&style=for-the-badge)
@@ -472,12 +474,10 @@ This is a list of the AppImages I've built until I wrote this brief guide:
 | -- |
 | [*Anki*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/anki) |
 | [*Asunder*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/asunder) |
-| [*Audacious*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/audacious) |
 | [*Chromium BSU*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/chromium-bsu) |
 | [*Falkon*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/falkon) |
 | [*FileZilla*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/filezilla) |
 | [*kwave*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/kwave) |
-| [*Poedit*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/poedit) |
 | [*Webcamoid*](https://github.com/ivan-hc/Database-of-pkg2appimaged-packages/releases/tag/webcamoid) |
 
 
