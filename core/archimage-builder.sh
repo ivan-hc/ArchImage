@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 export ARCHIMAGE_VERSION="archimage5.0"
 
 ##########################################################################################################################################################
@@ -33,7 +35,9 @@ _junest_setup() {
 					fi
 				fi
 			done
-			[ -z "$archcn_mirror" ] && exit 0
+			if [ -z "$archcn_mirror" ]; then
+				exit 0
+			fi
 			_JUNEST_CMD -- sudo pacman --noconfirm -U "$archcn_mirror"/x86_64/"$archcn_key_pkg"
 			printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = $archcn_mirror/\$arch" >> ./.junest/etc/pacman.conf
 		fi
@@ -79,10 +83,10 @@ _install_packages() {
 	_JUNEST_CMD -- yay -Syy
 
 	# Enable AUR
-	[ -n "$BASICSTUFF" ] && JUNEST_AUR_ENABLED="1"
-	[ -n "$COMPILERS" ] && JUNEST_AUR_ENABLED="1"
-	[ -n "$CHAOTICAUR_ON" ] && JUNEST_AUR_ENABLED="1"
-	[ -n "$ARCHLINUXCN_ON" ] && JUNEST_AUR_ENABLED="1"
+	if [ -n "$BASICSTUFF" ]; then JUNEST_AUR_ENABLED="1"; fi
+	if [ -n "$COMPILERS" ]; then JUNEST_AUR_ENABLED="1"; fi
+	if [ -n "$CHAOTICAUR_ON" ]; then JUNEST_AUR_ENABLED="1"; fi
+	if [ -n "$ARCHLINUXCN_ON" ]; then JUNEST_AUR_ENABLED="1"; fi
 	if [ -n "$JUNEST_AUR_ENABLED" ]; then
 		_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
 	fi
@@ -122,8 +126,10 @@ _install_packages() {
 		# Create loaders.cache for gdk-pixbuf
 		if _JUNEST_CMD -- yay -Qs gdk-pixbuf2; then
 			_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
-			if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ] && [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
-				_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
+			if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ]; then
+				[ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
+					_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
+				fi
 			fi
 		fi
 	else
@@ -142,7 +148,9 @@ _root_appdir() {
 		rm -Rf AppDir/*
 	elif [ -f ./deps ]; then
 		DEPENDENCES0=$(cat ./deps)
-		[ "$DEPENDENCES0" != "$DEPENDENCES" ] && rm -Rf AppDir/*
+		if [ "$DEPENDENCES0" != "$DEPENDENCES" ]; then
+			rm -Rf AppDir/*
+		fi
 	fi
 
 	# Set locale
@@ -184,8 +192,12 @@ _root_appdir() {
 	elif [ -f ./*.svg ]; then
 		cp -r ./*.svg AppDir/ | echo "◆ Add local .svg to AppDir"
 	else
-		[ -z "$ICON" ] && ICON=$(cat "$LAUNCHER" | grep "Icon=" | head -1 | cut -c 6-)
-		[ -z "$ICON" ] && ICON="$BIN"
+		if [ -z "$ICON" ]; then
+			ICON=$(cat "$LAUNCHER" | grep "Icon=" | head -1 | cut -c 6-)
+		fi
+		if [ -z "$ICON" ]; then
+			ICON="$BIN"
+		fi
 		cp -r archlinux/.junest/usr/share/icons/*"$ICON"* AppDir/ 2>/dev/null
 		hicolor_dirs="22x22 24x24 32x32 48x4 64x64 128x128 192x192 256x256 512x512 scalable"
 		for i in $hicolor_dirs; do
@@ -301,8 +313,12 @@ _apprun_binds() {
 	}
 
 	HEREDOC
-	[ -n "$mountpoint_files" ] && sed -i "s#bind_files=\"#bind_files=\"$mountpoint_files #g" AppDir/AppRun
-	[ -n "$mountpoint_dirs" ] && sed -i "s#bind_dirs=\"#bind_dirs=\"$mountpoint_dirs #g" AppDir/AppRun
+	if [ -n "$mountpoint_files" ]; then
+		sed -i "s#bind_files=\"#bind_files=\"$mountpoint_files #g" AppDir/AppRun
+	fi
+	if [ -n "$mountpoint_dirs" ]; then
+		sed -i "s#bind_dirs=\"#bind_dirs=\"$mountpoint_dirs #g" AppDir/AppRun
+	fi
 }
 
 ##########################################################################################################################################################
@@ -310,10 +326,17 @@ _apprun_binds() {
 ##########################################################################################################################################################
 
 # Deploy core libraries of the app
+_run_quick_sharun_in_parallel() {
+	export DESKTOP=$(grep -iRl "^Exec.*$b" .junest/usr/share/applications/* | grep ".desktop")
+	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$b"*
+}
+
 _run_quick_sharun() {
 	printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
 
-	[ -n "$LAUNCHER" ] && export DESKTOP="$LAUNCHER"
+	if [ -n "$LAUNCHER" ]; then
+		export DESKTOP="$LAUNCHER"
+	fi
 
 	cd archlinux || exit 1
 	rm -Rf AppDir/*
@@ -332,14 +355,16 @@ _run_quick_sharun() {
 
 	if [ -n "$extra_bins" ]; then
 		for b in $extra_bins; do
-			export DESKTOP=$(grep -iRl "^Exec.*$b" .junest/usr/share/applications/* | grep ".desktop") && _JUNEST_CMD -- ./quick-sharun /usr/bin/"$b"* &
+			_run_quick_sharun_in_parallel &
 		done
 		wait
 	fi
 
 	cd .. || exit 1
 	echo "$DEPENDENCES" > ./deps
-	[ ! -f ./deps ] && touch ./deps
+	if [ ! -f ./deps ]; then
+		touch ./deps
+	fi
 	printf "\n-----------------------------------------------------------------------------\n"
 }
 
@@ -369,7 +394,10 @@ _extract_main_package() {
 			fi
 		done
 	fi
-	[ -z "$pkg_full_path" ] && echo "💀 ERROR: no package found for \"$APP\", operation aborted!" && exit 0
+	if [ -z "$pkg_full_path" ]; then
+		echo "💀 ERROR: no package found for \"$APP\", operation aborted!"
+		exit 0
+	fi
 	tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword
 	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
 }
@@ -393,7 +421,9 @@ _extract_core_dependencies() {
 			fi
 		done
 		_extract_base_to_AppDir | printf "\n\n◆ Extract core dependencies to AppDir\n"
-		[ -z "$extra_bins" ] && rm -Rf dependencies/usr/share/locale
+		if [ -z "$extra_bins" ]; then
+			rm -Rf dependencies/usr/share/locale
+		fi
 		rm -f dependencies/.*
 		rsync -av --inplace --no-whole-file --size-only dependencies/* AppDir/.junest/ 1>/dev/null
 	fi
@@ -418,6 +448,12 @@ _savebins() {
 }
 
 # Save files in /usr/lib
+_savelibs_parallel()
+	if [ ! -d AppDir/"$arg" ]; then
+		rsync -av --inplace --no-whole-file --size-only archlinux/"$arg" AppDir/"$arg" 1>/dev/null
+	fi
+}
+
 _savelibs() {
 	echo "◆ Detect libraries related to /usr/bin files"
 	libs4bin=$(readelf -d AppDir/.junest/usr/bin/* 2>/dev/null | grep NEEDED | tr '[] ' '\n' | grep ".so")
@@ -434,7 +470,7 @@ _savelibs() {
 	LIBPATHS=$(sort ./libs)
 	echo "◆ Copy selected libraries to AppDir"
 	for arg in $LIBPATHS; do
-		[ ! -d AppDir/"$arg" ] && rsync -av --inplace --no-whole-file --size-only archlinux/"$arg" AppDir/"$arg" 1>/dev/null &
+		_savelibs_parallel &
 	done
 	wait
 	core_libs=$(find AppDir -type f)
@@ -487,7 +523,9 @@ _save_doc_and_locale() {
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / 2>/dev/null | printf "◆ Save documentation from base package\n"
 	fi
 	if [ -d AppDir/.junest/usr/share/locale ]; then
-		[ -z "$extra_bins" ] && find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+		if [ -z "$extra_bins" ]; then
+			find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+		fi
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ 2>/dev/null | printf "◆ Save locale from base package\n"
 	fi
 }
@@ -534,13 +572,27 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 	bind_dirs=$(grep "_dirs=" AppDir/AppRun | tr '" ' '\n' | grep "/" | sort | xargs)
 	for d in $bind_dirs; do mkdir -p AppDir/.junest"$d"; done
 	mkdir -p AppDir/.junest/run/user
-	rm -f AppDir/.junest/etc/localtime && touch AppDir/.junest/etc/localtime
-	[ ! -f AppDir/.junest/etc/asound.conf ] && touch AppDir/.junest/etc/asound.conf
-	[ ! -e AppDir/.junest/usr/share/X11/xkb ] && rm -f AppDir/.junest/usr/share/X11/xkb && mkdir -p AppDir/.junest/usr/share/X11/xkb && sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
+
+	rm -f AppDir/.junest/etc/localtime
+	touch AppDir/.junest/etc/localtime
+
+	if [ ! -f AppDir/.junest/etc/asound.conf ]; then
+		touch AppDir/.junest/etc/asound.conf
+	fi
+	if [ ! -e AppDir/.junest/usr/share/X11/xkb ]; then
+		rm -f AppDir/.junest/usr/share/X11/xkb
+		mkdir -p AppDir/.junest/usr/share/X11/xkb
+		sed -i -- 's# /var"$# /usr/share/X11/xkb /var"#g' AppDir/AppRun
+	fi
 	if [ -n "$mountpoint_files" ]; then
 		for f in $mountpoint_files; do
-			[ ! -f AppDir/.junest"$f" ] && touch AppDir/.junest"$f"
-			[ ! -e AppDir/.junest"$f" ] && rm -f AppDir/.junest"$f" && touch AppDir/.junest"$f"
+			if [ ! -f AppDir/.junest"$f" ]; then
+				touch AppDir/.junest"$f"
+			fi
+			if [ ! -e AppDir/.junest"$f" ]; then
+				rm -f AppDir/.junest"$f"
+				touch AppDir/.junest"$f"
+			fi
 		done
 	fi
 			
