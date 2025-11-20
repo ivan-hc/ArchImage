@@ -72,9 +72,6 @@ _enable_multilib() { MULTILIB_ON="1"; }
 #	INSTALL PROGRAMS USING YAY
 ##########################################################################################################################################################
 
-_JUNEST_CMD -- yay -Syy
-#_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
-
 [ -f ../archimage-builder.sh ] && source ../archimage-builder.sh install "$@"
 
 cd ..
