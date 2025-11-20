@@ -38,7 +38,7 @@ _junest_setup() {
 			printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = $archcn_mirror/\$arch" >> ./.junest/etc/pacman.conf
 		fi
 
-		# Enable the chaoticaut third-party repository
+		# Enable the chaoticaur third-party repository
 		if [ "$CHAOTICAUR_ON" = 1 ]; then
 			_JUNEST_CMD -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
 			_JUNEST_CMD -- sudo pacman-key --lsign-key 3056513887B78AEB
@@ -76,6 +76,17 @@ _junest_setup() {
 ##########################################################################################################################################################
 
 _install_packages() {
+	_JUNEST_CMD -- yay -Syy
+
+	# Enable AUR
+	[ -n "$BASICSTUFF" ] && JUNEST_AUR_ENABLED="1"
+	[ -n "$COMPILERS" ] && JUNEST_AUR_ENABLED="1"
+	[ -n "$CHAOTICAUR_ON" ] && JUNEST_AUR_ENABLED="1"
+	[ -n "$ARCHLINUXCN_ON" ] && JUNEST_AUR_ENABLED="1"
+	if [ -n "$JUNEST_AUR_ENABLED" ]; then
+		_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
+	fi
+
 	if [ -n "$BASICSTUFF" ]; then
 			_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
 	fi
