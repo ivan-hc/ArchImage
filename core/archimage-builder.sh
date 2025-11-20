@@ -2,8 +2,6 @@
 
 export ARCHIMAGE_VERSION="archimage5.0"
 
-TMPDIR=${TMPDIR:-/tmp}
-
 ##########################################################################################################################################################
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
 ##########################################################################################################################################################
@@ -358,16 +356,6 @@ _run_quick_sharun() {
 			_run_quick_sharun_in_parallel &
 		done
 		wait
-	fi
-
-	# Validate sharun-aio
-	if [ ! -f "$TMPDIR"/sharun-aio ]; then
-		echo "ERROR: sharun was not downloaded at all!"
-		exit 1
-	fi
-	if ! head -c 4 "$TMPDIR"/sharun-aio | grep -qa 'ELF'; then
-		echo "ERROR: What was downloaded is not sharun!"
-		exit 1
 	fi
 
 	cd .. || exit 1
