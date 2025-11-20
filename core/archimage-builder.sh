@@ -127,7 +127,7 @@ _install_packages() {
 		if _JUNEST_CMD -- yay -Qs gdk-pixbuf2; then
 			_JUNEST_CMD -- mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
 			if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/* ]; then
-				[ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
+				if [ ! -f ./.junest/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
 					_JUNEST_CMD -- gdk-pixbuf-query-loaders --update-cache
 				fi
 			fi
@@ -448,7 +448,7 @@ _savebins() {
 }
 
 # Save files in /usr/lib
-_savelibs_parallel()
+_savelibs_parallel() {
 	if [ ! -d AppDir/"$arg" ]; then
 		rsync -av --inplace --no-whole-file --size-only archlinux/"$arg" AppDir/"$arg" 1>/dev/null
 	fi
