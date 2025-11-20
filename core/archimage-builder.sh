@@ -347,6 +347,9 @@ _run_quick_sharun() {
 	if [ ! -f ./quick-sharun ]; then
 		wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun || exit 1
 		chmod +x ./quick-sharun
+		if ! ./quick-sharun "$@"; then
+			exit 1
+		fi
 	fi
 
 	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"*
