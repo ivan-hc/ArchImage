@@ -358,6 +358,16 @@ _run_quick_sharun() {
 		wait
 	fi
 
+	# Validate sharun-aio
+	if [ ! -f /tmp/sharun-aio ]; then
+		echo "ERROR: sharun was not downloaded at all!"
+		exit 1
+	fi
+	if ! head -c 4 /tmp/sharun-aio | grep -qa 'ELF'; then
+		echo "ERROR: What was downloaded is not sharun!"
+		exit 1
+	fi
+
 	cd .. || exit 1
 	echo "$DEPENDENCES" > ./deps
 	if [ ! -f ./deps ]; then
