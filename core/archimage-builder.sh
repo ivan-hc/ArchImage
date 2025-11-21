@@ -241,6 +241,10 @@ _root_appdir() {
 #	APPRUN
 ##########################################################################################################################################################
 
+# This section contains the common functions used in all AppImages created with this method to fill the initial part of the AppRun.
+# The final part of the AppRun is in the app script and can be used to add different functions, options, and actions, depending on the user's needs.
+
+# The AppRun header includes core variables and a function to make the AppImage compatible with systems that have kernel-level restrictions (see BubbleWrap in Ubuntu)
 _apprun_header() {
 	cat <<-'HEREDOC' >> AppDir/AppRun
 	#!/bin/sh
@@ -259,6 +263,8 @@ _apprun_header() {
 	HEREDOC
 }
 
+# Nvidia driver support is optional. The "NVIDIA_ON" variable must be set to 1 in the app script to include the handler.
+# Host libraries are copied to "${CACHEDIR}/junest_shared" and then exported to LD_LIBRARY_PATH.
 _apprun_nvidia() {
 	if [ "$NVIDIA_ON" = 1 ]; then
 		cat <<-'HEREDOC' >> AppDir/AppRun
@@ -291,6 +297,9 @@ _apprun_nvidia() {
 	fi
 }
 
+# BubbleWrap (default) and PROOT require mount points on the host. This function sets the variables dynamically.
+# The /home, /run/user, /tmp, /sys, /proc, /dev, and /run/user/$($ID -u) directories are already mounted by default in JuNest.
+# If NVIDIA_ON is set to 1, the directories listed in the "$bind_nvidia_data_dirs" variable (see above) will also be mounted.
 _apprun_binds() {
 	cat <<-'HEREDOC' >> AppDir/AppRun
 
@@ -313,9 +322,12 @@ _apprun_binds() {
 	}
 
 	HEREDOC
+
+	# The path to the files listed in "$mountpoint_files" by the user, in the app script, will be mounted dynamically.
 	if [ -n "$mountpoint_files" ]; then
 		sed -i "s#bind_files=\"#bind_files=\"$mountpoint_files #g" AppDir/AppRun
 	fi
+	# The path to the directories listed in "$mountpoint_dirs" by the user, in the app script, will be mounted dynamically.
 	if [ -n "$mountpoint_dirs" ]; then
 		sed -i "s#bind_dirs=\"#bind_dirs=\"$mountpoint_dirs #g" AppDir/AppRun
 	fi
@@ -326,11 +338,15 @@ _apprun_binds() {
 ##########################################################################################################################################################
 
 # Deploy core libraries of the app
+
+
 _run_quick_sharun_in_parallel() {
 	export DESKTOP=$(grep -iRl "^Exec.*$b" .junest/usr/share/applications/* | grep ".desktop")
 	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$b"*
 }
 
+# The "quick-sharun" script is used to test the app's startup behavior and collect the libraries required for the program to run and function at startup.
+# This function also tests its validity.
 _run_quick_sharun() {
 	printf -- "\n-----------------------------------------------------------------------------\n IMPLEMENTING APP'S SPECIFIC LIBRARIES (SHARUN)\n-----------------------------------------------------------------------------\n"
 
@@ -351,8 +367,11 @@ _run_quick_sharun() {
 		chmod +x ./quick-sharun
 	fi
 
+	# Run quick-sharun on the main binary ("$BIN" variable)
 	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$BIN"*
 
+	# This function is executed if the "$extra_bins" variable is set.
+	# Each keyword will be searched in /usr/bin and considered a program from which to collect the libraries needed to run it.
 	if [ -n "$extra_bins" ]; then
 		for b in $extra_bins; do
 			_run_quick_sharun_in_parallel &
@@ -371,6 +390,9 @@ _run_quick_sharun() {
 	fi
 
 	cd .. || exit 1
+
+	# Save the dependency list to a file. If this file isn't present, quick-sharun will also restart when the script is restarted
+	# which will list the newly installed libraries with the new dependencies added in "$DEPENDENCES".
 	echo "$DEPENDENCES" > ./deps
 	if [ ! -f ./deps ]; then
 		touch ./deps
@@ -378,7 +400,7 @@ _run_quick_sharun() {
 	printf "\n-----------------------------------------------------------------------------\n"
 }
 
-# Extract the main package in the AppDir
+# Add the content of the base package to the AppDir
 _extract_base_to_AppDir() {
 	rsync -av --inplace --no-whole-file --size-only base/etc/* AppDir/.junest/etc/ 2>/dev/null
 	rsync -av --inplace --no-whole-file --size-only base/usr/bin/* AppDir/.junest/usr/bin/ 2>/dev/null
@@ -390,6 +412,7 @@ _extract_base_to_AppDir() {
 	fi
 }
 
+# Extract the base package to "base", before placing them in the AppDir
 _extract_main_package() {
 	mkdir -p base
 	rm -Rf ./base/*
@@ -412,6 +435,7 @@ _extract_main_package() {
 	_extract_base_to_AppDir | printf "\n◆ Extract the base package to AppDir\n"
 }
 
+# Extract all dependencies listed in "$DEPENDENCES" do dependencies, before placing them in the AppDir
 _extract_core_dependencies() {
 	if [ -n "$DEPENDENCES" ]; then
 		mkdir -p dependencies
@@ -529,12 +553,12 @@ _saveshare() {
 
 _save_doc_and_locale() {
 	if [ -d AppDir/.junest/usr/share/doc ]; then
-		find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
+		find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null # Remove all documentation not related to the app
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/doc/* / 2>/dev/null | printf "◆ Save documentation from base package\n"
 	fi
 	if [ -d AppDir/.junest/usr/share/locale ]; then
 		if [ -z "$extra_bins" ]; then
-			find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
+			find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null # Remove all additional locale files
 		fi
 		rsync -av --inplace --no-whole-file --size-only base/usr/share/locale/* AppDir/.junest/usr/share/locale/ 2>/dev/null | printf "◆ Save locale from base package\n"
 	fi
