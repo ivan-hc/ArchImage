@@ -339,7 +339,6 @@ _apprun_binds() {
 
 # Deploy core libraries of the app
 
-
 _run_quick_sharun_in_parallel() {
 	export DESKTOP=$(grep -iRl "^Exec.*$b" .junest/usr/share/applications/* | grep ".desktop")
 	_JUNEST_CMD -- ./quick-sharun /usr/bin/"$b"*
