@@ -252,7 +252,7 @@ _apprun_header() {
 	export JUNEST_HOME="$HERE"/.junest
 
 	CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-	mkdir -p "$CACHEDIR" || exit 1
+	mkdir -p "$CACHEDIR"
 
 	if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
 	   PROOT_ON=1 && export PATH="$HERE"/.local/share/junest/bin/:"$PATH"
