@@ -355,7 +355,8 @@ _run_quick_sharun() {
 
 	cd archlinux || exit 1
 	rm -Rf AppDir/*
-	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+	SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/4b173527344300d0a14305ec827cf7184e5513ef/useful-tools/quick-sharun.sh"
+	#SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
 	mkdir -p ./.config ./.local
 	export XDG_DATA_HOME="$PWD/.local"
