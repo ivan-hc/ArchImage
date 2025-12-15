@@ -563,6 +563,11 @@ _save_doc_and_locale() {
 	fi
 }
 
+_import_hicolor_icon_theme() {
+	mkdir -p AppDir/.junest/usr/share/icons/hicolor
+	rsync -av --inplace --no-whole-file --size-only archlinux/.junest/usr/share/icons/hicolor/* AppDir/.junest/usr/share/icons/hicolor/ 2>/dev/null | printf "◆ Save hicolor icon theme\n"
+}
+
 _remove_more_bloatwares() {
 	for r in $ETC_REMOVED; do rm -Rf AppDir/.junest/etc/"$r"*; done
 	for r in $BIN_REMOVED; do rm -Rf AppDir/.junest/usr/bin/"$r"*; done
@@ -693,6 +698,8 @@ case "$1" in
 		printf -- "\n\n-----------------------------------------------------------------------------\n ATTEMPTS TO REDUCE THE SIZE\n-----------------------------------------------------------------------------\n\n"
 
 		_save_doc_and_locale
+
+		_import_hicolor_icon_theme
 
 		_remove_more_bloatwares
 
