@@ -69,7 +69,7 @@ _junest_setup() {
 
 		# Update arch linux in junest
 		_JUNEST_CMD -- sudo pacman -Syy
-		_JUNEST_CMD -- sudo pacman --noconfirm -Syu
+		_JUNEST_CMD -- sudo pacman --noconfirm -Syu || _JUNEST_CMD -- sudo pacman --noconfirm -Syu --allow-weak-key-signatures
 	else
 		printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
 	fi
