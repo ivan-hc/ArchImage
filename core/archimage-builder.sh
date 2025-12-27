@@ -40,7 +40,6 @@ _junest_setup() {
 			fi
 			_JUNEST_CMD -- sudo pacman --noconfirm -U "$archcn_mirror"/x86_64/"$archcn_key_pkg"
 			printf "\n[archlinuxcn]\n#SigLevel = Never\nServer = $archcn_mirror/\$arch" >> ./.junest/etc/pacman.conf
-			_JUNEST_CMD -- sudo pacman --noconfirm -Sy
 		fi
 
 		# Enable the chaoticaur third-party repository
@@ -50,7 +49,6 @@ _junest_setup() {
 			_JUNEST_CMD -- sudo pacman-key --populate chaotic
 			_JUNEST_CMD -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 			printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
-			_JUNEST_CMD -- sudo pacman --noconfirm -Sy
 		fi
 
 		# Enable multilib
