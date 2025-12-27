@@ -69,7 +69,7 @@ _junest_setup() {
 
 		# Update arch linux in junest
 		_JUNEST_CMD -- sudo pacman -Syy
-		_JUNEST_CMD -- sudo pacman --noconfirm -Syu || _JUNEST_CMD -- sudo pacman --noconfirm -Syu --allow-weak-key-signatures
+		_JUNEST_CMD -- sudo pacman --noconfirm -Syu
 	else
 		printf -- "-----------------------------------------------------------------------------\n RESTART JUNEST\n-----------------------------------------------------------------------------\n"
 	fi
@@ -88,7 +88,7 @@ _install_packages() {
 	if [ -n "$CHAOTICAUR_ON" ]; then JUNEST_AUR_ENABLED="1"; fi
 	if [ -n "$ARCHLINUXCN_ON" ]; then JUNEST_AUR_ENABLED="1"; fi
 	if [ -n "$JUNEST_AUR_ENABLED" ]; then
-		_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
+		_JUNEST_CMD -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF --allow-weak-key-signatures
 	fi
 
 	if [ -n "$BASICSTUFF" ]; then
