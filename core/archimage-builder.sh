@@ -58,10 +58,33 @@ _junest_setup() {
 
 		# Use a custom mirrolist depending on your zone or the usage on github.com
 		COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
+		echo "Country code: $COUNTRY"
 		if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
-			curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS= | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
+			TAKES_COUNT=0
+			while [ "$TAKES_COUNT" -lt 10 ]; do
+				MIRRORLIST=$(curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS=)
+				if [ -z "$MIRRORLIST" ]; then
+					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
+					sleep 5
+				fi
+				TAKES_COUNT=$((TAKES_COUNT + 1))
+			done
 		else
-			curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
+			TAKES_COUNT=0
+			while [ "$TAKES_COUNT" -lt 10 ]; do
+				MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY")
+				if [ -z "$MIRRORLIST" ]; then
+					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
+					sleep 5
+				fi
+				TAKES_COUNT=$((TAKES_COUNT + 1))
+			done
+		fi
+		if [ -z "$MIRRORLIST" ]; then
+			echo " 💀 ERROR: MIRRORLIST IS EMPTY. ABORTED!"
+			exit 1
+		else
+			echo "$MIRRORLIST" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
 		fi
 
 		# Bypass signature check level
