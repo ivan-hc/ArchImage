@@ -25,20 +25,16 @@ _junest_setup() {
 
 		# Enable the archlinuxcn third-party repository
 		if [ "$ARCHLINUXCN_ON" = 1 ]; then
-			archcn_mirrors="https://repo.archlinuxcn.org"
-			archcn_key_pkg=$(curl -Ls "$archcn_mirrors/x86_64" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
-			if [ -z "$archcn_key_pkg" ]; then
-				archlinuxcn_mirrorlist="https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/refs/heads/master/archlinuxcn-mirrorlist"
-				archcn_mirrors=$(curl -Ls "$archlinuxcn_mirrorlist" | tr ' ' '\n' | grep "^https://" | sed 's#/$arch##g')
-				for m in $archcn_mirrors; do
-					if [ -z "$archcn_mirror" ]; then
-						archcn_key_pkg=$(curl -Ls "$m/x86_64" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
-						if [ -n "$archcn_key_pkg" ]; then
-							archcn_mirror="$m"
-						fi
+			archlinuxcn_mirrorlist="https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/refs/heads/master/archlinuxcn-mirrorlist"
+			archcn_mirrors=$(curl -Ls "$archlinuxcn_mirrorlist" | tr ' ' '\n' | grep "^https://" | sed 's#/$arch##g')
+			for m in $archcn_mirrors; do
+				if [ -z "$archcn_mirror" ]; then
+					archcn_key_pkg=$(curl -Ls "$m/x86_64" | tr '"' '\n' | grep "^archlinuxcn-keyring.*zst$" | tail -1)
+					if [ -n "$archcn_key_pkg" ]; then
+						archcn_mirror="$m"
 					fi
-				done
-			fi
+				fi
+			done
 			if [ -z "$archcn_mirror" ]; then
 				exit 0
 			fi
