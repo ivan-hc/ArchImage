@@ -305,9 +305,10 @@ _apprun_nvidia() {
 		   HOST_LIBS=$(/sbin/ldconfig -p)
 		   libnvidia_libs=$(echo "$HOST_LIBS" | grep -i "nvidia\|libcuda" | cut -d ">" -f 2)
 		   libvdpau_nvidia=$(find /usr/lib -type f -name 'libvdpau_nvidia.so*' -print -quit 2>/dev/null | head -1)
+		   libnvidia_vulkan=$(find /usr/lib -type f -name 'libnvidia*vulkan*' -print -quit 2>/dev/null | head -1)
 		   libnv_paths=$(echo "$HOST_LIBS" | grep "libnv" | cut -d ">" -f 2)
 		   for f in $libnv_paths; do strings "${f}" | grep -qi -m 1 "nvidia" && libnv_libs="$libnv_libs ${f}"; done
-		   host_nvidia_libs=$(echo "$libnv_libs $libnvidia_libs $libvdpau_nvidia" | sed 's/ /\n/g' | sort | grep .)
+		   host_nvidia_libs=$(echo "$libnv_libs $libnvidia_libs $libvdpau_nvidia $libnvidia_vulkan" | sed 's/ /\n/g' | sort | grep .)
 		   for n in $host_nvidia_libs; do libname=$(echo "$n" | sed 's:.*/::') && [ ! -f "${JUNEST_LIBS}"/"$libname" ] && cp "$n" "${JUNEST_LIBS}"/; done
 		   libvdpau="${JUNEST_LIBS}/libvdpau_nvidia.so"
 		   [ -f "${libvdpau}"."${nvidia_driver_version}" ] && [ ! -f "${libvdpau}" ] && ln -s "${libvdpau}"."${nvidia_driver_version}" "${libvdpau}"
