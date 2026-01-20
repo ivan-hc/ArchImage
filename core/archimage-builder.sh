@@ -130,7 +130,7 @@ _install_packages() {
 		VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 		# Use debloated packages
 		debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
-		extra_vk_packages="vulkan-asahi vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
+		extra_vk_packages="vulkan-broadcom vulkan-freedreno vulkan-intel vulkan-nouveau vulkan-panfrost vulkan-radeon"
 		extra_packages="ffmpeg gdk-pixbuf2 intel-media-driver librsvg llvm-libs mangohud mesa opus qt6-base $extra_vk_packages"
 		for p in $extra_packages; do
 			if _JUNEST_CMD -- yay -Qs "$p"; then
