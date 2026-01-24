@@ -277,7 +277,7 @@ _apprun_header() {
 	CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 	mkdir -p "$CACHEDIR" || exit 1
 
-	if command -v unshare >/dev/null 2>&1 && ! unshare --user -p /bin/true >/dev/null 2>&1; then
+	if command -v unshare >/dev/null 2>&1 && ! unshare -Urm /bin/true 2>/dev/null; then
 	   echo "JuNest running in proot mode"
 	   PROOT_ON=1
 	   export PATH="$HERE"/.local/share/junest/bin/:"$PATH"
