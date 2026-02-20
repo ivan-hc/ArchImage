@@ -126,7 +126,15 @@ _install_packages() {
 	fi
 	if [ -n "$APP" ]; then
 		_JUNEST_CMD -- yay --noconfirm -S alsa-lib binutils gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
-		_JUNEST_CMD -- yay --noconfirm -S "$APP"
+
+		# If there is a PKGBUILD near the builder, use it, otherwise install from the repositories
+		if [ -f ../PKGBUILD ]; then
+			cp -r ../PKGBUILD ./PKGBUILD
+			_JUNEST_CMD -- makepkg --noconfirm -si
+		else
+			_JUNEST_CMD -- yay --noconfirm -S "$APP"
+		fi
+
 		VERSION="$(_JUNEST_CMD -- yay -Q "$APP" | awk '{print $2; exit}' | sed 's@.*:@@')"
 		# Use debloated packages
 		debloated_soueces="https://github.com/pkgforge-dev/archlinux-pkgs-debloated/releases/download/continuous"
