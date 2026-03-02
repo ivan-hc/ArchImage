@@ -115,7 +115,9 @@ _install_packages() {
 	fi
 
 	if [ -n "$BASICSTUFF" ]; then
-			_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
+		_JUNEST_CMD -- yay --noconfirm -S $BASICSTUFF
+	else
+		_JUNEST_CMD -- yay --noconfirm -S base-devel
 	fi
 	if [ -n "$COMPILERS" ]; then
 		_JUNEST_CMD -- yay --noconfirm -S $COMPILERS
