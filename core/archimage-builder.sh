@@ -3,6 +3,7 @@
 export ARCHIMAGE_VERSION="archimage5.0"
 
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
+if [ -z "$DESKTOP" ]; then export DESKTOP=DUMMY; fi
 
 ##########################################################################################################################################################
 #	DOWNLOAD, INSTALL AND CONFIGURE JUNEST
