@@ -63,7 +63,6 @@ _junest_setup() {
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
 				MIRRORLIST=$(curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS=)
-				wait
 				if [ -z "$MIRRORLIST" ]; then
 					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
 					sleep 5
@@ -74,7 +73,6 @@ _junest_setup() {
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
 				MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY")
-				wait
 				if [ -z "$MIRRORLIST" ]; then
 					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
 					sleep 5
