@@ -71,6 +71,7 @@ _junest_setup() {
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
 			if [ -z "$MIRRORLIST" ]; then
+				printf "\n Running in Github Actions mode forcing US mirrors\n\n"
 				TAKES_COUNT=0
 				while [ "$TAKES_COUNT" -lt 10 ]; do
 					MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=US")
