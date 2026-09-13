@@ -70,6 +70,16 @@ _junest_setup() {
 				fi
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
+			if [ -z "$MIRRORLIST" ]; then
+				while [ "$TAKES_COUNT" -lt 10 ]; do
+					MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=US")
+					if [ -z "$MIRRORLIST" ]; then
+						printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
+						sleep 5
+					fi
+					TAKES_COUNT=$((TAKES_COUNT + 1))
+				done
+			fi
 		else
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
