@@ -58,7 +58,6 @@ _junest_setup() {
 
 		# Use a custom mirrolist depending on your zone or the usage on github.com
 		COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
-		[ "$COUNTRY" = EN ] && COUNTRY=US
 		echo "Country code: $COUNTRY"
 		if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
 			TAKES_COUNT=0
