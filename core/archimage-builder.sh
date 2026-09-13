@@ -93,6 +93,10 @@ _junest_setup() {
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
 		fi
+		# Validate mirrorlist
+		if ! echo "$MIRRORLIST" | grep -q "^#Server ="; then
+			MIRRORLIST=""
+		fi
 		if [ -z "$MIRRORLIST" ]; then
 			echo " 💀 ERROR: MIRRORLIST IS EMPTY. ABORTED!"
 			exit 1
