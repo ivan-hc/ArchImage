@@ -98,6 +98,8 @@ _junest_setup() {
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
 		fi
+		# Show mirrorlist content
+		[ -n "$MIRRORLIST" ] && printf "This will be the content of /etc/pacman.d/mirrorlist:\n\n $MIRRORLIST" && echo ""
 		# Validate mirrorlist
 		if ! echo "$MIRRORLIST" | grep -q "^#Server ="; then
 			MIRRORLIST=""
