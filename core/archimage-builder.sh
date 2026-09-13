@@ -56,6 +56,11 @@ _junest_setup() {
 			printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 		fi
 
+		# Determine curl version
+		echo ""
+		curl --version
+		echo ""
+
 		# Use a custom mirrolist depending on your zone or the usage on github.com
 		COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
 		echo "Country code: $COUNTRY"
