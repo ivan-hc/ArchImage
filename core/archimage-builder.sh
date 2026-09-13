@@ -71,6 +71,7 @@ _junest_setup() {
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
 			if [ -z "$MIRRORLIST" ]; then
+				TAKES_COUNT=0
 				while [ "$TAKES_COUNT" -lt 10 ]; do
 					MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=US")
 					if [ -z "$MIRRORLIST" ]; then
