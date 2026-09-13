@@ -60,6 +60,7 @@ _junest_setup() {
 		COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
 		echo "Country code: $COUNTRY"
 		if [ -n "$GITHUB_REPOSITORY_OWNER" ] || ! curl --output /dev/null --silent --head --fail "https://archlinux.org/mirrorlist/?country=$COUNTRY" 1>/dev/null; then
+			printf "\n Running in Github Actions mode\n\n"
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
 				MIRRORLIST=$(curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS=)
