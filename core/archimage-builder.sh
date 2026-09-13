@@ -56,11 +56,6 @@ _junest_setup() {
 			printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 		fi
 
-		# Determine curl version
-		echo ""
-		curl --version
-		echo ""
-
 		# Use a custom mirrolist depending on your zone or the usage on github.com
 		COUNTRY=$(curl -i ipinfo.io 2>/dev/null | grep country | cut -c 15- | cut -c -2)
 		echo "Country code: $COUNTRY"
@@ -98,14 +93,16 @@ _junest_setup() {
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
 		fi
+
 		# Show mirrorlist content
-		[ -n "$MIRRORLIST" ] && printf "This will be the content of /etc/pacman.d/mirrorlist:\n\n $MIRRORLIST" && echo ""
+		[ -n "$MIRRORLIST" ] && printf -- "-----------------------------------------------------------------------------\nThis will be the content of /etc/pacman.d/mirrorlist:\n\n $MIRRORLIST\n-----------------------------------------------------------------------------\n"
+
 		# Validate mirrorlist
 		if ! echo "$MIRRORLIST" | grep -q "^#Server ="; then
 			MIRRORLIST=""
 		fi
 		if [ -z "$MIRRORLIST" ]; then
-			echo " 💀 ERROR: MIRRORLIST IS EMPTY. ABORTED!"
+			printf -- "-----------------------------------------------------------------------------\n 💀 ERROR: MIRRORLIST IS EMPTY OR INVALID. ABORTED! \n-----------------------------------------------------------------------------\n"
 			exit 1
 		else
 			echo "$MIRRORLIST" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
