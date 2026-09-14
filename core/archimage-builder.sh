@@ -64,18 +64,18 @@ _junest_setup() {
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
 				MIRRORLIST=$(curl -Ls https://archlinux.org/mirrorlist/all | awk NR==2 RS=)
-				if [ -z "$MIRRORLIST" ]; then
+				if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
 					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
 					sleep 5
 				fi
 				TAKES_COUNT=$((TAKES_COUNT + 1))
 			done
-			if [ -z "$MIRRORLIST" ]; then
+			if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
 				printf "\n Running in Github Actions mode forcing US mirrors\n\n"
 				TAKES_COUNT=0
 				while [ "$TAKES_COUNT" -lt 10 ]; do
 					MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=US")
-					if [ -z "$MIRRORLIST" ]; then
+					if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
 						printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
 						sleep 5
 					fi
@@ -86,7 +86,7 @@ _junest_setup() {
 			TAKES_COUNT=0
 			while [ "$TAKES_COUNT" -lt 10 ]; do
 				MIRRORLIST=$(curl -Ls "https://archlinux.org/mirrorlist/?country=$COUNTRY")
-				if [ -z "$MIRRORLIST" ]; then
+				if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
 					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
 					sleep 5
 				fi
@@ -94,17 +94,25 @@ _junest_setup() {
 			done
 		fi
 
-		# Show mirrorlist content
-		[ -n "$MIRRORLIST" ] && printf -- "-----------------------------------------------------------------------------\nThis will be the content of /etc/pacman.d/mirrorlist:\n\n $MIRRORLIST\n-----------------------------------------------------------------------------\n"
-
 		# Validate mirrorlist
-		if ! echo "$MIRRORLIST" | grep -q "^#Server ="; then
-			MIRRORLIST=""
+		if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
+			printf "\n Check mirrorlist from Gitlab\n\n"
+			TAKES_COUNT=0
+			while [ "$TAKES_COUNT" -lt 10 ]; do
+				MIRRORLIST=$(curl -Ls https://gitlab.archlinux.org/archlinux/packaging/packages/pacman-mirrorlist/-/raw/main/mirrorlist | awk NR==2 RS=)
+				if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
+					printf "\n The mirrorlist is empty, attempt %b of 10 will start in 5 seconds...\n\n" "$((TAKES_COUNT + 1))"
+					sleep 5
+				fi
+				TAKES_COUNT=$((TAKES_COUNT + 1))
+			done
 		fi
-		if [ -z "$MIRRORLIST" ]; then
+
+		if ! echo "$MIRRORLIST" | grep -q "^#Server =" || [ -z "$MIRRORLIST" ]; then
 			printf -- "-----------------------------------------------------------------------------\n 💀 ERROR: MIRRORLIST IS EMPTY OR INVALID. ABORTED! \n-----------------------------------------------------------------------------\n"
 			exit 1
 		else
+			printf -- "-----------------------------------------------------------------------------\nThis will be the content of /etc/pacman.d/mirrorlist:\n\n $MIRRORLIST\n-----------------------------------------------------------------------------\n"
 			echo "$MIRRORLIST" | sed 's/#Server/Server/g' > ./.junest/etc/pacman.d/mirrorlist
 		fi
 
