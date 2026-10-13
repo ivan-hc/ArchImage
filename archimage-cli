@@ -29,9 +29,12 @@ less() {
 
 # XDG Variables
 SCRIPTDIR="${SCRIPTDIR:-$(xdg-user-dir DESKTOP 2>/dev/null)}"
+printf "$DIVIDING_LINE"
 if [ ! -d "$SCRIPTDIR" ]; then
 	echo "◆ No \"XDG DESKTOP\" directory found, scripts will be saved in \"$PWD\"" | _fit
 	SCRIPTDIR="$PWD"
+else
+	echo "◆ Scripts will be saved in \"$SCRIPTDIR\"" | _fit
 fi
 
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
