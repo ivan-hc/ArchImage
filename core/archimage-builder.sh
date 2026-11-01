@@ -718,6 +718,21 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 }
 
 ##########################################################################################################################################################
+#	USE APPIMAGETOOL TO EXPORT AN APPDIR TO AN APPIMAGE
+##########################################################################################################################################################
+
+_appimagetool() {
+	if ! command -v appimagetool 1>/dev/null; then
+		if [ ! -f ./appimagetool ]; then
+			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/ivan-hc/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
+		fi
+		./appimagetool "$@"
+	else
+		appimagetool "$@"
+	fi
+}
+
+##########################################################################################################################################################
 #	USAGE
 ##########################################################################################################################################################
 
