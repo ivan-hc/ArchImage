@@ -123,15 +123,6 @@ UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.z
 
 echo "$VERSION" > ./version
 
-_appimagetool() {
-	if ! command -v appimagetool 1>/dev/null; then
-		if [ ! -f ./appimagetool ]; then
-			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
-		fi
-		./appimagetool "$@"
-	else
-		appimagetool "$@"
-	fi
-}
+[ -f ./archimage-builder.sh ] && source ./archimage-builder.sh
 
 ARCH=x86_64 _appimagetool -u "$UPINFO" AppDir "$APPNAME"_"$VERSION"-"$ARCHIMAGE_VERSION"-x86_64.AppImage
