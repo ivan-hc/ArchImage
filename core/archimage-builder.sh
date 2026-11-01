@@ -724,7 +724,14 @@ _enable_mountpoints_for_the_inbuilt_bubblewrap() {
 _appimagetool() {
 	if ! command -v appimagetool 1>/dev/null; then
 		if [ ! -f ./appimagetool ]; then
-			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/ivan-hc/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
+			echo " Downloading appimagetool..."
+			if [ "$APP" = bottles ]; then
+				appimagetool_repo_ref="https://github.com/pkgforge-dev/appimagetool-uruntime"
+			else
+				appimagetool_repo_ref="https://github.com/ivan-hc/appimagetool"
+			fi
+			echo " Downloading appimagetool from $appimagetool_repo_ref ..."
+			curl -#Lo appimagetool "$appimagetool_repo_ref"/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
 		fi
 		./appimagetool "$@"
 	else
