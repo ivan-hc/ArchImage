@@ -167,7 +167,7 @@ _install_packages() {
 		done
 	fi
 	if [ -n "$APP" ]; then
-		_JUNEST_CMD -- yay --noconfirm -S alsa-lib binutils gtk3 hicolor-icon-theme xapp xdg-utils xorg-server-xvfb
+		_JUNEST_CMD -- yay --noconfirm -S alsa-lib binutils gtk3 hicolor-icon-theme tar xapp xdg-utils xorg-server-xvfb
 
 		# If there is a PKGBUILD near the builder, use it, otherwise install from the repositories
 		if [ -f ../PKGBUILD ]; then
